@@ -1,0 +1,202 @@
+{
+  "hope_schema_version": "1.0",
+  "created_at": "2026-05-06T22:00:00Z",
+  "updated_at": "2026-05-06T22:00:00Z",
+  "user_id": "person:jane-doe-fictional",
+  "nodes": {
+    "Person": [
+      {
+        "type": "Person",
+        "user_id": "person:jane-doe-fictional",
+        "name": "Jane Doe",
+        "email": "jane.doe@example.com",
+        "headline": "Senior Product Designer · Type & Systems",
+        "summary": "Product designer with 9 years across B2B SaaS, focused on design systems and developer-facing tools. Led the Figma design-system consolidation across 12 product teams.",
+        "location": "Brooklyn, NY",
+        "linkedin": "https://linkedin.com/in/janedoe-fictional",
+        "created_at": "2026-05-06T22:00:00Z",
+        "updated_at": "2026-05-06T22:00:00Z"
+      }
+    ],
+    "Skill": [
+      {"type": "Skill", "name": "design systems", "category": "design", "level": "advanced", "years": 6, "confidence": 0.92, "market_demand": "high", "source": "document", "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"},
+      {"type": "Skill", "name": "typography", "category": "design", "level": "advanced", "years": 9, "confidence": 0.95, "market_demand": "medium", "source": "document", "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"},
+      {"type": "Skill", "name": "component architecture", "category": "design", "level": "advanced", "years": 5, "confidence": 0.88, "market_demand": "high", "source": "document", "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"},
+      {"type": "Skill", "name": "stakeholder management", "category": "soft", "level": "advanced", "years": 6, "confidence": 0.85, "market_demand": "high", "source": "document", "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"},
+      {"type": "Skill", "name": "systems thinking", "category": "methodology", "level": "advanced", "years": 6, "confidence": 0.85, "market_demand": "high", "source": "document", "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"},
+      {"type": "Skill", "name": "mobile design", "category": "design", "level": "intermediate", "years": 3, "confidence": 0.78, "market_demand": "medium", "source": "document", "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"},
+      {"type": "Skill", "name": "brand identity", "category": "design", "level": "intermediate", "years": 4, "confidence": 0.80, "market_demand": "medium", "source": "document", "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"}
+    ],
+    "Experience": [
+      {
+        "type": "Experience",
+        "id": "exp:jane-doe:figma:senior-product-designer:2022",
+        "title": "Senior Product Designer",
+        "description": "Leading design systems work and component governance.",
+        "start_date": "2022-09-01",
+        "end_date": null,
+        "is_current": true,
+        "responsibilities": ["Lead design systems work", "Component governance", "Mentor junior designers"],
+        "achievements": ["37% design-system adoption across 12 teams", "Onboarding time 3 weeks to 1 week"],
+        "contributions": [
+          {
+            "situation": "Figma's design system was fragmenting across 12 product teams",
+            "task": "Lead the consolidation effort",
+            "action": "Designed governance model, ran RFC process, shipped unified components",
+            "result": "37% surface-area unification in 8 months; onboarding time dropped from 3 weeks to 1",
+            "metric": {"value": "37%", "of": "design system adoption across product teams"},
+            "skills_applied": ["design systems", "stakeholder management", "systems thinking", "component architecture"],
+            "skills_categories": ["design", "soft", "methodology"],
+            "scope": "company-wide",
+            "domain": "B2B SaaS / developer tools",
+            "competencies": ["systems thinking", "stakeholder alignment", "governance design"]
+          }
+        ],
+        "confidence": 0.95,
+        "source": "document",
+        "created_at": "2026-05-06T22:00:00Z",
+        "updated_at": "2026-05-06T22:00:00Z"
+      },
+      {
+        "type": "Experience",
+        "id": "exp:jane-doe:linear:product-designer:2019",
+        "title": "Product Designer",
+        "description": "Keyboard-first product design.",
+        "start_date": "2019-03-01",
+        "end_date": "2022-08-15",
+        "is_current": false,
+        "responsibilities": ["Design command-palette UX", "Mobile app design language"],
+        "achievements": ["18% retention bump from command palette", "Mobile app shipped zero rework"],
+        "contributions": [
+          {
+            "situation": "Linear users wanted a faster way to navigate",
+            "task": "Design and ship a keyboard-first command palette",
+            "action": "Defined interaction model, prototyped, ran usability rounds, shipped",
+            "result": "Power-user retention up 18% in adopting cohort",
+            "metric": {"value": "18%", "of": "power-user retention bump"},
+            "skills_applied": ["typography", "command-line UI", "keyboard interaction"],
+            "skills_categories": ["design"],
+            "scope": "product-wide",
+            "domain": "developer tools",
+            "competencies": ["interaction design", "prototyping"]
+          }
+        ],
+        "confidence": 0.90,
+        "source": "document",
+        "created_at": "2026-05-06T22:00:00Z",
+        "updated_at": "2026-05-06T22:00:00Z"
+      }
+    ],
+    "Education": [
+      {
+        "type": "Education",
+        "id": "edu:jane-doe:risd:bfa-graphic-design:2013",
+        "institution": "Rhode Island School of Design",
+        "degree": "BFA",
+        "field_of_study": "Graphic Design",
+        "start_date": "2013-09-01",
+        "end_date": "2017-05-30",
+        "confidence": 0.95,
+        "source": "document",
+        "created_at": "2026-05-06T22:00:00Z",
+        "updated_at": "2026-05-06T22:00:00Z"
+      }
+    ],
+    "Certification": [
+      {
+        "type": "Certification",
+        "id": "cert:jane-doe:cooper-design-leadership:2023",
+        "name": "Cooper Design Leadership Certificate",
+        "issuer": "Cooper",
+        "issue_date": "2023-06-15",
+        "confidence": 0.90,
+        "source": "document",
+        "created_at": "2026-05-06T22:00:00Z",
+        "updated_at": "2026-05-06T22:00:00Z"
+      }
+    ],
+    "Project": [
+      {
+        "type": "Project",
+        "id": "proj:jane-doe:typebook:2024",
+        "name": "Typebook",
+        "description": "Self-published 200-page book on typography in software interfaces.",
+        "start_date": "2023-08-01",
+        "end_date": "2024-04-30",
+        "achievements": ["2,400 copies sold in Q1"],
+        "confidence": 0.92,
+        "source": "document",
+        "created_at": "2026-05-06T22:00:00Z",
+        "updated_at": "2026-05-06T22:00:00Z"
+      }
+    ],
+    "JobPosting": [],
+    "Company": [
+      {"type": "Company", "canonical_id": "company:figma-com", "name": "Figma", "domain": "figma.com", "is_enriched": false, "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"},
+      {"type": "Company", "canonical_id": "company:linear-app", "name": "Linear", "domain": "linear.app", "is_enriched": false, "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"},
+      {"type": "Company", "canonical_id": "company:risd-edu", "name": "Rhode Island School of Design", "domain": "risd.edu", "is_enriched": false, "created_at": "2026-05-06T22:00:00Z", "updated_at": "2026-05-06T22:00:00Z"}
+    ],
+    "Memory": [
+      {
+        "type": "Memory",
+        "id": "mem:jane-doe:travel-constraint",
+        "topic": "travel-constraint",
+        "content": "Has a young child; unable to travel more than 25% for work.",
+        "category": "constraint",
+        "importance": 0.92,
+        "extracted_at": "2026-05-06T22:00:00Z",
+        "created_at": "2026-05-06T22:00:00Z",
+        "updated_at": "2026-05-06T22:00:00Z"
+      },
+      {
+        "type": "Memory",
+        "id": "mem:jane-doe:role-target",
+        "topic": "role-target",
+        "content": "Looking for Senior IC role at AI-first or design-mature company. Hybrid OK; SF / NYC / remote acceptable.",
+        "category": "aspiration",
+        "importance": 0.95,
+        "extracted_at": "2026-05-06T22:00:00Z",
+        "created_at": "2026-05-06T22:00:00Z",
+        "updated_at": "2026-05-06T22:00:00Z"
+      }
+    ],
+    "Document": [],
+    "CuratedPortfolio": [],
+    "Application": [],
+    "Interview": [],
+    "Offer": [],
+    "Connection": []
+  },
+  "edges": [
+    {"from": "person:jane-doe-fictional", "to": "design systems", "type": "HAS_SKILL", "level": "advanced", "years": 6, "confidence": 0.92, "source": "document"},
+    {"from": "person:jane-doe-fictional", "to": "typography", "type": "HAS_SKILL", "level": "advanced", "years": 9, "confidence": 0.95, "source": "document"},
+    {"from": "person:jane-doe-fictional", "to": "component architecture", "type": "HAS_SKILL", "level": "advanced", "years": 5, "confidence": 0.88, "source": "document"},
+    {"from": "person:jane-doe-fictional", "to": "stakeholder management", "type": "HAS_SKILL", "level": "advanced", "years": 6, "confidence": 0.85, "source": "document"},
+    {"from": "person:jane-doe-fictional", "to": "systems thinking", "type": "HAS_SKILL", "level": "advanced", "years": 6, "confidence": 0.85, "source": "document"},
+    {"from": "person:jane-doe-fictional", "to": "mobile design", "type": "HAS_SKILL", "level": "intermediate", "years": 3, "confidence": 0.78, "source": "document"},
+    {"from": "person:jane-doe-fictional", "to": "brand identity", "type": "HAS_SKILL", "level": "intermediate", "years": 4, "confidence": 0.80, "source": "document"},
+
+    {"from": "person:jane-doe-fictional", "to": "exp:jane-doe:figma:senior-product-designer:2022", "type": "HAS_EXPERIENCE"},
+    {"from": "person:jane-doe-fictional", "to": "exp:jane-doe:linear:product-designer:2019", "type": "HAS_EXPERIENCE"},
+
+    {"from": "exp:jane-doe:figma:senior-product-designer:2022", "to": "company:figma-com", "type": "AT_COMPANY"},
+    {"from": "exp:jane-doe:linear:product-designer:2019", "to": "company:linear-app", "type": "AT_COMPANY"},
+
+    {"from": "exp:jane-doe:figma:senior-product-designer:2022", "to": "design systems", "type": "USED_SKILL", "context": "led consolidation"},
+    {"from": "exp:jane-doe:figma:senior-product-designer:2022", "to": "stakeholder management", "type": "USED_SKILL", "context": "12 product teams"},
+    {"from": "exp:jane-doe:figma:senior-product-designer:2022", "to": "systems thinking", "type": "USED_SKILL"},
+    {"from": "exp:jane-doe:figma:senior-product-designer:2022", "to": "component architecture", "type": "USED_SKILL"},
+    {"from": "exp:jane-doe:linear:product-designer:2019", "to": "typography", "type": "USED_SKILL"},
+    {"from": "exp:jane-doe:linear:product-designer:2019", "to": "mobile design", "type": "USED_SKILL"},
+
+    {"from": "person:jane-doe-fictional", "to": "edu:jane-doe:risd:bfa-graphic-design:2013", "type": "HAS_EDUCATION"},
+    {"from": "edu:jane-doe:risd:bfa-graphic-design:2013", "to": "company:risd-edu", "type": "AT_INSTITUTION"},
+
+    {"from": "person:jane-doe-fictional", "to": "cert:jane-doe:cooper-design-leadership:2023", "type": "HAS_CERTIFICATION"},
+    {"from": "person:jane-doe-fictional", "to": "proj:jane-doe:typebook:2024", "type": "HAS_PROJECT"},
+    {"from": "proj:jane-doe:typebook:2024", "to": "typography", "type": "USED_SKILL"},
+
+    {"from": "person:jane-doe-fictional", "to": "mem:jane-doe:travel-constraint", "type": "HAS_MEMORY"},
+    {"from": "person:jane-doe-fictional", "to": "mem:jane-doe:role-target", "type": "HAS_MEMORY"}
+  ]
+}

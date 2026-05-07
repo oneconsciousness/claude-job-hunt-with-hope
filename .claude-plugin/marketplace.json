@@ -1,0 +1,15 @@
+{
+  "name": "hope",
+  "owner": "hope-contributors",
+  "description": "Hope — a Claude plugin for the job hunt. Onboarding to offer, in milestones.",
+  "plugins": [
+    {
+      "name": "hope",
+      "description": "Turn the job hunt into a journey of milestones. Generate portfolios, dashboards, tailored résumés, cover letters, interview prep, and outreach — all from a personal career graph stored on your machine.",
+      "version": "0.1.0",
+      "source": ".",
+      "license": "MIT",
+      "tags": ["career", "job-search", "portfolio", "resume", "interview"]
+    }
+  ]
+}

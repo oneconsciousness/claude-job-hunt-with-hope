@@ -1,0 +1,46 @@
+# Hope plugin .gitignore
+
+# ─── User runtime data (never committed) ──────────────────────────
+~/Hope/career-graph/
+career.json
+.hope-meta.json
+
+# ─── Internal contributor & governance docs (kept local) ──────────
+CONTRIBUTING.md
+CLAUDE.md
+references/design-cookbook.md
+references/design-system.md
+
+# ─── Internal session / planning / audit artifacts ────────────────
+tasks/
+_ground-truth-*.html
+
+# ─── Agent infrastructure (local Claude Code config + hooks) ──────
+.claude/
+
+# ─── OS files ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Editors / IDEs ───────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── Python ───────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# ─── Logs ─────────────────────────────────────────────────────────
+*.log
+
+# ─── Secrets / credentials (defense in depth) ─────────────────────
+.env
+.env.*
+*.pem
+*.key
+credentials.*
+secrets.*

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{{PERSON_NAME}} — Cover Letter · {{TARGET_COMPANY}}</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --void: #06080E; --glass: rgba(14,20,32,0.85);
+    --text-primary: #E8ECF4; --text-secondary: #8B94A8; --text-muted: #747D9B; --text-dim: #556086;
+    --accent-cyan: #00D4FF;
+    --border-default: rgba(255,255,255,0.07); --card-bg: rgba(20,24,36,0.55);
+    --grid-line: rgba(255,255,255,0.025);
+    --bg-radial-1: radial-gradient(circle at 12% 8%, rgba(0,212,255,0.08), transparent 40%);
+    --bg-radial-2: radial-gradient(circle at 88% 92%, rgba(167,139,250,0.06), transparent 45%);
+    --radius-pill: 9999px;
+    --font-sans: "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  [data-theme="light"] {
+    --void: #F5F0E8; --glass: rgba(255,252,247,0.75);
+    --text-primary: #1F1B16; --text-secondary: #5C544A; --text-muted: #8C857A; --text-dim: #B5AC9E;
+    --accent-cyan: #0099BB;
+    --border-default: rgba(31,27,22,0.10); --card-bg: rgba(255,252,247,0.70);
+    --grid-line: rgba(31,27,22,0.03);
+    --bg-radial-1: radial-gradient(circle at 12% 8%, rgba(0,153,187,0.10), transparent 40%);
+    --bg-radial-2: radial-gradient(circle at 88% 92%, rgba(124,58,237,0.08), transparent 45%);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-radial-1), var(--bg-radial-2), var(--void);
+    color: var(--text-primary); line-height: 1.7; font-size: 16px;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 60px 40px; position: relative; z-index: 1; }
+  .theme-toggle {
+    position: absolute; top: 20px; right: 20px;
+    width: 34px; height: 34px; border-radius: var(--radius-pill);
+    background: var(--card-bg); border: 1px solid var(--border-default);
+    color: var(--text-secondary); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; z-index: 2;
+  }
+  .theme-toggle:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle .icon-moon { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: block; }
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 11px; letter-spacing: 0.06em;
+    color: var(--text-muted); margin-bottom: 28px;
+  }
+  .meta .row { margin-bottom: 4px; }
+  .meta .key { color: var(--text-dim); display: inline-block; width: 60px; }
+  .body p { margin: 0 0 18px; color: var(--text-primary); }
+  .signature {
+    margin-top: 32px;
+    color: var(--text-secondary);
+  }
+  .footer {
+    margin-top: 48px; padding-top: 16px;
+    border-top: 1px solid var(--border-default);
+    color: var(--text-dim); font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.04em; text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+  </button>
+
+  <div class="meta">
+    <div class="row"><span class="key">From:</span> {{PERSON_NAME}} · {{EMAIL}}</div>
+    <div class="row"><span class="key">To:</span> {{COMPANY}} · {{ROLE}}</div>
+    <div class="row"><span class="key">Date:</span> {{DATE}}</div>
+  </div>
+
+  <div class="body">
+    <p>{{PARAGRAPH_1_SPECIFIC_MOMENT}}</p>
+    <p>{{PARAGRAPH_2_WHAT_YOU_DID_WITH_METRIC}}</p>
+    <p>{{PARAGRAPH_3_INVITATION}}</p>
+  </div>
+
+  <div class="signature">— {{PERSON_NAME}}</div>
+
+  <div class="footer">Cover letter for {{TARGET_COMPANY}} · drafted with Hope</div>
+</div>
+
+<script>
+  function applyTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    try { localStorage.setItem('hope-cover-letter-theme', t); } catch (e) {}
+  }
+  let saved = 'dark';
+  try { const s = localStorage.getItem('hope-cover-letter-theme'); if (s === 'light' || s === 'dark') saved = s; } catch (e) {}
+  applyTheme(saved);
+  const b = document.getElementById('theme-toggle');
+  if (b) b.addEventListener('click', () => {
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+</script>
+</body>
+</html>

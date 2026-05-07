@@ -1,0 +1,24 @@
+{
+  "hope_schema_version": "1.0",
+  "created_at": "REPLACE_AT_INIT",
+  "updated_at": "REPLACE_AT_INIT",
+  "user_id": "REPLACE_AT_INIT",
+  "nodes": {
+    "Person": [],
+    "Skill": [],
+    "Experience": [],
+    "Education": [],
+    "Certification": [],
+    "Project": [],
+    "JobPosting": [],
+    "Company": [],
+    "Memory": [],
+    "Document": [],
+    "CuratedPortfolio": [],
+    "Application": [],
+    "Interview": [],
+    "Offer": [],
+    "Connection": []
+  },
+  "edges": []
+}

@@ -1,0 +1,64 @@
+Jane Doe
+Senior Product Designer · Type & Systems
+Brooklyn, NY · jane.doe@example.com · linkedin.com/in/janedoe-fictional
+
+SUMMARY
+Product designer with 9 years across B2B SaaS, focused on design systems and developer-facing
+tools. Led the Figma design-system consolidation across 12 product teams. Comfortable in
+ambiguous product framing and stakeholder-heavy environments.
+
+EXPERIENCE
+
+Senior Product Designer · Figma
+2022 – Present
+- Led the consolidation of Figma's internal design system across 12 product teams. Achieved
+  37% surface-area unification in 8 months. Onboarding time for new designers dropped from
+  3 weeks to 1.
+- Designed the new component governance model adopted across the design org. Includes RFC
+  flow, voting mechanism, and deprecation calendar.
+- Mentored 4 junior designers; 2 promoted to mid-level within the year.
+- Skills used: design systems, typography, component architecture, stakeholder management,
+  systems thinking, RFC writing, governance design.
+
+Product Designer · Linear
+2019 – 2022
+- Designed Linear's keyboard-first command palette (still in production). Increased power-user
+  retention by 18% in the cohort that adopted it.
+- Owned the design language for Linear's mobile app launch in 2021. Shipped on time with
+  zero designer reworks during dev integration.
+- Skills used: command-line UI, keyboard interaction, mobile design, design language,
+  typography.
+
+Independent Designer · Various clients
+2017 – 2019
+- Worked with 8 early-stage startups on brand identity, product UX, and onboarding flows.
+  Notable: shipped onboarding redesign for a fintech client that improved D1 activation
+  from 34% to 51%.
+- Skills used: brand identity, onboarding design, fintech UX, conversion optimization.
+
+EDUCATION
+
+Rhode Island School of Design
+BFA, Graphic Design · 2013 – 2017
+
+PROJECTS
+
+Typebook (2024)
+A self-published 200-page book on the use of typography in software interfaces. Sold 2,400
+copies in the first quarter via independent design bookstores.
+- Skills used: typography, editorial design, publishing.
+
+Linear Keyboard Palette (open-source community fork, 2022)
+After leaving Linear, contributed a community-driven keyboard palette pattern that's been
+adopted by 15+ open-source apps.
+- Skills used: keyboard interaction, command-line UI, open-source design.
+
+CERTIFICATIONS
+- Cooper Design Leadership Certificate, 2023
+
+SKILLS
+Design: typography, design systems, component architecture, mobile design, brand identity,
+editorial design
+Methodology: systems thinking, governance design, RFC writing, design language work
+Domain: B2B SaaS, developer tools, fintech
+Soft: stakeholder management, mentorship, cross-functional collaboration

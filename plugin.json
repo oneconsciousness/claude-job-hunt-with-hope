@@ -1,0 +1,40 @@
+{
+  "name": "hope",
+  "version": "0.1.0",
+  "description": "A Claude plugin that turns the job hunt into a journey of milestones — onboarding, discovery, presentation, application, interview, negotiation, decision. For anyone seeking work. Built while job-hunting; the only thing the maker has submitted with it — a Hope-generated portfolio — is getting interview calls.",
+  "author": {
+    "name": "Hope contributors",
+    "url": "https://github.com/<owner>/claude-job-hunt-with-hope"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/<owner>/claude-job-hunt-with-hope",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<owner>/claude-job-hunt-with-hope.git"
+  },
+  "keywords": [
+    "career",
+    "job-search",
+    "portfolio",
+    "resume",
+    "interview-prep",
+    "milestones",
+    "anthropic",
+    "claude",
+    "skill",
+    "plugin"
+  ],
+  "skills": [
+    "skills/hope",
+    "skills/onboarding",
+    "skills/discovery",
+    "skills/portfolio",
+    "skills/resume-tailor",
+    "skills/cover-letter",
+    "skills/application",
+    "skills/interview",
+    "skills/negotiation",
+    "skills/decision",
+    "skills/dashboard"
+  ]
+}

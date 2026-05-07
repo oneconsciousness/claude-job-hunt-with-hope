@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{{PERSON_NAME}} — Résumé · {{TARGET_COMPANY}}</title>
+<style>
+  /* Hope design tokens — same as portfolio.html. Trim version below. */
+  :root {
+    color-scheme: light dark;
+    --void: #06080E; --surface: #0C1019; --glass: rgba(14,20,32,0.85);
+    --text-primary: #E8ECF4; --text-secondary: #8B94A8; --text-muted: #747D9B; --text-dim: #556086;
+    --accent-cyan: #00D4FF; --accent-emerald: #10B981;
+    --border-default: rgba(255,255,255,0.07); --card-bg: rgba(20,24,36,0.55);
+    --grid-line: rgba(255,255,255,0.025);
+    --bg-radial-1: radial-gradient(circle at 12% 8%, rgba(0,212,255,0.08), transparent 40%);
+    --bg-radial-2: radial-gradient(circle at 88% 92%, rgba(167,139,250,0.06), transparent 45%);
+    --glow-cyan: 0 0 30px rgba(100,180,255,0.10);
+    --radius-card: 1rem; --radius-pill: 9999px;
+    --font-sans: "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  [data-theme="light"] {
+    --void: #F5F0E8; --surface: #FBF7F0; --glass: rgba(255,252,247,0.75);
+    --text-primary: #1F1B16; --text-secondary: #5C544A; --text-muted: #8C857A; --text-dim: #B5AC9E;
+    --accent-cyan: #0099BB; --accent-emerald: #059669;
+    --border-default: rgba(31,27,22,0.10); --card-bg: rgba(255,252,247,0.70);
+    --grid-line: rgba(31,27,22,0.03);
+    --bg-radial-1: radial-gradient(circle at 12% 8%, rgba(0,153,187,0.10), transparent 40%);
+    --bg-radial-2: radial-gradient(circle at 88% 92%, rgba(124,58,237,0.08), transparent 45%);
+    --glow-cyan: 0 0 30px rgba(0,153,187,0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-radial-1), var(--bg-radial-2), var(--void);
+    color: var(--text-primary); line-height: 1.55; font-size: 14.5px;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 40px 32px 64px; position: relative; z-index: 1; }
+  .theme-toggle {
+    position: absolute; top: 20px; right: 20px;
+    width: 34px; height: 34px; border-radius: var(--radius-pill);
+    background: var(--card-bg); border: 1px solid var(--border-default);
+    color: var(--text-secondary); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; z-index: 2;
+  }
+  .theme-toggle:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+  .theme-toggle .icon-moon { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: block; }
+
+  .header {
+    border-bottom: 1px solid var(--border-default);
+    padding-bottom: 20px; margin-bottom: 28px;
+  }
+  .header h1 {
+    margin: 0 0 4px; font-size: 28px; font-weight: 600;
+    letter-spacing: -0.02em; color: var(--text-primary);
+  }
+  .header .headline { color: var(--accent-cyan); font-size: 15px; margin-bottom: 8px; }
+  .header .meta {
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .header .meta a { color: var(--accent-cyan); text-decoration: none; }
+  h2 {
+    font-size: 11px; margin: 28px 0 12px; font-weight: 500;
+    font-family: var(--font-mono); letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent-cyan); opacity: 0.85;
+  }
+  .role {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-default);
+  }
+  .role:last-child { border-bottom: none; }
+  .role-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    flex-wrap: wrap; gap: 8px; margin-bottom: 4px;
+  }
+  .role-title { font-weight: 600; color: var(--text-primary); font-size: 15px; }
+  .role-company { color: var(--accent-cyan); }
+  .role-dates {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-muted); letter-spacing: 0.04em;
+  }
+  .role ul {
+    margin: 8px 0 0; padding-left: 18px;
+    color: var(--text-secondary); font-size: 13.5px;
+  }
+  .role li { margin-bottom: 4px; }
+  .skills-line {
+    margin-top: 6px;
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-muted); letter-spacing: 0.04em;
+  }
+  .skills-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px 16px;
+  }
+  .skills-grid .cat-name {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 4px;
+  }
+  .skills-grid .cat-list { color: var(--text-secondary); font-size: 13px; }
+  .footer {
+    margin-top: 48px; padding-top: 16px;
+    border-top: 1px solid var(--border-default);
+    color: var(--text-dim); font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.04em; text-align: center;
+  }
+  @media print {
+    body { background: white !important; color: black !important; }
+    body::before { display: none; }
+    .theme-toggle { display: none; }
+    .wrap { padding: 0; }
+    a { color: black; }
+    .header h1, .role-title { color: black; }
+    .role-company, .header .headline { color: #006D87; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+  </button>
+
+  <header class="header">
+    <h1>{{PERSON_NAME}}</h1>
+    <div class="headline">{{HEADLINE}}</div>
+    <div class="meta">
+      <span>{{LOCATION}}</span>
+      <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
+      <a href="{{LINKEDIN_URL}}">{{LINKEDIN_HANDLE}}</a>
+    </div>
+  </header>
+
+  <h2>Summary</h2>
+  <p style="color: var(--text-secondary); font-size: 14px; margin: 0 0 8px;">{{SUMMARY}}</p>
+
+  <h2>Experience</h2>
+  <!-- Repeat .role for each Experience -->
+  <div class="role">
+    <div class="role-row">
+      <div><span class="role-title">{{ROLE_TITLE}}</span> · <span class="role-company">{{COMPANY}}</span></div>
+      <div class="role-dates">{{START_DATE}} — {{END_DATE_OR_PRESENT}}</div>
+    </div>
+    <ul>
+      <li>{{BULLET_1}}</li>
+      <li>{{BULLET_2}}</li>
+      <li>{{BULLET_3}}</li>
+    </ul>
+    <div class="skills-line">{{SKILLS_LIST}}</div>
+  </div>
+
+  <h2>Projects</h2>
+  <!-- Repeat .role for each Project -->
+
+  <h2>Skills</h2>
+  <div class="skills-grid">
+    <!-- Repeat per category -->
+    <div>
+      <div class="cat-name">{{CATEGORY}}</div>
+      <div class="cat-list">{{SKILLS_IN_CATEGORY}}</div>
+    </div>
+  </div>
+
+  <h2>Education</h2>
+  <!-- Repeat .role for each Education -->
+
+  <div class="footer">{{PERSON_NAME}} · résumé tailored for {{TARGET_COMPANY}} · {{DATE}}</div>
+</div>
+
+<script>
+  function applyTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    try { localStorage.setItem('hope-resume-theme', t); } catch (e) {}
+  }
+  let saved = 'dark';
+  try { const s = localStorage.getItem('hope-resume-theme'); if (s === 'light' || s === 'dark') saved = s; } catch (e) {}
+  applyTheme(saved);
+  const b = document.getElementById('theme-toggle');
+  if (b) b.addEventListener('click', () => {
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+</script>
+</body>
+</html>
