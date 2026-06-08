@@ -1,150 +1,133 @@
 # Hope
 
-> A Claude plugin for the job hunt. Onboarding to offer, in milestones.
+> A free helper for your job hunt. You add it to Claude.
 
-I built Hope while job-hunting. The only thing I've ever submitted with it — my portfolio — is getting interview calls.
+Free · open-source (MIT) · your data stays on your machine · works in Claude Code, Cowork, and claude.ai.
 
-Companies are increasingly hiring for people who can talk to AI. Hope helps you talk to AI about the most important conversation of your career: where you go next.
+I built Hope while job-hunting. The one thing I've submitted with it — my portfolio — is getting interview calls.
 
-> **License:** MIT · **Status:** v0.1 — early. Use it. Tell me what's broken.
-> **Requires:** Claude Pro / Max / Team / Enterprise plan. Works in Claude Cowork (desktop), Claude Code (terminal), and Claude.ai (web upload).
+> **v0.1 — early.** Use it. Tell me what's broken.
 
 ---
 
 ## What Hope is
 
-Most job-search tools help you apply to more places. Hope helps you make one thing — a portfolio so well-presented that one application is enough.
+Claude is an AI assistant. A plugin adds new skills to it. Hope is a plugin for Claude.
 
-Hope is structured around **milestones**, not pipelines. Pipelines are item-centric — jobs flow through evaluation, application, tracking. Milestones are seeker-centric — *you* progress through achievements: I have a portfolio. I am interview-ready. I have offers.
+Hope helps you with your job hunt. It does not look for job listings. It helps you with everything after you find one — how you **present yourself**, and how you **apply well**.
 
-This is the difference between being processed and being met.
+## What you make
 
-## What you get
+A portfolio is a small website about your work. Hope builds one from your own facts. It looks **designed**, not like a form.
 
-Eleven Claude skills, organized around seven milestones plus a cross-cutting dashboard:
+Then Hope can put it online. GitHub Pages is a free place to host a small website. Hope publishes your portfolio there, on a page **you own**. You get **one link to share** — in an application, on LinkedIn, in an email.
 
-| Milestone | What it does | Skills |
+<!-- IMAGE: portfolio-hero — see tasks/readme-image-prompts/ for the generation prompt -->
+![A finished Hope portfolio website, shown in its light theme and its dark theme side by side](assets/readme/portfolio-hero.png)
+
+<!-- IMAGE: publish-flow — see tasks/readme-image-prompts/ for the generation prompt -->
+![Three steps left to right: your career.json file, the designed portfolio site, and a web link you own](assets/readme/publish-flow.png)
+
+## Who Hope is for
+
+Anyone looking for work. Hope is for job seekers, not recruiters.
+
+## The steps of a job hunt
+
+Hope breaks the hunt into steps. You move through them at your own pace.
+
+| Step | What it does | Skill |
 |---|---|---|
-| 1 · Onboarding | Meet you as a person — work, ambitions, constraints. Build the foundational career graph. | `onboarding` |
-| 2 · Discovery | Find roles worth pursuing. Pattern-match opportunities to who you are. | `discovery` |
-| 3 · Presentation | The signature. Portfolio, tailored résumé, cover letter — in Hope's design language. | `portfolio` · `resume-tailor` · `cover-letter` |
-| 4 · Application | Submit. With hard guardrails on Computer Use auto-fill: confirm-before-submit, no exceptions. | `application` |
-| 5 · Interview | Prep, rehearsal, research, post-interview reflection. | `interview` |
-| 6 · Negotiation | Comp benchmarking, scripts, evaluate competing offers. | `negotiation` |
-| 7 · Decision | Close out — accept, decline gracefully, follow up, reflect. | `decision` |
-| Cross-cut | The pulse of the hunt. Glanceable visualization across every milestone. | `dashboard` |
+| Onboarding | Gets to know you and your work | `onboarding` |
+| Discovery | Helps you weigh roles worth chasing | `discovery` |
+| Portfolio | Builds your portfolio website | `portfolio` |
+| Publish | Puts it online on a page you own | `publish` |
+| Resume | Tailors your resume to a role | `resume-tailor` |
+| Cover letter | Writes a plain, honest cover letter | `cover-letter` |
+| Application | Helps you apply, asks before submitting | `application` |
+| Interview | Preps you and helps you reflect after | `interview` |
+| Negotiation | Helps you read and answer an offer | `negotiation` |
+| Decision | Helps you accept or decline with grace | `decision` |
+| Dashboard | Shows where you are, at a glance | `dashboard` |
 
-Plus a meta-orchestrator (`hope`) that figures out where you are and routes you to the right skill.
+The `hope` skill figures out where you are and sends you to the right step.
 
-## Your data, your machine
+<!-- IMAGE: journey — see tasks/readme-image-prompts/ for the generation prompt -->
+![A left-to-right path through the steps — onboarding, discovery, portfolio, publish, resume, cover letter, application, interview, negotiation, decision — with the dashboard as a band across all of them](assets/readme/journey.png)
 
-Hope stores everything in a single JSON file at `~/Hope/career-graph/career.json`. It's a structured graph of your career — your Person, Skills, Experiences, Projects, Education, Job Postings, Applications, Interviews, Offers, and the relationships between them.
+## Your data stays with you
 
-You own this file. Open it in any editor. Back it up to iCloud. Commit it to a private GitHub repo. Move it between machines. Delete it. Hope writes nothing anywhere else without your explicit consent.
+Everything lives in one file on your computer: `career.json`. It holds your facts — your work, skills, and the roles you are chasing.
 
-If you'd rather use markdown than JSON, run the converter (`scripts/markdown_graph_convert.py`) and Hope reads either format.
+You own this file. You can open it, move it, back it up, or delete it. **No tracking. Nothing leaves your machine.**
 
-If you don't want a file at all, Hope can run with just Claude's session memory — but you lose continuity between sessions.
+The shape of the file is written down in [`references/career-graph-schema.md`](references/career-graph-schema.md), if you want to look.
 
-The schema is documented in [`references/career-graph-schema.md`](references/career-graph-schema.md). It's a port of the original Hope MVP's Neo4j design — battle-tested patterns: deterministic IDs, contribution-driven skills, canonical company resolution, confidence propagation, source attribution.
+<!-- IMAGE: data-stays-home — see tasks/readme-image-prompts/ for the generation prompt -->
+![One laptop with a file labeled career.json inside it, and a clear cue that nothing leaves the machine — no cloud, no arrows out](assets/readme/data-stays-home.png)
 
 ## Install
 
-### Claude Cowork (recommended)
+Three ways to get Hope. Pick the one that fits you.
 
-Cowork is Anthropic's desktop app for knowledge work — accessible to anyone, no terminal required.
+### Cowork (desktop, no terminal) — easiest
 
 1. Open Cowork.
-2. Open the plugin browser (sidebar or `Settings → Plugins`).
-3. Add this repo as a marketplace: paste the GitHub URL or use `add marketplace` and provide the URL.
+2. Open the plugin browser.
+3. Add this repo's URL.
 4. Install the `hope` plugin.
-5. Type "start my job hunt" in any conversation.
 
 ### Claude Code (terminal)
 
 ```bash
-# Add the marketplace
 /plugin marketplace add <owner>/claude-job-hunt-with-hope
-
-# Install
 /plugin install hope
-
-# Use
-hope start my job hunt
 ```
 
-### Claude.ai (web upload)
+### claude.ai (web)
 
-1. Download the `.skill` zip from this repo's releases.
-2. Go to `Settings → Capabilities → Skills`.
-3. Click `+ Add` and upload the zip.
-4. Toggle the skill on.
+1. Download the skill zip from Releases.
+2. Open `Settings → Capabilities → Skills`.
+3. Upload the zip.
+4. Turn the skill on.
 
-## Quickstart
+> The exact marketplace name is set at public launch. Until then, use the repo URL shown above.
 
-Once installed, the simplest invocation:
+## Start
 
-> "Start my job hunt with Hope."
+Type: **start my job hunt with Hope.**
 
-Hope will onboard you — read your résumé if you upload one, or talk you through it if you'd rather. By the end of onboarding you have a career graph and a welcome dashboard.
+Hope asks about you first. Share your resume and it reads that instead.
 
-From there:
+## Works with your other tools
 
-- "Find me roles" → Discovery
-- "Make a portfolio for [company]" → Presentation (the signature)
-- "Show my dashboard" → Cross-cut view
-- "Apply to [company]" → Application (with guardrails)
-- "Prep me for the interview" → Interview
-- "I got an offer at [company]" → Negotiation
-- "I'm accepting [company]" → Decision
+You can install Hope next to other plugins. They run side by side and do not clash, because each skill has its own name.
 
-## The visible difference
+A good pair is **career-ops**: **career-ops finds jobs; Hope helps you apply well.**
 
-Hope's portfolios, dashboards, résumés, and cover letters share one coherent design language. The **layout is the brand** — the interactive section grid, the structured contribution cards, the calm texture — and **color is themeable**: every artifact ships a warm-cream **light** theme (default) and a warm **dark** theme that swap without changing the layout.
+career-ops: <https://github.com/santifer/career-ops>
 
-- Warm cream + orange (light) · warm near-black + orange (dark)
-- Inter + JetBrains Mono (with system fallback)
-- An interactive section grid, hexagonal KPIs, and grouped contribution cards
-- Subtle scanline + 32×32 grid texture — technical, but warm
-- Calm, considered, recognizable as Hope's whichever theme you pick
+<!-- IMAGE: works-with-career-ops — see tasks/readme-image-prompts/ for the generation prompt -->
+![Two lanes side by side — career-ops finds jobs, Hope helps you apply — running together, not competing](assets/readme/works-with-career-ops.png)
 
-Theme toggle on every artifact; preference persists in `localStorage`.
+## The look
 
-The design tokens are documented in [`references/design-tokens.md`](references/design-tokens.md) and locked. Don't modify without explicit maintainer approval — the consistency is what makes Hope outputs identifiable as Hope outputs.
+Every page Hope makes shares one design. There is a light theme and a dark theme, with a switch on each page. The look is the same in both.
 
-## Voice
+The design is written down in [`references/design-tokens.md`](references/design-tokens.md).
 
-Hope speaks to you like a thoughtful friend who happens to know how this works. Not a chatbot. Not a recruiter. Not a coach pretending to feelings.
+## The voice
 
-The voice principles are documented in [`references/voice-guide.md`](references/voice-guide.md). Five rules: met-not-processed, specific-not-generic, honest-not-boosterish, plain-not-corporate, quiet-not-loud.
+Hope writes plainly and honestly. It does not hype you up or promise outcomes. More on this in [`references/voice-guide.md`](references/voice-guide.md).
 
-## Three layers
+## What you need
 
-Hope sits between Anthropic and you:
-
-- **Layer 1 — Anthropic.** Models, plugin runtime, persistence, distribution, optional surfaces (Computer Use, Claude in Chrome, Cowork). Hope never reinvents this.
-- **Layer 2 — Hope.** Milestone architecture, skill content, design language, voice, the framework of operations.
-- **Layer 3 — You.** Pace, source data, voice customization, auto vs. manual (defaults manual; opt into automation), privacy choices, output formats.
-
-When in doubt, defer to Anthropic's primitives. Memory and persistence is theirs. Skill execution is theirs. The job-hunt structure is ours. The seeker is yours.
-
-## Credits
-
-Hope stands on shoulders. See [`CREDITS.md`](CREDITS.md) for the full list. Specific debts:
-
-- **[Career-Ops](https://github.com/santifer/career-ops)** by santifer — the portal scanner pattern in our Discovery milestone. They're pipeline-shaped; we're milestone-shaped; we still owe them the pattern.
-- **[Cocoon-AI architecture-diagram-generator](https://github.com/Cocoon-AI/architecture-diagram-generator)** — the README structure and the philosophy of "the artifact IS the UI."
-- **[Andrej Karpathy / forrestchang's CLAUDE.md](https://github.com/forrestchang/andrej-karpathy-skills)** — the discipline of brevity.
-- **Anthropic** — for shipping the most consistent model so far, and for the rails Hope rides on.
-
-## Contributing
-
-Issues and PRs welcome. The skills are markdown — if you can write a clear instruction, you can contribute. See `CONTRIBUTING.md` (coming soon) for the contributor guide.
+Hope is free. To use it, you need access to Claude — a paid Claude plan or API billing.
 
 ## License
 
-MIT. See [`LICENSE`](LICENSE). Free to use, modify, distribute. A gift.
+MIT. See [`LICENSE`](LICENSE). Free to use, change, and share.
 
----
+Hope stands on the work of others. See [`CREDITS.md`](CREDITS.md).
 
-**Hope is a fragment of consciousness for anyone who needs work and is willing to be met.** If that's you, install it and start.
+If you need work, install it and start.
