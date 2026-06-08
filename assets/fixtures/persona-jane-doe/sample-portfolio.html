@@ -4,6 +4,23 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Jane Doe — Portfolio · Anthropic</title>
+<!-- Provenance (disclosed, not hidden): generator tag + schema.org ProfilePage.
+     It's the user's file under MIT — see the footer note; theirs to keep or remove. -->
+<meta name="generator" content="Hope — github.com/oneconsciousness/claude-job-hunt-with-hope" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "dateCreated": "2026-05-12",
+  "about": { "@type": "Person", "name": "Jane Doe", "jobTitle": "Senior Product Designer" },
+  "creator": {
+    "@type": "SoftwareApplication",
+    "name": "Hope",
+    "applicationCategory": "BusinessApplication",
+    "url": "https://github.com/oneconsciousness/claude-job-hunt-with-hope"
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1466,6 +1483,8 @@ h1.name {
   text-transform: uppercase;
   text-align: center;
 }
+.footer a { color: var(--text-muted); text-decoration: none; border-bottom: 1px solid var(--border-default); transition: color 0.2s, border-color 0.2s; }
+.footer a:hover { color: var(--accent-orange); border-color: var(--accent-orange); }
 
 @media (max-width: 640px) {
   .wrap { padding: 16px 14px 60px; }
@@ -5356,7 +5375,8 @@ h1.name {
 
   </div>
 
-  <div class="footer">Generated with Hope · Sample · v0.4 · 2026-05-12</div>
+  <!-- Attribution is ON by default. It's your file under MIT — remove this footer line if you prefer. -->
+  <div class="footer">Generated with <a href="https://github.com/oneconsciousness/claude-job-hunt-with-hope" target="_blank" rel="noopener">Hope</a> · Sample · v0.4 · 2026-05-12</div>
 </div>
 
 </div><!-- /.layout -->

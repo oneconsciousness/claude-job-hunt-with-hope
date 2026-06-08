@@ -4,6 +4,24 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{{name}} — Portfolio{{#target_company}} · {{target_company}}{{/target_company}}</title>
+<!-- Provenance (disclosed, not hidden): a standards-based generator tag + a
+     schema.org ProfilePage so recruiters/crawlers can read who made this and with what.
+     This is the user's file under MIT — see the footer note; it's theirs to keep or remove. -->
+<meta name="generator" content="Hope — github.com/oneconsciousness/claude-job-hunt-with-hope" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "dateCreated": "{{generation_date}}",
+  "about": { "@type": "Person", "name": "{{name}}", "jobTitle": "{{headline}}" },
+  "creator": {
+    "@type": "SoftwareApplication",
+    "name": "Hope",
+    "applicationCategory": "BusinessApplication",
+    "url": "https://github.com/oneconsciousness/claude-job-hunt-with-hope"
+  }
+}
+</script>
 <!--
   Hope portfolio template · v0.4 · cookbook v1.1 conformant.
   Renders identical structure to assets/fixtures/persona-jane-doe/sample-portfolio.html.
@@ -254,6 +272,8 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
 .proj-tile .techs { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-dim); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.02em; }
 
 .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border-default); color: var(--text-dim); font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; text-align: center; }
+.footer a { color: var(--text-muted); text-decoration: none; border-bottom: 1px solid var(--border-default); transition: color 0.2s, border-color 0.2s; }
+.footer a:hover { color: var(--accent-orange); border-color: var(--accent-orange); }
 
 @media (max-width: 640px) {
   .wrap { padding: 16px 14px 60px; }
@@ -578,7 +598,8 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
     </div>
   </div>
 
-  <div class="footer">Generated with Hope · {{generation_date}}{{#target_company}} · For {{target_company}}{{/target_company}}</div>
+  <!-- Attribution is ON by default. It's your file under MIT — remove this footer line if you prefer. -->
+  <div class="footer">Generated with <a href="https://github.com/oneconsciousness/claude-job-hunt-with-hope" target="_blank" rel="noopener">Hope</a> · {{generation_date}}{{#target_company}} · For {{target_company}}{{/target_company}}</div>
 </div>
 
 <script>

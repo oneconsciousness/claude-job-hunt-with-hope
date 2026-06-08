@@ -71,6 +71,15 @@ This is the **visible** differentiator. The portfolio looks unmistakably like a 
 
 Use `assets/templates/portfolio.html` as the starting structure. Replace placeholders with content from the graph. **Do not deviate from the design tokens** in `references/design-tokens.md`.
 
+## Provenance & attribution
+
+Every Hope portfolio carries **disclosed** provenance — never hidden:
+
+- A visible **"Generated with Hope"** footer linking to the project (Layer 1).
+- A `<meta name="generator">` tag and a schema.org **ProfilePage** JSON-LD block in `<head>` — machine-readable for recruiters/crawlers (Layer 2). Escape `{{name}}` / `{{headline}}` for valid JSON; keep `{{generation_date}}` as an ISO date.
+
+This is honest attribution, not a tracker: there is **no hidden marker, no telemetry, nothing that phones home**. Because it's the user's file under MIT, the footer is theirs to keep or remove — tell them so if they ask. The template carries an HTML comment saying exactly that.
+
 ## Length
 
 Most portfolios should fit in 2–3 screens of vertical scroll on desktop. Long-scroll portfolios with twelve roles and twenty projects defeat the point. If the user's career is large, curate harder.
