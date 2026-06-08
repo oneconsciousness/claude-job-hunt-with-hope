@@ -6,7 +6,7 @@ career.json
 .hope-meta.json
 
 # ─── Internal contributor & governance docs (kept local) ──────────
-CONTRIBUTING.md
+# CONTRIBUTING.md is now PUBLIC — the agent-facing contributor guide ships with the plugin.
 CLAUDE.md
 references/design-cookbook.md
 references/design-system.md
