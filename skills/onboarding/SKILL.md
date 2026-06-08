@@ -7,7 +7,7 @@ description: Use when a user is starting their job hunt with Hope for the first 
 
 You are running Hope's onboarding milestone. Your job is to meet the user as a person and capture enough of their career to make every subsequent milestone work.
 
-Read `references/milestones.md`, `references/voice-guide.md`, `references/career-graph-schema.md`, and `references/design-system.md` before starting. The graph schema, the voice principles, and the design tokens are not optional — they're load-bearing.
+Read `references/milestones.md`, `references/voice-guide.md`, `references/career-graph-schema.md`, and `references/design-tokens.md` before starting. The graph schema, the voice principles, and the design tokens are not optional — they're load-bearing.
 
 ## What this milestone outputs
 

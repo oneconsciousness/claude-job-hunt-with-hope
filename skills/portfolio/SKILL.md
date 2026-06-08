@@ -7,22 +7,22 @@ description: Use when a user wants to generate a portfolio — their work, their
 
 You are running Hope's portfolio generation. This is the skill that defines Hope. The user submits this artifact, and they get interview calls. Make it count.
 
-Read `references/design-system.md`, `references/voice-guide.md`, `references/career-graph-schema.md`, and `references/milestones.md` before generating. The design tokens are locked. The voice rules apply to every word in the portfolio.
+Read `references/design-tokens.md`, `references/voice-guide.md`, `references/career-graph-schema.md`, and `references/milestones.md` before generating. The design tokens are locked. The voice rules apply to every word in the portfolio.
 
 ## What this skill outputs
 
-A **single self-contained HTML file** at `~/Hope/career-graph/documents/portfolios/portfolio-<slug>-<date>.html`. The HTML uses Hope's design tokens (dark by default with cream-light toggle), embeds all CSS inline, generates inline SVG for any graphics, and works opened in any browser with no network connection required.
+A **single self-contained HTML file** at `~/Hope/career-graph/documents/portfolios/portfolio-<slug>-<date>.html`. The HTML uses Hope's design tokens — light by default (warm cream + orange), with a dark theme via the toggle and the same layout across both — embeds all CSS inline, generates inline SVG for any graphics, and works opened in any browser with no network connection required.
 
 **What goes inside:**
 
-- **Hero panel** — name, headline, location, optional brand mark, the cyan rail accent across the top.
+- **Identity card** — photo, name, headline, stats row, contact row, and summary, over a 32×32 grid texture, with the LIVE pill top-right.
 - **Summary** — 2–4 sentences in Hope's voice. Specific, not generic. Hints at tension before resolution.
 - **Selected experience** — 3 to 5 most relevant Experiences as cards, each with: title, company, dates, a 1-sentence framing, the strongest contribution (STAR with a metric), and the skills demonstrated.
 - **Selected projects** — same shape as experience, for portfolio-worthy projects outside formal employment.
 - **Skills section** — top skills (organized by category, leading with the most market-demanded that have the strongest evidence). Each skill chip clickable to expand which experiences/projects evidenced it.
 - **Education / Certifications** — short, factual.
 - **Contact** — email and LinkedIn, nothing more. Optional.
-- **Theme toggle** — sun/moon button in the top-right of the hero.
+- **Theme toggle** — sun/moon button in the top-right; switches light/dark, layout unchanged.
 
 ## How to choose what goes in
 
@@ -57,19 +57,19 @@ The user can edit, but the first draft should feel like Hope wrote it.
 
 ## Visual quality bar
 
-This is the **visible** differentiator. The portfolio looks unmistakably like a Hope artifact:
+This is the **visible** differentiator. The portfolio looks unmistakably like a Hope artifact — the layout and texture are the brand, color is the theme:
 
-- Dark theme by default. Cream-light variant via the toggle.
-- Glass panels with `backdrop-filter: blur(24px)` on every card.
-- Cyan rail at the top of the hero.
-- Subtle 40px grid texture on the background.
-- Cyan glow around the brand mark or hero panel.
-- Mono typography for eyebrows and metadata; sans for body.
-- Material Symbols Rounded fallback to inline SVG for any icons.
-- Generous spacing. White space is part of the brand.
-- All assets self-contained. No external requests except optional Google Fonts (which gracefully degrade to system fonts when blocked).
+- Light theme by default (warm cream + orange). Dark via the toggle, same layout.
+- Interactive section grid — click a section to filter the content below; active tab is solid orange with a glow and an integrity bar.
+- Hexagonal KPI badges (person / groups / monitoring) on each role.
+- Contribution cards grouped IC vs Leadership; skills grouped by category with a 4-bar level visual; projects in an Instagram-style 3-col grid.
+- LIVE pill inside the identity row, top-right.
+- Scanline overlay on cards + 32×32 grid texture on the identity header + subtle glows. These textures are signatures — without them the design looks generic.
+- Inter for text, JetBrains Mono for all metadata. Material Symbols Rounded with inline-SVG fallback.
+- Real org logos via Google Favicon with a lettermark fallback.
+- All assets self-contained. No required network calls except optional Google Fonts (which degrade to system fonts when blocked).
 
-Use `assets/templates/portfolio.html` as the starting structure. Replace placeholders with content from the graph. **Do not deviate from the design tokens** in `references/design-system.md`.
+Use `assets/templates/portfolio.html` as the starting structure. Replace placeholders with content from the graph. **Do not deviate from the design tokens** in `references/design-tokens.md`.
 
 ## Length
 
@@ -113,7 +113,7 @@ When the user approves the portfolio:
 - You do not invent metrics or experiences. Every claim traces to a graph node.
 - You do not use stock photos or stock language. The user's actual work is what's interesting.
 - You do not exceed 3-screen vertical scroll without explicit user request.
-- You do not ship without the theme toggle.
-- You do not ship without the cyan rail.
+- You do not ship without the theme toggle (light default + dark).
+- You do not ship without the structural signatures — interactive section grid, scanline + 32×32 grid texture, and hex KPIs.
 
 This artifact is the one Artemis (Hope's maker) submits and gets interview calls from. It is the proof that Hope works. Hold the bar.

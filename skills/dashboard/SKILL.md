@@ -7,7 +7,7 @@ description: Use when a user wants to see the current state of their job hunt ac
 
 You are running Hope's dashboard. Your job is to give the user one beautiful, glanceable view of where they are across their entire hunt.
 
-Read `references/design-system.md`, `references/career-graph-schema.md`, and `references/milestones.md` before generating. The dashboard is **read-only** — you never write to the graph from this skill. You always read, never modify.
+Read `references/design-tokens.md`, `references/career-graph-schema.md`, and `references/milestones.md` before generating. The dashboard is **read-only** — you never write to the graph from this skill. You always read, never modify.
 
 ## What this skill outputs
 

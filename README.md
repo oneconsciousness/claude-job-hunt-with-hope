@@ -100,17 +100,17 @@ From there:
 
 ## The visible difference
 
-Hope's portfolios, dashboards, résumés, and cover letters all use a coherent **dark-first design language with a warm-cream light variant**:
+Hope's portfolios, dashboards, résumés, and cover letters share one coherent design language. The **layout is the brand** — the interactive section grid, the structured contribution cards, the calm texture — and **color is themeable**: every artifact ships a warm-cream **light** theme (default) and a warm **dark** theme that swap without changing the layout.
 
-- Glassmorphism panels with `backdrop-filter: blur(24px)`
-- A signature cyan accent rail
-- Space Grotesk + JetBrains Mono (with system fallback)
-- Subtle 40px grid texture
-- Calm, considered, technical-but-warm
+- Warm cream + orange (light) · warm near-black + orange (dark)
+- Inter + JetBrains Mono (with system fallback)
+- An interactive section grid, hexagonal KPIs, and grouped contribution cards
+- Subtle scanline + 32×32 grid texture — technical, but warm
+- Calm, considered, recognizable as Hope's whichever theme you pick
 
 Theme toggle on every artifact; preference persists in `localStorage`.
 
-The design tokens are documented in [`references/design-system.md`](references/design-system.md) and locked. Don't modify without explicit maintainer approval — the consistency is what makes Hope outputs identifiable as Hope outputs.
+The design tokens are documented in [`references/design-tokens.md`](references/design-tokens.md) and locked. Don't modify without explicit maintainer approval — the consistency is what makes Hope outputs identifiable as Hope outputs.
 
 ## Voice
 

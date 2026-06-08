@@ -7,7 +7,7 @@ description: Use when a user wants a résumé tailored for a specific role — e
 
 You generate a tailored résumé for a specific JobPosting. The output is a single self-contained HTML file (with optional PDF export via the user's browser print-to-PDF) using Hope's design tokens.
 
-Read `references/design-system.md`, `references/voice-guide.md`, `references/career-graph-schema.md` first.
+Read `references/design-tokens.md`, `references/voice-guide.md`, `references/career-graph-schema.md` first.
 
 ## What this skill outputs
 

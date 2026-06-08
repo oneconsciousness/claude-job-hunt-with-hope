@@ -1,0 +1,132 @@
+# Hope Design Tokens
+
+The locked design tokens for every Hope artifact — portfolios, dashboards, résumés, cover letters, and any HTML the plugin generates. **Read this before generating or editing any visual output.**
+
+Hope's identity is **structural**: the layout, the interactive patterns, and the texture are the brand. **Color is themeable** — every artifact ships a light theme (default) and a dark theme that swap cleanly without changing a single element of the layout. That separation is deliberate: a Hope portfolio is recognizable as Hope's whether it's light, dark, or recolored, because the *structure* never moves.
+
+The canonical values below match what `assets/templates/*.html` actually ship. If a template and this file ever disagree, the template is the bug — fix it to match here, or update here and re-derive the templates. Don't let them drift.
+
+---
+
+## 1. The theme mechanism
+
+- Every artifact sets `data-theme` on `<html>` (`light` | `dark` | `custom`) and declares `color-scheme: light dark` so native form controls match.
+- All colors are CSS custom properties on `:root` (light values). `[data-theme="dark"]` overrides the **same variable names** with dark values. Components reference `var(--token)` only — never a raw hex.
+- A sun/moon toggle (top-right) flips `data-theme` and persists the choice to `localStorage` under `hope-portfolio-theme` (or a skill-specific key).
+- **Default is light** when no preference is stored. This is a deliberate brand choice — warm cream + orange is Hope's face. Do not auto-switch to dark based on OS preference; let the user choose.
+
+Because every component reads `var(--token)`, recoloring is a token swap, never a layout edit.
+
+## 2. Light theme (default)
+
+```css
+:root {
+  color-scheme: light dark;
+  --bg: #F0EBE3; --surface: #E8E2D8; --surface-2: #EDE8DF;
+  --card-bg: #F5F0E8; --card-bg-hover: #FAF6EE; --card-bg-active: #FFFCF3;
+  --text-primary: #1A1612; --text-secondary: #5C4F3D; --text-muted: #8C7E6D; --text-dim: #B5AC9E;
+  --accent-orange: #D97706; --accent-orange-hover: #B45309;
+  --accent-orange-bg: rgba(217,119,6,0.10); --accent-orange-glow: 0 4px 14px rgba(217,119,6,0.22);
+  --accent-cyan: #0891B2; --accent-cyan-soft: rgba(8,145,178,0.08); --accent-cyan-edge: rgba(8,145,178,0.20);
+  --accent-emerald: #16A34A; --accent-emerald-bg: rgba(22,163,74,0.10);
+  --accent-emerald-edge: rgba(22,163,74,0.30); --accent-emerald-glow: 0 0 10px rgba(22,163,74,0.20);
+  --accent-violet: #7C5BBF; --accent-violet-bg: rgba(124,91,191,0.10); --accent-violet-edge: rgba(124,91,191,0.25);
+  --accent-amber: #C27D0E; --accent-amber-bg: rgba(194,125,14,0.12); --accent-amber-edge: rgba(194,125,14,0.30);
+  --accent-rose: #D43450;
+  --border-default: rgba(31,22,14,0.10); --border-subtle: rgba(31,22,14,0.05); --border-hover: rgba(31,22,14,0.20);
+  --radius-card: 8px; --radius-panel: 10px; --radius-button: 6px; --radius-pill: 9999px; --radius-tight: 3px;
+  --shadow-sm: 0 1px 2px rgba(31,22,14,0.04); --shadow-md: 0 2px 8px rgba(31,22,14,0.06);
+  --grid-line: rgba(31,22,14,0.04); --scan-line: rgba(31,22,14,0.02);
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+}
+```
+
+## 3. Dark theme (toggle alternate)
+
+A **warm dark** — near-black browns, not a cold blue HUD. Light remains the default; dark is the alternate.
+
+```css
+[data-theme="dark"] {
+  --bg: #1A1612; --surface: #221D17; --surface-2: #2A241D;
+  --card-bg: #1F1A14; --card-bg-hover: #261F18; --card-bg-active: #2D261D;
+  --text-primary: #F0E7D5; --text-secondary: #B5A78F; --text-muted: #8C7E6D; --text-dim: #5C4F3D;
+  --accent-orange: #FB923C; --accent-orange-hover: #FDBA74;
+  --accent-orange-bg: rgba(251,146,60,0.14); --accent-orange-glow: 0 4px 14px rgba(251,146,60,0.30);
+  --accent-cyan: #22D3EE; --accent-cyan-soft: rgba(34,211,238,0.10); --accent-cyan-edge: rgba(34,211,238,0.25);
+  --accent-emerald: #34D572; --accent-emerald-bg: rgba(52,213,114,0.14);
+  --accent-emerald-edge: rgba(52,213,114,0.30); --accent-emerald-glow: 0 0 12px rgba(52,213,114,0.25);
+  --accent-violet: #A78BFA; --accent-violet-bg: rgba(167,139,250,0.12); --accent-violet-edge: rgba(167,139,250,0.30);
+  --accent-amber: #F59E0B; --accent-amber-bg: rgba(245,158,11,0.14); --accent-amber-edge: rgba(245,158,11,0.30);
+  --accent-rose: #F43F5E;
+  --border-default: rgba(240,231,213,0.08); --border-subtle: rgba(240,231,213,0.04); --border-hover: rgba(240,231,213,0.20);
+  --grid-line: rgba(240,231,213,0.04); --scan-line: rgba(240,231,213,0.02);
+}
+```
+
+## 4. Custom themes (extension point)
+
+A user may recolor without breaking the brand, because layout is independent of color. The supported, safe path:
+
+- Add `[data-theme="custom"] { ... }` overriding **only the accent tokens** (`--accent-orange` is the primary; `--accent-cyan` the secondary) and, if needed, the neutral ramp.
+- **Never let a custom palette touch the layout, radii, type scale, or texture** — those are the brand, not the theme.
+- Keep `--text-*` on `--bg`/`--card-bg` at WCAG AA contrast (≥ 4.5:1 for body text). If you derive a palette from a single seed accent, leave the neutral ramps on one of the locked light/dark sets rather than recoloring backgrounds and text together.
+
+Treat custom as "swap the accent(s), keep everything else." That's the whole feature — resist building a per-token editor.
+
+## 5. Color usage
+
+- **Orange (`--accent-orange`) — THE Hope brand color.** Active section tab (filled orange, white text, glow), CTA / primary action, default skill chip, section icon container, current-role accent bar, hex-KPI icon, expanded chevron.
+- **Cyan (`--accent-cyan`) — secondary accent.** Headline under the name, role company names, the LinkedIn link (other links stay `--text-secondary`), education/cert institution, IC contribution group header.
+- **Emerald (`--accent-emerald`) — status / positive.** LIVE dot (pulse), ACTIVE pill, high-confidence bars, metric increase/decrease, achievement checks.
+- **Violet (`--accent-violet`) — leadership / scope.** Leadership contribution group header, scope badges.
+- **Amber (`--accent-amber`) — warning.** "No date" pills, medium-confidence bars.
+- **Rose (`--accent-rose`) — destructive.** Photo-remove button, low-confidence bars.
+
+## 6. Typography
+
+| Family | Use |
+|---|---|
+| **Inter** (`--font-sans`) | All body text, headings, labels. **Required — not Space Grotesk** (humanist and warm, not geometric). |
+| **JetBrains Mono** (`--font-mono`) | All metadata, dates, counts, badges, IDs, contribution numbers, eyebrow text. |
+| **Material Symbols Rounded** | Icons (via Google Fonts when available; fall back to inline SVG). |
+
+Weights: 400 body · 500 emphasis · 600 headlines/labels/companies · 700 section labels/titles/names/numbers · 800 sparingly. Base size 14.5px. Mono uppercase letter-spacing 0.04–0.10em; large sans headings −0.02em.
+
+## 7. Radii, shadows, spacing
+
+- Radii: button 6 · card 8 · panel 10 · pill 9999 · tight 3. (Soft, pill-rounded badges — not sharp.)
+- Shadows: `--shadow-sm` on most cards, `--shadow-md` only on hover/expanded. Subtle — Hope is not a heavy-shadow system. Glow shadows (`--accent-*-glow`) are reserved for the LIVE pill, metric badges, the current-role accent bar, and skill-category ledges.
+- Spacing: 4-point grid. Section/card padding usually 14–20px.
+
+## 8. Texture signatures (do not omit)
+
+Three calm textures give Hope its "technical-but-warm" identity. Without them the output looks generic.
+
+1. **Scanline overlay** on role/project cards — `repeating-linear-gradient` of `--scan-line`, 2px stripe, opacity ~0.30.
+2. **32×32 grid texture** in the identity header — crossed `--grid-line` gradients at `background-size: 32px 32px`.
+3. **Subtle glows** on the LIVE pill, metric badges, current-role accent bar, and skill-category ledges.
+
+## 9. DO / DON'T
+
+**DO**
+- Default to light; ship light + dark (and optional custom) with an identical layout.
+- Use Inter for text, JetBrains Mono for all metadata.
+- Keep the interactive section grid (click to filter) with an orange active state + integrity bars.
+- Use hexagonal KPI badges (person / groups / monitoring) and the 4-bar skill-level visual.
+- Group skills by category (colored ledges) and render projects as an Instagram-style 3-col grid.
+- Place the LIVE pill inside the identity row, top-right.
+- Apply the scanline + grid textures and the subtle glows.
+- Render real org logos via Google Favicon with a lettermark fallback.
+- Keep artifacts self-contained: inline CSS, inline SVG, no required network calls.
+
+**DON'T**
+- Default to dark, or auto-switch by OS preference — light is the deliberate default.
+- Use Space Grotesk, glassmorphism `blur(24px)`, a cyan rail, or a saturated `#00D4FF` HUD palette — those are the abandoned v0.2 look, not Hope.
+- Let a custom palette touch layout, type, radii, or texture.
+- Use raw hex in components — always `var(--token)`.
+- Ship without the theme toggle or without the texture signatures.
+
+---
+
+*The deep rationale (per-component anatomy, schema→UI mapping, the production lineage) lives in the maintainers' design cookbook. This file is the shippable canon every skill and template depends on.*
