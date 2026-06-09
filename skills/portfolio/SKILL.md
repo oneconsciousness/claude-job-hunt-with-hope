@@ -71,6 +71,10 @@ This is the **visible** differentiator. The portfolio looks unmistakably like a 
 
 Use `assets/templates/portfolio.html` as the starting structure. Replace placeholders with content from the graph. **Do not deviate from the design tokens** in `references/design-tokens.md`.
 
+**Before saving the user's file, clean the output:**
+- **Strip the template-authoring comment** — the `<!-- Hope portfolio template · v0.4 … See skills/portfolio/SKILL.md for the substitution contract -->` block. It documents the template for *you*; it must not ship in the user's portfolio (it also contains a literal `{{single_tokens}}` that fails a "no unsubstituted tokens" check). Keep the disclosed provenance comments (share-url, generator) — those are intentional.
+- **Verify zero unsubstituted placeholders remain** — grep the output for `{{` and `<!-- HOPE:`. If any survive, the substitution is incomplete; fix before saving. Never hand the user a file with raw template tokens.
+
 ## Provenance & attribution
 
 Every Hope portfolio carries one **visible** credit — never hidden, never enforced:

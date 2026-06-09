@@ -22,7 +22,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-DEFAULT_GRAPH_PATH = Path.home() / "Hope" / "career-graph" / "career.json"
+# Project-folder relative (the folder the user runs Hope in) — NOT a home dir.
+# Callers should pass an explicit path; this default assumes cwd is the job-hunt folder.
+DEFAULT_GRAPH_PATH = Path("career-graph") / "career.json"
 SCHEMA_VERSION = "1.0"
 
 # --------- IO ---------

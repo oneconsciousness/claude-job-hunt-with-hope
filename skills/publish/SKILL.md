@@ -29,6 +29,7 @@ Read `references/computer-use-guardrails.md` first. Publishing creates a **publi
 For a non-technical user, **make these calls yourself; do not ask:**
 
 - **Host:** GitHub Pages. Always, by default.
+- **Owner:** resolve it with `gh api user --jq .login` — **never** parse `gh auth status`, whose displayed label can be a stale/renamed account (e.g. it shows `arun98aol` while the real login is `oneconsciousness`, which would silently publish to the wrong `*.github.io`). If `gh` has **multiple** accounts logged in, that's the one case to confirm: "Publishing under your GitHub account **<login>** — right?" The live URL is `https://<login>.github.io/<repo>/`.
 - **Repo name:** auto-pick a clean one from their name (e.g. `firstname-lastname-portfolio`). Mention it; don't make them choose.
 - **Public vs private:** a portfolio is public *by design* — that's the whole point. Don't frame it as a choice; frame it as the goal ("so recruiters can see it").
 - **Branch, Pages settings, build options:** never surface these. They're yours.
