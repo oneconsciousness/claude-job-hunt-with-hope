@@ -2,7 +2,7 @@
 Hope graph query helpers.
 
 Pure stdlib + optional networkx. Skills invoke these to query and update
-the user's career graph stored at ~/Hope/career-graph/career.json.
+the user's career graph stored at career-graph/career.json.
 
 Usage from a skill:
 

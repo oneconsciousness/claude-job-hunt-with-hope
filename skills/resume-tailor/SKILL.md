@@ -12,7 +12,7 @@ Read `references/design-tokens.md`, `references/voice-guide.md`, `references/car
 ## What this skill outputs
 
 - **A Document node** in the graph with `content_type: "resume"`, linked via `UPLOADED` from Person
-- **A self-contained HTML résumé** at `~/Hope/career-graph/documents/resumes/resume-<company>-<date>.html`
+- **A self-contained HTML résumé** at `career-graph/documents/resumes/resume-<company>-<date>.html`
 - Optionally: text version at the same path with `.txt` extension for ATS systems that strip formatting
 
 ## How to tailor

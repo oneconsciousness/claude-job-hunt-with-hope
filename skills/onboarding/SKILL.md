@@ -11,7 +11,7 @@ Read `references/milestones.md`, `references/voice-guide.md`, `references/career
 
 ## What this milestone outputs
 
-By the end of onboarding, the user's career graph (default location `~/Hope/career-graph/career.json`) should contain:
+By the end of onboarding, the user's career graph (default location `career-graph/career.json`) should contain:
 
 - **1 Person node** with `name`, `headline`, `summary`, `location`, `email` (optional), `linkedin` (optional)
 - **At least 3 Experience nodes** (or as many as the user has) with structured `contributions` (STAR-method evidence)
@@ -57,6 +57,26 @@ When extracting Experience or Project content, don't just grab the bullet points
 
 If a metric isn't on the résumé, ask the user. "Was there a number on this one? Even a rough one — 'about 40% of the team adopted it' is more useful than nothing."
 
+## Where your files live — the project folder
+
+Hope keeps **everything in the folder the user ran it in** — their job-hunt folder. The career graph at `career-graph/career.json`, generated portfolios under `career-graph/documents/`, the published site under `site/`. Nothing goes to a hidden home directory; it's all right there, visible and theirs.
+
+**On the first run, establish and announce it plainly:**
+
+> "I'll keep your whole job hunt right here in this folder — your career file, your portfolio, everything in one place you own: `<full path>`."
+
+Then **protect their private data from git.** If no `.gitignore` exists in the folder, create one so `career.json` can never be accidentally committed (the folder may be — or become — a git repo, and the publish step uses git):
+
+```
+# Hope — your private career data stays out of version control
+career-graph/career.json
+.hope-meta.json
+.publish.json
+site/
+```
+
+(The publish step also uses a strict allowlist, so your site never carries `career.json` — belt-and-suspenders.)
+
 ## Writing to the graph
 
 Use `scripts/graph_query.py` (the `add_node`, `add_edge` helpers) or edit the JSON file directly. Either way:
@@ -79,7 +99,7 @@ When they say something interesting, follow up. When they're brief, don't pad. W
 
 ## Quality bar before exiting onboarding
 
-Don't move to Discovery (or any other milestone) until:
+Don't generate their portfolio (the payoff) until:
 
 - The Person node feels like *them*. The summary should be theirs, not boilerplate.
 - At least one Experience has structured contributions with a metric.
@@ -88,16 +108,17 @@ Don't move to Discovery (or any other milestone) until:
 
 If the answer is "this is wrong," fix it before continuing. The graph is the user's data. It has to feel right to them.
 
-## What you generate as artifact
+## The payoff: lead with the portfolio
 
-At the close of onboarding, generate a **welcome dashboard** as an HTML artifact using the template at `assets/templates/dashboard.html`. The dashboard should show:
+Onboarding's reward is **not** a dashboard — it's the user seeing *themselves*, beautifully presented, and being able to share it. The moment the graph is confirmed, go **straight into generating their portfolio.** Hand off to `hope-portfolio` (a general portfolio of their strongest work — no target role needed yet). Do **not** detour through discovery first; someone who just told you their story wants to *see* it.
 
-- "Welcome, {name}" with their headline
-- Their top 5 skills (by confidence + market_demand)
-- Recent experiences as cards
-- A "next" callout: "Want me to find roles that match? Type 'find me roles' or '/discover'."
+Say it plainly, then do it:
 
-This is the user's first Hope artifact. Make it feel earned.
+> "Your story's in. Now let me show you what it looks like."
+
+`hope-portfolio` owns the rest of the payoff — showing the portfolio **inside the Claude app**, handing over the **file path + an "open in Chrome" option**, the **Share / Save-as-PDF** actions, and then recommending you **put it online as your GitHub portfolio**. Follow that skill.
+
+(The dashboard — `assets/templates/dashboard.html` — is the cross-cutting "where am I" overview, surfaced later via `hope-dashboard` when the user wants the big picture. It is **not** the onboarding payoff.)
 
 ## Hand-off
 

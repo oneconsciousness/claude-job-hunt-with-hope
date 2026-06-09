@@ -1,9 +1,13 @@
 # Hope plugin .gitignore
 
 # ─── User runtime data (never committed) ──────────────────────────
-~/Hope/career-graph/
+# Hope writes a user's career files into the project folder it runs in.
+# These patterns keep that data out of git if Hope is ever run inside this repo.
+career-graph/
 career.json
 .hope-meta.json
+.publish.json
+site/
 
 # ─── Internal contributor & governance docs (kept local) ──────────
 # CONTRIBUTING.md is now PUBLIC — the agent-facing contributor guide ships with the plugin.

@@ -23,7 +23,7 @@ A fictional persona used for testing Hope skills without requiring real user PII
 
 1. **Test Onboarding:** Start a fresh session, upload `resume.txt`, and let Hope onboard Jane. Compare the resulting graph to `profile.json`.
 
-2. **Test Portfolio:** Copy `profile.json` to `~/Hope/career-graph/career.json` and ask Hope to "make my portfolio for Anthropic." Verify the generated HTML matches Hope's design system and the content is sensible.
+2. **Test Portfolio:** Copy `profile.json` to `career-graph/career.json` and ask Hope to "make my portfolio for Anthropic." Verify the generated HTML matches Hope's design system and the content is sensible.
 
 3. **Test Dashboard:** With `profile.json` as the graph, ask "show my dashboard." Verify the milestone state reflects Jane's position (between Discovery and Presentation).
 

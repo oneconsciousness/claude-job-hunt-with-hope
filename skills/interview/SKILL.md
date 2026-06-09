@@ -12,7 +12,7 @@ Read `references/career-graph-schema.md`, `references/voice-guide.md`, `referenc
 ## What this skill outputs
 
 - **An Interview node** in the graph (round, scheduled_at, format, application_id)
-- **A prep Document** at `~/Hope/career-graph/documents/interview-prep/prep-<company>-round-<n>-<date>.html` using Hope's design tokens
+- **A prep Document** at `career-graph/documents/interview-prep/prep-<company>-round-<n>-<date>.html` using Hope's design tokens
 - Optional **Connection nodes** for known interviewers
 - After the interview: a **reflection Memory node** capturing what worked and what didn't
 

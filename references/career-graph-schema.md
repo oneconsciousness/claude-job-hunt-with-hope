@@ -10,12 +10,12 @@ Markdown alternative is available for users who don't want a graph file. The str
 
 ## File structure
 
-Default location: `~/Hope/career-graph/career.json`
+Default location: `career-graph/career.json`
 
 The user picks the storage backend (Layer 3 control). Default is local. Opt-ins: Google Drive, Box, Dropbox, Notion, GitHub repo (private), or pure in-memory (no persistence).
 
 ```
-~/Hope/career-graph/
+career-graph/
 ├── career.json           # The full graph (typical: 1–10 MB)
 ├── documents/            # Generated artifacts referenced by graph nodes
 │   ├── resumes/
@@ -416,7 +416,7 @@ The `markdown_graph_convert.py` script translates losslessly between the two for
 ```python
 from graph_query import load_graph, skills_for_job, similar_experiences
 
-graph = load_graph("~/Hope/career-graph/career.json")
+graph = load_graph("career-graph/career.json")
 
 # Find which of my skills match a target job
 matched, missing = skills_for_job(graph, job_id="job:anthropic:product-designer:2026-05")

@@ -12,7 +12,7 @@ Read `references/voice-guide.md` and `references/career-graph-schema.md` first.
 ## What this skill outputs
 
 - An **Offer node** in the graph with full compensation breakdown
-- A **negotiation strategy document** at `~/Hope/career-graph/documents/negotiation/<company>-<date>.md`
+- A **negotiation strategy document** at `career-graph/documents/negotiation/<company>-<date>.md`
 - Optional **counter scripts** in the user's voice
 - After the negotiation: notes as Memory
 

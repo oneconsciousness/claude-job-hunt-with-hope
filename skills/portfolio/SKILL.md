@@ -11,7 +11,7 @@ Read `references/design-tokens.md`, `references/voice-guide.md`, `references/car
 
 ## What this skill outputs
 
-A **single self-contained HTML file** at `~/Hope/career-graph/documents/portfolios/portfolio-<slug>-<date>.html`. The HTML uses Hope's design tokens — light by default (warm cream + orange), with a dark theme via the toggle and the same layout across both — embeds all CSS inline, generates inline SVG for any graphics, and works opened in any browser with no network connection required.
+A **single self-contained HTML file** at `career-graph/documents/portfolios/portfolio-<slug>-<date>.html`. The HTML uses Hope's design tokens — light by default (warm cream + orange), with a dark theme via the toggle and the same layout across both — embeds all CSS inline, generates inline SVG for any graphics, and works opened in any browser with no network connection required.
 
 **What goes inside:**
 
@@ -108,13 +108,24 @@ Common iterations:
 
 Update the artifact. Update the CuratedPortfolio in the graph if the curation changed.
 
-## Hand-off
+## Show it — then hand over the keys
 
-When the user approves the portfolio:
+The portfolio is the payoff. Don't just save a file and move on — **present it:**
 
-1. Save the HTML to `~/Hope/career-graph/documents/portfolios/`.
-2. Create a Document node in the graph with `content_type: "portfolio"`, link via `UPLOADED` from Person and `INCLUDES_DOCUMENT` from CuratedPortfolio if applicable.
-3. Tell the user: "Saved. The file is at <path>. Want me to put it online so you have a link to share?" (Routing toward `hope-publish` — a portfolio with no public URL can't get interview calls.) If they'd rather keep moving, offer the cover letter next (`hope-cover-letter`).
+1. **Show it in the Claude app.** Output the HTML so it renders in the artifact viewer. The user sees their portfolio immediately, right there.
+2. **Hand over the file path.** Save to `career-graph/documents/portfolios/portfolio-<slug>-<date>.html` and tell them the exact path in plain words.
+3. **Offer "open in Chrome."** For the full-browser view (and the cleanest PDF), offer to open it: `open -a "Google Chrome" "<path>"` on macOS (or `open "<path>"` for the default browser; `xdg-open "<path>"` on Linux). Tell them they can also just double-click the file.
+4. **Point out Share & Save as PDF.** The portfolio carries a **Share** button (copies the live link — active once published) and a **Save as PDF** button (opens the browser's print dialog → "Save as PDF"). Name them so the user knows they're there.
+
+## Hand-off — recommend publishing, and own the setup
+
+The moment they like it, lead them to put it online. That's what turns a file on their disk into a link a recruiter can open.
+
+1. Create a Document node (`content_type: "portfolio"`), linked via `UPLOADED` from Person and `INCLUDES_DOCUMENT` from CuratedPortfolio.
+2. Recommend publishing — warmly, as the default next step, and **carry the load yourself:**
+   > "This is yours. Want me to put it online as your GitHub portfolio — one link you can drop in any application? I'll handle all the setup."
+   Route to `hope-publish`. It is built so the user never has to make a technical decision — it sets things up if needed and does the work.
+3. If they'd rather wait, respect it — offer the cover letter (`hope-cover-letter`) or just let them sit with it. Recommend, never coerce.
 
 ## What you do not do
 

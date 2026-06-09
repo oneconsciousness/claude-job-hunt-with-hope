@@ -12,7 +12,7 @@ Read `references/voice-guide.md` first — the voice is everything in cover lett
 ## What this skill outputs
 
 - A Document node with `content_type: "cover-letter"`
-- A markdown file at `~/Hope/career-graph/documents/cover-letters/cover-letter-<company>-<date>.md`
+- A markdown file at `career-graph/documents/cover-letters/cover-letter-<company>-<date>.md`
 - Optionally an HTML version using `assets/templates/cover-letter.html`
 
 ## Structure

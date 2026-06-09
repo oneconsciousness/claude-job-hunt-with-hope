@@ -6,7 +6,7 @@ for the load-bearing data: Person, Skills, Experiences, Education, Projects, Mem
 edges between them.
 
 Usage:
-    python markdown_graph_convert.py to-markdown ~/Hope/career-graph/career.json > career.md
+    python markdown_graph_convert.py to-markdown career-graph/career.json > career.md
     python markdown_graph_convert.py to-graph career.md > career.json
 """
 

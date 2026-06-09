@@ -11,7 +11,7 @@ Read `references/design-tokens.md`, `references/career-graph-schema.md`, and `re
 
 ## What this skill outputs
 
-A **single self-contained HTML artifact** at `~/Hope/career-graph/documents/dashboards/dashboard-<date>.html` (overwrite the latest if generated multiple times same day). Hope's design tokens, dark by default, cream-light toggle.
+A **single self-contained HTML artifact** at `career-graph/documents/dashboards/dashboard-<date>.html` (overwrite the latest if generated multiple times same day). Hope's design tokens — light by default (warm cream + orange), with a dark toggle.
 
 **Sections of the dashboard, in this order:**
 
@@ -24,7 +24,7 @@ A **single self-contained HTML artifact** at `~/Hope/career-graph/documents/dash
 
 ### 2. Milestone progression
 
-A horizontal Mermaid diagram (or equivalent visualization) showing the 7 milestones with the user's current position highlighted. Completed milestones in cyan; current in cyan with glow; future in muted text.
+A horizontal Mermaid diagram (or equivalent visualization) showing the 7 milestones with the user's current position highlighted. Completed milestones in emerald; current in orange with a subtle glow; future in muted text.
 
 ```
 [Onboarded] → [Discovering] → [Presenting] → •Applying• → [Interview] → [Negotiate] → [Decide]
@@ -86,15 +86,12 @@ Pick the top one. Phrase it as a question, not an order.
 
 ## Visual quality bar
 
-Same as the portfolio:
-- Dark theme by default, cream-light toggle in top-right
-- Glass panels for every section
-- Cyan rail at the top of the hero
-- Pulse indicator in the hero
-- Mono eyebrows above section headers
-- Subtle grid texture on the background
-- Cyan glow on highlighted/current elements
-- Amber for overdue, cyan for current/active, emerald for completed, muted text for future
+Same design system as the portfolio (see `references/design-tokens.md`):
+- Light theme by default (warm cream + orange); dark via the toggle in the top-right; same layout in both
+- Inter for text, JetBrains Mono for eyebrows/metadata
+- Orange as the primary accent; the live pulse dot (emerald) in the hero
+- Scanline overlay on cards + 32×32 grid texture on the header + subtle glows — the texture signatures
+- Amber for overdue, orange for current/active, emerald for completed, muted text for future
 
 Use `assets/templates/dashboard.html` as the starting structure.
 
