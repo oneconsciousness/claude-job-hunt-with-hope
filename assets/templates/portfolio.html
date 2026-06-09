@@ -33,6 +33,8 @@
   Portfolio skill substitutes:
     1. {{single_tokens}} — name, headline, contact fields, summary, counts, etc.
     2. <!-- HOPE:loop_name --> blocks — replaces the example item inside with N rendered items.
+    3. {{photo_data_url}} + {{photo_class}} — the headshot, baked in as a data: URL at
+       generation time (set {{photo_class}} to " has-photo" when filled, "" when empty).
   See skills/portfolio/SKILL.md for the substitution contract.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -354,9 +356,12 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
   <!-- IDENTITY ===================================================== -->
   <div class="identity-card materialize stagger-1">
     <div class="identity-row">
-      <label class="photo-upload" id="photo-upload" for="photo-input">
+      <label class="photo-upload{{photo_class}}" id="photo-upload" for="photo-input">
         <span class="upload-prompt"><span class="material-symbols-rounded">add_a_photo</span><span>Photo</span></span>
-        <img id="photo-preview" alt="" />
+        <!-- Baked in at generation time as a data: URL (see SKILL.md "Bake the headshot
+             into the file"). Empty when no headshot was found → the upload prompt shows.
+             The file input below stays as a "change your photo" fallback either way. -->
+        <img id="photo-preview" src="{{photo_data_url}}" alt="{{name}}" />
         <input type="file" accept="image/*" id="photo-input" />
         <button class="photo-remove" id="photo-remove" type="button" aria-label="Remove photo">
           <span class="material-symbols-rounded">close</span>
@@ -742,10 +747,18 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
   const photoPreview = document.getElementById('photo-preview');
   const photoUpload = document.getElementById('photo-upload');
   const photoRemove = document.getElementById('photo-remove');
+  // A photo baked into the file at generation time arrives as the img's src +
+  // the .has-photo class already on the label. Remember it so "remove" reverts
+  // to it instead of wiping the published photo. A localStorage upload (the
+  // "change your photo" fallback) overrides it in this browser only.
+  const bakedPhoto = (photoPreview && photoPreview.getAttribute('src')) || '';
   function setPhoto(dataUrl) {
     if (dataUrl) { photoPreview.src = dataUrl; photoUpload.classList.add('has-photo'); }
     else { photoPreview.removeAttribute('src'); photoUpload.classList.remove('has-photo'); }
   }
+  // Normalize the load-time state: drop an empty src="" (no baked photo) so it
+  // never fires a spurious request, and honor whatever's correct on first paint.
+  if (photoPreview) { if (bakedPhoto) setPhoto(bakedPhoto); else setPhoto(null); }
   if (photoInput) {
     photoInput.addEventListener('change', () => {
       const file = photoInput.files && photoInput.files[0];
@@ -757,13 +770,15 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
       };
       reader.readAsDataURL(file);
     });
+    // A locally-uploaded photo wins over the baked-in one for this viewer.
     try { const stored = localStorage.getItem(PHOTO_KEY); if (stored) setPhoto(stored); } catch (e) {}
   }
   if (photoRemove) {
     photoRemove.addEventListener('click', (e) => {
       e.preventDefault(); e.stopPropagation();
-      setPhoto(null);
       try { localStorage.removeItem(PHOTO_KEY); } catch (e) {}
+      // Revert to the baked-in photo if the file shipped with one; else clear.
+      setPhoto(bakedPhoto || null);
     });
   }
 })();

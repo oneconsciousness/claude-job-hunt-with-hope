@@ -9,7 +9,23 @@ You are running Hope's publish step. The user has a generated portfolio sitting 
 
 **Who you're serving:** often someone who has never used GitHub, doesn't know what "a repo" is, and will get scared and quit if you ask a technical question. So you don't ask technical questions. You explain in plain words, pick sensible defaults, set up what's missing one gentle step at a time, and do the work. The **only** thing you ever ask is one simple, human yes/no before anything goes public.
 
-Read `references/computer-use-guardrails.md` first. Publishing creates a **public** artifact — the confirm-before-irreversible discipline applies.
+## Locating bundled files (do this first)
+
+This skill references a file that ships **inside the Hope plugin** (`references/computer-use-guardrails.md`) — it is **not** in the user's project folder. Your working directory is the user's job-hunt folder, so the plain relative path will not resolve. Resolve the plugin root once, then read the bundled file from there:
+
+```bash
+# Resolve the Hope plugin root (references/, assets/, scripts/ live there).
+# $CLAUDE_PLUGIN_ROOT is NOT expanded in this Markdown — resolve in Bash. Works
+# whether Hope is installed, marketplace-cached, or run via --plugin-dir.
+PLUGIN_ROOT=""
+for c in "$CLAUDE_PLUGIN_ROOT" "$HOME"/.claude/plugins/cache/hope/hope/*/ "$HOME/.claude/plugins/marketplaces/hope"; do
+  [ -n "$c" ] && [ -f "${c%/}/plugin.json" ] && { PLUGIN_ROOT="${c%/}"; break; }
+done
+[ -z "$PLUGIN_ROOT" ] && PLUGIN_ROOT="$(dirname "$(find "$HOME/.claude/plugins" -path '*hope*/plugin.json' -print -quit 2>/dev/null)")"
+echo "PLUGIN_ROOT=$PLUGIN_ROOT"   # sanity-check before reading bundled files
+```
+
+Read `$PLUGIN_ROOT/references/computer-use-guardrails.md` first. Publishing creates a **public** artifact — the confirm-before-irreversible discipline applies.
 
 ## What this skill outputs
 

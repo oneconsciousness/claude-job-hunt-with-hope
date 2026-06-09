@@ -7,7 +7,24 @@ description: Use when a user is starting their job hunt with Hope for the first 
 
 You are running Hope's onboarding milestone. Your job is to meet the user as a person and capture enough of their career to make every subsequent milestone work.
 
-Read `references/milestones.md`, `references/voice-guide.md`, `references/career-graph-schema.md`, and `references/design-tokens.md` before starting. The graph schema, the voice principles, and the design tokens are not optional — they're load-bearing.
+## Locating bundled files (do this first)
+
+This skill references files that ship **inside the Hope plugin** (`references/`, `scripts/`) — they are **not** in the user's project folder. Your working directory is the user's job-hunt folder, so plain relative paths like `references/voice-guide.md` will not resolve. Resolve the plugin root once, then read bundled files from there:
+
+```bash
+# Resolve the Hope plugin root (references/, assets/, scripts/ live there).
+# $CLAUDE_PLUGIN_ROOT is NOT expanded in this Markdown — resolve in Bash. Works
+# whether Hope is installed, marketplace-cached, or run via --plugin-dir.
+PLUGIN_ROOT=""
+for c in "$CLAUDE_PLUGIN_ROOT" "$HOME"/.claude/plugins/cache/hope/hope/*/ "$HOME/.claude/plugins/marketplaces/hope"; do
+  [ -n "$c" ] && [ -f "${c%/}/plugin.json" ] && { PLUGIN_ROOT="${c%/}"; break; }
+done
+[ -z "$PLUGIN_ROOT" ] && PLUGIN_ROOT="$(dirname "$(find "$HOME/.claude/plugins" -path '*hope*/plugin.json' -print -quit 2>/dev/null)")"
+echo "PLUGIN_ROOT=$PLUGIN_ROOT"   # sanity-check before reading bundled files
+```
+If `PLUGIN_ROOT` comes back empty, ask the user where the Hope plugin is checked out rather than guessing — a bare relative `references/…` read resolves against the user's project folder and will 404.
+
+Every reference below to `$PLUGIN_ROOT/...` means *that* resolved path. Read `$PLUGIN_ROOT/references/milestones.md`, `$PLUGIN_ROOT/references/voice-guide.md`, `$PLUGIN_ROOT/references/career-graph-schema.md`, and `$PLUGIN_ROOT/references/design-tokens.md` before starting. The graph schema, the voice principles, and the design tokens are not optional — they're load-bearing.
 
 ## What this milestone outputs
 
@@ -21,7 +38,7 @@ By the end of onboarding, the user's career graph (default location `career-grap
 - **2–5 Memory nodes** capturing personal preferences, constraints, aspirations — things that should color every future Hope interaction
 - **Documents node** for any files the user uploads (résumé, portfolio PDF, etc.)
 
-The schema is in `references/career-graph-schema.md`. Use deterministic IDs (see the schema doc — every Experience ID is `exp:<user-slug>:<company-slug>:<role-slug>:<start-year>` so re-runs MERGE rather than duplicate).
+The schema is in `$PLUGIN_ROOT/references/career-graph-schema.md`. Use deterministic IDs (see the schema doc — every Experience ID is `exp:<user-slug>:<company-slug>:<role-slug>:<start-year>` so re-runs MERGE rather than duplicate).
 
 ## How to start
 
@@ -79,7 +96,7 @@ site/
 
 ## Writing to the graph
 
-Use `scripts/graph_query.py` (the `add_node`, `add_edge` helpers) or edit the JSON file directly. Either way:
+Use `$PLUGIN_ROOT/scripts/graph_query.py` (the `add_node`, `add_edge` helpers) or edit the JSON file directly. The script is bundled in the plugin, not the user's folder, so invoke it by its `$PLUGIN_ROOT` path (e.g. `python "$PLUGIN_ROOT/scripts/graph_query.py" ...`). Either way:
 
 - **Always check if a node exists before creating** (deterministic IDs make this cheap).
 - **Set `confidence` and `source`** on every node and edge. `source: "document"` for résumé extraction, `source: "conversation"` for chat-derived. Confidence defaults: document=0.85, conversation=0.70.
