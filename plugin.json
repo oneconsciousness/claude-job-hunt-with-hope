@@ -4,13 +4,13 @@
   "description": "A Claude plugin that turns the job hunt into a journey of milestones — onboarding, discovery, presentation, application, interview, negotiation, decision. For anyone seeking work. Built while job-hunting; the only thing the maker has submitted with it — a Hope-generated portfolio — is getting interview calls.",
   "author": {
     "name": "Hope contributors",
-    "url": "https://github.com/<owner>/claude-job-hunt-with-hope"
+    "url": "https://github.com/oneconsciousness/claude-job-hunt-with-hope"
   },
   "license": "MIT",
-  "homepage": "https://github.com/<owner>/claude-job-hunt-with-hope",
+  "homepage": "https://github.com/oneconsciousness/claude-job-hunt-with-hope",
   "repository": {
     "type": "git",
-    "url": "https://github.com/<owner>/claude-job-hunt-with-hope.git"
+    "url": "https://github.com/oneconsciousness/claude-job-hunt-with-hope.git"
   },
   "keywords": [
     "career",
