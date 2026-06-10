@@ -1014,12 +1014,12 @@ img { display: block; }
 .photo-remove .material-symbols-rounded { font-size: 11px; }
 .photo-upload.has-photo:hover .photo-remove { display: flex; }
 
-/* ─── PUBLISHED-MODE CONTRACT — every editing affordance gates on
-   html[data-hope-mode=published] ─────────────────────────────────────────
+/* ─── PUBLISHED-MODE CONTRACT — every editing affordance AND builder
+   diagnostic gates on html[data-hope-mode=published] ─────────────────────
    A published copy carries data-hope-mode="published" on the <html> element,
    stamped by the publish skill into the STAGED site/index.html only. The
    generated/local file NEVER carries it — it stays the owner's editable copy.
-   Under the flag a visitor sees a finished site, not an editor:
+   Under the flag a visitor sees a finished site, not an editor or a draft:
      · photo upload fully inert — pointer-events none (which also kills the
        :hover ring — hover can't engage on a pointer-events:none element),
        upload prompt hidden, remove × never shown, and with no baked photo
@@ -1027,17 +1027,23 @@ img { display: block; }
      · the matching JS gate (document.documentElement.dataset.hopeMode ===
        'published') disables the file input and SKIPS the photo localStorage
        read/write, so a visitor's stale localStorage never shadows the
-       owner's baked photo.
+       owner's baked photo;
+     · the section-grid INTEGRITY bars (the % on each app tile) are hidden —
+       that percentage is a data-confidence diagnostic for the OWNER ("this
+       section is thin"), never a recruiter-facing grade. It already never
+       prints (the grid is hidden in all print modes); this keeps it off the
+       live site too.
    Visitor FEATURES are deliberately NOT gated: theme toggle (its
    localStorage persistence is a per-visitor preference), Share menu,
    Save-as-PDF, section-grid navigation, card expansion.
-   ANY FUTURE editable added to this template MUST ride the same flag —
-   CSS scoped under html[data-hope-mode="published"], JS behind the same
-   dataset.hopeMode check. */
+   ANY FUTURE editable or builder-facing diagnostic added to this template
+   MUST ride the same flag — CSS scoped under html[data-hope-mode="published"],
+   JS behind the same dataset.hopeMode check. */
 html[data-hope-mode="published"] .photo-upload { pointer-events: none; cursor: default; }
 html[data-hope-mode="published"] .photo-upload .upload-prompt { display: none; }
 html[data-hope-mode="published"] .photo-upload:not(.has-photo) { display: none; }
 html[data-hope-mode="published"] .photo-remove { display: none !important; }
+html[data-hope-mode="published"] .section-btn .integrity { display: none; }
 
 .identity-info { flex: 1; min-width: 0; }
 .identity-top {
