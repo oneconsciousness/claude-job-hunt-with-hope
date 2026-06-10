@@ -317,7 +317,7 @@ A subgraph curated for one specific job. Picks subset of skills, experiences, pr
 }
 ```
 
-## Edge types (20 total)
+## Edge types (29 total)
 
 Edges live in a flat `edges` array, each with `from`, `to`, `type`, and optional properties.
 
@@ -357,6 +357,7 @@ Edges live in a flat `edges` array, each with `from`, `to`, `type`, and optional
 - `INCLUDES_PROJECT` — CuratedPortfolio → Project
 - `INCLUDES_EDUCATION` — CuratedPortfolio → Education
 - `INCLUDES_CERTIFICATION` — CuratedPortfolio → Certification
+- `INCLUDES_DOCUMENT` — CuratedPortfolio → Document (e.g. the generated portfolio file itself)
 
 ### Application/Interview/Offer edges
 
@@ -377,7 +378,7 @@ These are the patterns the original Hope team got right. The port preserves them
 
 **Canonical company resolution.** Companies dedupe via `canonical_id` derived from domain (preferred) or slugified name. "Anthropic" / "Anthropic PBC" / "anthropic.com" collapse to one node. Person and Education share company nodes (school = company with type=school).
 
-**Confidence propagation.** Every node and edge carries a `confidence` score (0.0–1.0). Skills have base confidences from source: `document=0.85`, `conversation=0.70`, `github_api=0.95`, `web_enrichment=0.90`, `inferred=0.40`. **Confidence never downgrades** — when re-extracting, `level` and `years` only upgrade.
+**Confidence propagation.** Every node and edge carries a `confidence` score (0.0–1.0). Skills have base confidences from source: `document=0.85`, `conversation=0.70`, `github=0.95`, `web_enrichment=0.90`, `inferred=0.40`. **Confidence never downgrades** — when re-extracting, `level` and `years` only upgrade.
 
 **Source attribution.** Every node records its `source`: `document`, `conversation`, `github`, `web_enrichment`, `inferred`. Enables disambiguation when sources conflict.
 

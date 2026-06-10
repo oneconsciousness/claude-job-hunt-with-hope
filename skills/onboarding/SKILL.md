@@ -36,19 +36,81 @@ By the end of onboarding, the user's career graph (default location `career-grap
 - **Education nodes** for any formal training the user mentions
 - **Project nodes** for portfolio-worthy work outside formal employment
 - **2–5 Memory nodes** capturing personal preferences, constraints, aspirations — things that should color every future Hope interaction
-- **Documents node** for any files the user uploads (résumé, portfolio PDF, etc.)
+- **Document nodes** for any files the user uploads (résumé, portfolio PDF, etc.)
 
 The schema is in `$PLUGIN_ROOT/references/career-graph-schema.md`. Use deterministic IDs (see the schema doc — every Experience ID is `exp:<user-slug>:<company-slug>:<role-slug>:<start-year>` so re-runs MERGE rather than duplicate).
 
-## How to start
+## How to start — inventory first, interview last
 
-If the user has uploaded a résumé or pasted text, **lead with that.** Don't make them fill out a form when you already have data.
+Onboarding is **smart intake**: find what already exists, gather it with the least possible user effort, and interview only for what's still missing. The whole thing should feel like "give me what you've got, I'll do the work."
 
-> "I've got your résumé. Let me read through it. Two minutes."
+### Step 0 · Silent folder scan — before any question
 
-Then read the document, extract Experiences/Education/Projects/Skills with structured contributions, and show the user what you got. Confirm before writing to the graph.
+Scan the project folder before saying anything:
 
-If the user has nothing uploaded, ask three things — not more, not fewer. Ask each per **voice-guide rule #6 ("Choices, not blanks.")**: numbered options so the user can answer with just "2", exactly one marked "(recommended)" with a one-clause why, free text always honored. These are narrative questions, so the options are example-scaffolds that spark the user's own answer — never a quiz. Keep the warmth; this is a conversation, not a form.
+- **Resume-like documents** — `*.pdf` / `*.docx` / `*.txt`, names containing `resume` or `cv`, or any lone PDF.
+- **Headshot candidates** — `headshot.*` / `photo.*` / `profile.*`, or any portrait image.
+- **An existing graph** — `career-graph/career.json`.
+
+Open with what you **found**, not a question:
+
+> "I see `resume.pdf` and `headshot.jpg` in this folder — I'll use those. Anything else you've got?"
+
+Never ask for something that's already in the folder. If the scan finds **nothing**, skip straight to the Step 1 inventory — that question becomes the opener. And if a graph already exists with a Person node, this is a **returning user** — confirm what you have and route forward; don't re-onboard.
+
+### Step 1 · The inventory — one question, multi-select
+
+Ask **once**, up front, covering everything (voice-guide rule #6: numbered, one "(recommended)" with a one-clause why, free text always honored; this runs to five options because it's a **multi-select inventory** — rule #6's scannable-checklist exception, not a decision):
+
+> "What do you already have? Any combo — '1 and 3', or say it your way:
+> 1. A resume or CV (recommended — the richest single source)
+> 2. Your LinkedIn profile
+> 3. GitHub, Behance, or a personal site
+> 4. A professional photo
+> 5. None of these — we'll build it from a conversation, that works too."
+
+Any subset in any phrasing is legal — "check my linkedin, that's all I have", "resume + linkedin, also behance and github". Parse it; whatever they name becomes the work list. Items already found in Step 0 are acknowledged, never re-asked.
+
+### Step 2 · Gather, cheapest-first
+
+Minimize user work; announce each move before you make it. If a named source isn't in hand yet — a file that's not in the folder, a GitHub/Behance with no handle or URL — ask for it in the same announcement: "drop the file here, or paste the link."
+
+1. **Folder files** — read them now.
+2. **Public URLs** (GitHub / Behance / personal site) — fetch **directly**: `gh api` for the GitHub profile, pinned/top repos, and their READMEs; curl/web-fetch for Behance and personal sites. No browser permission needed — they're public. Say what you're reading: "Pulling your GitHub — public, just reading."
+3. **LinkedIn** — auth-walled; the one source that needs the user's browser. If a browser integration is available in this environment (Claude in Chrome / a connected browser tool), **ask permission**:
+
+   > "LinkedIn needs your logged-in browser. Want me to read your profile through the browser? I'll only read the page you give me — nothing else, no clicks."
+
+   If unavailable or declined, the honest fallback, stated kindly:
+
+   > "No problem — on your profile: More (or Resources) → Save to PDF, then drop the file here or paste the text."
+
+   **Never** attempt credentialed access yourself; never scrape past the wall.
+4. **Photo** — if found in Step 0, confirm it; otherwise invite (optional, openly skippable): drop an image into the folder.
+
+**Guardrails:** browser use is read-only and only on URLs the user gave you; announce public fetches before fetching; nothing leaves the machine.
+
+### Step 3 · Extract & merge — all sources, one pass
+
+Extract Experiences/Education/Projects/Skills with structured contributions from everything gathered, and merge into the graph in one pass:
+
+- **Dedupe via the schema's deterministic IDs** — multi-source overlap and re-runs MERGE rather than duplicate.
+- **Honest source attribution** per the schema's `source` field: `document` for files, `conversation` for chat, `github` for GitHub-derived, `web_enrichment` for browser/web-fetched data (LinkedIn, Behance, personal site).
+- **Never downgrade existing data** (see "Writing to the graph" below).
+
+### Step 4 · Gap-fill only — the interview shrinks to what's missing
+
+Show the user what you captured, confirm it, then ask **only about gaps**. Typically:
+
+- **Missing metrics** on the strongest contributions (see "Capturing experiences" below).
+- **The constraint/fear question** — Q3 from the no-assets path below, asked verbatim; data can't answer it, so it's almost always a gap.
+- **The headline-stats & interests pass** — choices derived from captured metrics, as specified in its own section below.
+
+No grilling. If a source already answered a question, never ask it again.
+
+### The no-assets path — option 5
+
+If the user has nothing (option 5, or the inventory comes back empty), build it from a conversation — ask three things, not more, not fewer. Ask each per **voice-guide rule #6 ("Choices, not blanks.")**: numbered options so the user can answer with just "2", exactly one marked "(recommended)" with a one-clause why, free text always honored. These are narrative questions, so the options are example-scaffolds that spark the user's own answer — never a quiz. Keep the warmth; this is a conversation, not a form.
 
 1. **What kind of work are you looking for?** (Listen for role family, level, industry — but don't grill.)
 
@@ -95,7 +157,7 @@ When extracting Experience or Project content, don't just grab the bullet points
 - **Domain:** B2B SaaS / consumer / fintech / etc.
 - **Competencies:** systems thinking, stakeholder management, etc.
 
-If a metric isn't on the résumé, ask the user. "Was there a number on this one? Even a rough one — 'about 40% of the team adopted it' is more useful than nothing."
+If a metric isn't in any gathered source, ask the user (this is the heart of the Step 4 gap-fill). "Was there a number on this one? Even a rough one — 'about 40% of the team adopted it' is more useful than nothing."
 
 ## Headline stats & interests — capture for the summary band
 
@@ -166,7 +228,7 @@ site/
 Use `$PLUGIN_ROOT/scripts/graph_query.py` (the `add_node`, `add_edge` helpers) or edit the JSON file directly. The script is bundled in the plugin, not the user's folder, so invoke it by its `$PLUGIN_ROOT` path (e.g. `python "$PLUGIN_ROOT/scripts/graph_query.py" ...`). Either way:
 
 - **Always check if a node exists before creating** (deterministic IDs make this cheap).
-- **Set `confidence` and `source`** on every node and edge. `source: "document"` for résumé extraction, `source: "conversation"` for chat-derived. Confidence defaults: document=0.85, conversation=0.70.
+- **Set `confidence` and `source`** on every node and edge. `source: "document"` for file extraction (résumé, LinkedIn PDF), `source: "conversation"` for chat-derived, `source: "github"` for GitHub-derived, `source: "web_enrichment"` for browser/web-fetched. Confidence defaults: document=0.85, conversation=0.70, github=0.95, web_enrichment=0.90.
 - **Never downgrade.** If a Skill already exists with `years: 8` and the new evidence says 6, keep 8.
 - **Set `hope_schema_version: "1.0"`** on the graph file if it's new.
 
@@ -210,7 +272,7 @@ When onboarding is complete, write a Memory node:
 
 ```json
 {
-  "id": "mem:onboarding-complete:<date>",
+  "id": "mem:<user-slug>:onboarding-complete:<date>",
   "topic": "onboarding-complete",
   "content": "Onboarded on <date>. User is looking for <role>. Top skills: <list>. Constraints: <list>. Style preferences: <list>.",
   "category": "constraint",
