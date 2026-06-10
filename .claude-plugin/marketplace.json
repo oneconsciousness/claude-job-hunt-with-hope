@@ -7,8 +7,9 @@
   "plugins": [
     {
       "name": "hope",
-      "description": "Build a designed portfolio website from your own facts and publish it to a free GitHub Pages site you own — all from a career file stored on your machine. One link to share.",
-      "version": "0.4.0",
+      "displayName": "JobHunt with Hope",
+      "description": "JobHunt with Hope — build a designed portfolio website from your own facts and publish it to a free GitHub Pages site you own, all from a career file stored on your machine. One link to share.",
+      "version": "0.4.1",
       "source": ".",
       "license": "MIT",
       "tags": ["career", "job-search", "portfolio", "resume", "interview"]

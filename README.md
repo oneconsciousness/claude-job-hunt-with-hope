@@ -1,4 +1,4 @@
-# Hope
+# JobHunt with Hope
 
 > A free helper for your job hunt. You add it to Claude.
 
