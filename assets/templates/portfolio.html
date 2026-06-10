@@ -161,7 +161,7 @@ img { display: block; }
   /* Keep SMALL units intact; let big containers (pane, card, group) break across
      pages. Keeping .section-pane/.item-card/.contrib-group together is what caused
      page-sized blank gaps — a container taller than one page can never "avoid". */
-  .identity-card, .item-head, .contrib, .skill-cell, .edu-card {
+  .identity-card, #summary-band, .item-head, .contrib, .skill-cell, .edu-card {
     break-inside: avoid; page-break-inside: avoid;
   }
   /* Headers never strand at the bottom of a page — they stay with their content. */
@@ -205,7 +205,12 @@ img { display: block; }
     --grid-line: transparent; --scan-line: transparent;
   }
   body.print-doc-portfolio.print-style-ink .identity-card::before,
+  body.print-doc-portfolio.print-style-ink #summary-band::before,
   body.print-doc-portfolio.print-style-ink .item-card::before { display: none !important; }
+  /* Summary band in ink: hexes + chips are already covered by the .hex-kpi .hex
+     and .skill-chip rules below; the ledge/eyebrow go #111 via the token — only
+     the ledge's literal glow needs killing (paired with skill-cat's, further down). */
+  body.print-doc-portfolio.print-style-ink .summary-eyebrow .ledge { box-shadow: none; }
   body.print-doc-portfolio.print-style-ink .item-card.is-current .accent-bar { background: linear-gradient(180deg, #111, #111 60%, transparent); box-shadow: none; }
   body.print-doc-portfolio.print-style-ink .live-pill,
   body.print-doc-portfolio.print-style-ink .active-pill { background: transparent; border-color: #c8c8c8; color: #111; box-shadow: none; }
@@ -236,6 +241,9 @@ img { display: block; }
   body.print-doc-portfolio.print-style-showcase .wrap { display: flex; flex-direction: column; }
   body.print-doc-portfolio.print-style-showcase .wrap > * { order: 2; }
   body.print-doc-portfolio.print-style-showcase .wrap > .identity-card { order: 0; }
+  /* Same order as identity — the flexbox DOM-order tie-break keeps the summary
+     band right after it, ahead of the elevated projects pane. */
+  body.print-doc-portfolio.print-style-showcase .wrap > #summary-band { order: 0; }
   body.print-doc-portfolio.print-style-showcase .wrap > .section-pane[data-pane="projects"] { order: 1; }
   body.print-doc-portfolio.print-style-showcase .wrap > .footer { order: 3; }
   body.print-doc-portfolio.print-style-showcase { font-size: 11.5px; }
@@ -254,6 +262,7 @@ img { display: block; }
 
   /* ── RESUME document — swap the portfolio for #resume-view. ── */
   body.print-doc-resume .identity-card,
+  body.print-doc-resume #summary-band,
   body.print-doc-resume .section-grid,
   body.print-doc-resume .section-pane,
   body.print-doc-resume .footer { display: none !important; }
@@ -364,6 +373,32 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
 .contact-row .item.linkedin { color: var(--accent-cyan); }
 .contact-row .item:hover { opacity: 0.8; }
 .summary { margin: 12px 0 0; color: var(--text-secondary); font-size: 13.5px; line-height: 1.65; max-width: 640px; }
+
+/* ─── Summary band (opt-in) — curated hero stats + interests ───────────
+   Identity-card family: same panel tokens + 32px grid texture, no new colors.
+   Rendered only when the user opted in (CuratedPortfolio.show_summary); the
+   portfolio skill strips the conditional block otherwise, so these rules are
+   inert on no-summary pages. */
+.summary-band { position: relative; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-panel); padding: 16px 24px 18px; margin-bottom: 14px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.summary-band::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.55; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 32px 32px; z-index: 0; }
+.summary-band > * { position: relative; z-index: 1; }
+.summary-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.summary-eyebrow .ledge { width: 18px; height: 2px; border-radius: 1px; background: var(--accent-orange); box-shadow: 0 0 6px color-mix(in srgb, var(--accent-orange) 50%, transparent); }
+.summary-eyebrow .name { font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--accent-orange); opacity: 0.92; }
+.summary-stats { display: flex; flex-wrap: wrap; gap: 14px 28px; }
+/* Scaled-up hex KPI: same clip-path/orange tint via the .hex-kpi classes, ~2×
+   size. Scoped selectors out-rank the later .hex-kpi base rules (specificity),
+   and ink's monochrome .hex-kpi overrides keep covering these for free. */
+.summary-band .hex-kpi { gap: 12px; }
+.summary-band .hex-kpi .hex { width: 44px; height: 44px; border-radius: 6px; flex-shrink: 0; }
+.summary-band .hex-kpi .hex .material-symbols-rounded { font-size: 22px; }
+.summary-stat .stat-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.summary-stat .stat-value { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); line-height: 1.1; }
+.summary-stat .stat-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.10em; color: var(--text-muted); }
+.summary-interests { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.summary-interests .interests-eyebrow { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--text-muted); margin-right: 6px; }
+/* Neutral chips — skill-chip bones, no category colors. */
+.summary-interests .skill-chip { background: var(--surface-2); color: var(--text-secondary); border-color: var(--border-default); }
 
 .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
 .section-btn { background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-button); padding: 12px 14px; display: flex; align-items: center; gap: 12px; text-align: left; font-family: inherit; box-shadow: var(--shadow-sm); transition: all 0.2s ease; }
@@ -551,6 +586,8 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
   .photo-upload { width: 96px; height: 96px; }
   .identity-top { flex-direction: column; align-items: flex-start; gap: 8px; }
   h1.name { font-size: 20px; }
+  .summary-band { padding: 14px 18px 16px; }
+  .summary-stats { gap: 12px 20px; }
   .section-grid { grid-template-columns: 1fr; }
   .item-meta { flex-wrap: wrap; gap: 6px; }
 }
@@ -625,6 +662,48 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
       </div>
     </div>
   </div>
+
+  <!-- SUMMARY BAND (opt-in) ======================================== -->
+  {{#show_summary}}
+  <!-- Renders ONLY when the user opted in (CuratedPortfolio.show_summary == true).
+       Opted out / nothing captured → the portfolio skill strips this whole
+       conditional block (markers included), zero placeholder residue — the page
+       renders exactly as it does without the band.
+       Portfolio skill substitutes:
+         summary_stats_loop     — up to 4 curated hero stats (Person.headline_stats,
+                                  human-curated, never auto-summed): stat_icon is a
+                                  Material Symbols name (e.g. rocket_launch / payments /
+                                  groups / public), stat_value e.g. "$2M+", stat_label
+                                  e.g. "client pipeline".
+         summary_interests_loop — up to 6 genuinely personal interests
+                                  (Person.interests, e.g. typography, trail running),
+                                  one neutral chip per interest.
+       Omit a whole row (.summary-stats or .summary-interests) when its source
+       list is empty — never render an eyebrow over nothing. -->
+  <section id="summary-band" class="summary-band materialize stagger-1">
+    <div class="summary-eyebrow">
+      <span class="ledge"></span>
+      <span class="name">Overview</span>
+    </div>
+    <div class="summary-stats">
+      <!-- HOPE:summary_stats_loop -->
+      <div class="summary-stat hex-kpi">
+        <span class="hex"><span class="material-symbols-rounded">{{stat_icon}}</span></span>
+        <span class="stat-text">
+          <span class="stat-value">{{stat_value}}</span>
+          <span class="stat-label">{{stat_label}}</span>
+        </span>
+      </div>
+      <!-- /HOPE:summary_stats_loop -->
+    </div>
+    <div class="summary-interests">
+      <span class="interests-eyebrow">Interests</span>
+      <!-- HOPE:summary_interests_loop -->
+      <span class="skill-chip">{{interest}}</span>
+      <!-- /HOPE:summary_interests_loop -->
+    </div>
+  </section>
+  {{/show_summary}}
 
   <!-- SECTION TABS ================================================= -->
   <div class="section-grid materialize stagger-2">

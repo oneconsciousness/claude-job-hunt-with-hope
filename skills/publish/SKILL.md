@@ -193,7 +193,13 @@ Plainly and warmly: "Done — your portfolio is live at **<url>**. Copy it into 
 If the share images shipped (step 6c), add — plainly: "Paste this link on LinkedIn and it shows your share card. og-image-square.png is yours to attach to posts." (The square image lives in `site/` and at `<SITE_URL>og-image-square.png`.) If they later say the LinkedIn preview looks stale or missing, point them to LinkedIn's **Post Inspector** — https://www.linkedin.com/post-inspector/ — paste the link there and hit Inspect to force a fresh scrape; LinkedIn caches previews for about a week, and posts already published keep their old card. If the images were skipped (no Chrome), don't promise a card — the link still works everywhere, just without the picture preview.
 
 ### 9. Custom domain (only if they ask)
-If they raise their own domain: write a `CNAME` file (commit, push) and **print** the exact DNS records to add at their registrar (`CNAME` `www` → `<owner>.github.io`, or apex `A` records per GitHub's IPs). You never edit their DNS — print the records, let them add them.
+If they raise their own domain, ask which address they want — numbered, recommended first (voice-guide rule #6):
+> "Which address should the portfolio live at?
+>  **1. `www.<their-domain>`** *(recommended)* — simplest setup, one DNS record.
+>  **2. `<their-domain>` (no www)** — works too, needs four records.
+>  (Or tell me in your own words.)"
+
+Then write the `CNAME` file (commit, push) and **print** the exact DNS records for their pick to add at their registrar (`CNAME` `www` → `<owner>.github.io`, or apex `A` records per GitHub's IPs). You never edit their DNS — print the records, let them add them.
 
 ## Hosts
 
@@ -204,6 +210,8 @@ If they raise their own domain: write a `CNAME` file (commit, push) and **print*
 ## Voice
 
 Warm, calm, in control — you know how this works so they don't have to. Plain words, one step at a time, never breezy about the public action.
+
+Questions follow voice-guide rule #6 ("Choices, not blanks"): they come as numbered choices with a *(recommended)* pick; plain yes/no confirms — like step 5's — stay plain.
 
 > ✅ "I'll put this online for you — it'll be public so recruiters can see it, and your private files stay home. Ready?"
 > ✅ "Putting it online now… setting up the page… done. Here's your link: <url>"

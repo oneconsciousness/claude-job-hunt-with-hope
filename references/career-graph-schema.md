@@ -71,10 +71,20 @@ The first 11 are ported directly from Hope MVP. Four new ones (Application, Inte
   "summary": "...",
   "location": "Brooklyn, NY",
   "linkedin": "https://linkedin.com/in/janedoe",
+  "headline_stats": [
+    {"icon": "rocket_launch", "value": "$2M+", "label": "client pipeline"},
+    {"icon": "groups", "value": "12", "label": "designers mentored"}
+  ],
+  "interests": ["trail running", "letterpress printing", "sci-fi novels"],
   "created_at": "2026-05-06T22:00:00Z",
   "updated_at": "2026-05-06T22:00:00Z"
 }
 ```
+
+Two **optional** fields feed the portfolio's summary band:
+
+- `headline_stats` — up to **4** hero numbers, each `{"icon": str, "value": str, "label": str}` where `icon` is a Material Symbols name (e.g. `rocket_launch`, `payments`, `groups`, `public`). **Curated by the human, never auto-summed** — the metrics are heterogeneous (dollars, headcounts, percentages, countries), so any automatic aggregation across them produces nonsense. Hope asks the user for their proudest numbers and records them verbatim.
+- `interests` — up to **6** genuinely personal interests (typography, trail running) — **not skill keywords**. Skills earn their own nodes with evidence edges; interests are who the person is off the org chart.
 
 ### Skill — global, shared across users in spirit (deduped within graph)
 
@@ -219,10 +229,13 @@ A subgraph curated for one specific job. Picks subset of skills, experiences, pr
   "title": "Jane Doe — for Anthropic",
   "summary": "...",
   "relevance_notes": "Emphasizes design systems and stakeholder narrative.",
+  "show_summary": true,
   "created_at": "...",
   "updated_at": "..."
 }
 ```
+
+`show_summary` (boolean, optional) — whether this portfolio renders the summary band (the Person's `headline_stats` + `interests`). A **presentation choice per portfolio, not a Person fact** — the same person may show the band for one role and hide it for another. Absent → the band is omitted.
 
 ### Application — NEW (Milestone 4)
 

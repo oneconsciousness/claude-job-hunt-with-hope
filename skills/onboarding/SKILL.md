@@ -30,7 +30,7 @@ Every reference below to `$PLUGIN_ROOT/...` means *that* resolved path. Read `$P
 
 By the end of onboarding, the user's career graph (default location `career-graph/career.json`) should contain:
 
-- **1 Person node** with `name`, `headline`, `summary`, `location`, `email` (optional), `linkedin` (optional)
+- **1 Person node** with `name`, `headline`, `summary`, `location`, `email` (optional), `linkedin` (optional) — plus optional curated `headline_stats` (max 4) and `interests` (max 6) when the user shares them (see "Headline stats & interests" below)
 - **At least 3 Experience nodes** (or as many as the user has) with structured `contributions` (STAR-method evidence)
 - **At least 5 Skill nodes** with `USED_SKILL` edges back to Experiences/Projects/Education — every skill earns its place by being demonstrated, never appearing as a flat list
 - **Education nodes** for any formal training the user mentions
@@ -48,11 +48,34 @@ If the user has uploaded a résumé or pasted text, **lead with that.** Don't ma
 
 Then read the document, extract Experiences/Education/Projects/Skills with structured contributions, and show the user what you got. Confirm before writing to the graph.
 
-If the user has nothing uploaded, ask three things — not more, not fewer:
+If the user has nothing uploaded, ask three things — not more, not fewer. Ask each per **voice-guide rule #6 ("Choices, not blanks.")**: numbered options so the user can answer with just "2", exactly one marked "(recommended)" with a one-clause why, free text always honored. These are narrative questions, so the options are example-scaffolds that spark the user's own answer — never a quiz. Keep the warmth; this is a conversation, not a form.
 
-1. **What kind of work are you looking for?** (Open-ended. Listen for role family, level, industry, but don't grill.)
+1. **What kind of work are you looking for?** (Listen for role family, level, industry — but don't grill.)
+
+   > "What are we hunting for?
+   > 1. More of what you do now, one level up (recommended — most strong hunts start from proven ground)
+   > 2. Same craft, different industry or company size
+   > 3. A real pivot — new role family entirely
+   >
+   > Or just tell me in your own words."
+
 2. **Tell me about something you've done that you're proud of.** (This is the entry point for the first Experience or Project node. Lead with their best work.)
+
+   > "Tell me about something you've done that you're proud of. If nothing jumps out, one of these shapes usually fits:
+   > 1. You built or shipped something and a number moved (recommended — a metric makes the strongest opening)
+   > 2. You led people through something hard
+   > 3. You rescued something that was failing
+   >
+   > Or start anywhere — I'll follow."
+
 3. **What's the constraint or fear you'd want me to remember?** (Comp floor, geography, family situation, ageism worry, gap in résumé — whatever they bring. Goes into a Memory node.)
+
+   > "What should I quietly keep in mind the whole way through?
+   > 1. A compensation floor (recommended — it's the constraint that shapes everything else, and I'll never surface it without asking)
+   > 2. Geography or remote — where life needs you to be
+   > 3. Something you worry reads badly — a gap, a pivot, your age
+   >
+   > Or say it however it comes."
 
 Then offer: "I'm going to ask you to tell me about a couple more roles you've held. We can do this in pieces. Want to keep going, or pick this back up later?"
 
@@ -73,6 +96,50 @@ When extracting Experience or Project content, don't just grab the bullet points
 - **Competencies:** systems thinking, stakeholder management, etc.
 
 If a metric isn't on the résumé, ask the user. "Was there a number on this one? Even a rough one — 'about 40% of the team adopted it' is more useful than nothing."
+
+## Headline stats & interests — capture for the summary band
+
+After the experiences are in (contributions captured, metrics drawn out) and **before** the quality bar, run one gentle, skippable pass for the data that powers the portfolio's summary band. **Never blocking** — if the user skips, move straight on. Downstream skills omit the band silently when these fields are absent, so a skip costs nothing.
+
+**Proudest numbers.** Derive the choices from metrics you already captured — don't make the user dig. Per voice-guide rule #6:
+
+> "I spotted these numbers in your story — which belong in lights at the top of your portfolio? Up to four:
+> 1. $2M+ client pipeline (recommended — your biggest)
+> 2. 37% adoption company-wide
+> 3. 6 engineers mentored
+>
+> Or type your own — any number you're proud of counts. Or skip; we can add these later."
+
+Capture rules:
+
+- **Max 4, curated by the user — never auto-summed.** Metrics are heterogeneous ($ next to % next to headcount); the user picks which go up in lights, you never do arithmetic across them.
+- The user picks the numbers; **you pick the icon** — a Material Symbols name that fits the stat (`rocket_launch` for launches, `payments` for revenue, `groups` for people, `public` for reach).
+- Keep `value` short and display-ready ("$2M+", "37%", "6"); keep `label` a quiet lowercase phrase ("client pipeline", "design-system adoption").
+
+**Interests.** A light ask, openly skippable:
+
+> "Last one, and it's skippable — anything off the clock worth knowing? The kind of thing a future teammate would remember:
+> 1. A craft — typography, woodworking, film photography (recommended — concrete and human beats a list of adjectives)
+> 2. Something physical — trail running, climbing, swimming
+> 3. Something communal — mentoring, a local club, open-source weekends
+>
+> Or tell me in your own words — or skip, and we move on."
+
+Max 6, **genuinely personal** — typography, trail running — not skill keywords. If they offer something that's already a Skill node ("Python"), ask for the off-the-clock version instead.
+
+**Write both to the Person node** as optional fields:
+
+```json
+{
+  "headline_stats": [
+    { "icon": "payments", "value": "$2M+", "label": "client pipeline" },
+    { "icon": "groups", "value": "6", "label": "engineers mentored" }
+  ],
+  "interests": ["typography", "trail running"]
+}
+```
+
+If the user skipped or no metrics exist, **write nothing** — no empty arrays, no placeholders. And the show/hide decision for the band itself is not yours: `show_summary` lives on the CuratedPortfolio node (a per-portfolio presentation choice, not a Person fact), and `hope-portfolio` asks at generation time. Onboarding only captures the raw material.
 
 ## Where your files live — the project folder
 
@@ -114,6 +181,8 @@ Warm and curious. Asking with genuine interest. Not a form. Not a chatbot. A fri
 
 When they say something interesting, follow up. When they're brief, don't pad. When they say "that's all," accept it.
 
+And when you ask, offer **choices, not blanks** — voice-guide rule #6: numbered options answerable with a "2", exactly one "(recommended)" with a one-clause why, free text always honored.
+
 ## Quality bar before exiting onboarding
 
 Don't generate their portfolio (the payoff) until:
@@ -121,7 +190,7 @@ Don't generate their portfolio (the payoff) until:
 - The Person node feels like *them*. The summary should be theirs, not boilerplate.
 - At least one Experience has structured contributions with a metric.
 - At least 5 Skills have `USED_SKILL` edges.
-- The user has confirmed the graph state matches reality. Show them. Ask "anything off?"
+- The user has confirmed the graph state matches reality. Show them. Ask "anything off?" — a plain yes/no confirm is compliant with voice-guide rule #6. If they say yes, scaffold the fix as choices: "1. A date, title, or metric that's wrong (recommended starting point — the most common miss) 2. A skill that's missing or doesn't belong 3. Something about how I've summarized you — or just point at the line."
 
 If the answer is "this is wrong," fix it before continuing. The graph is the user's data. It has to feel right to them.
 

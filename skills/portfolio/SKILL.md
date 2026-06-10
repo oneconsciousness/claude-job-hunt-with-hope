@@ -41,6 +41,7 @@ A **single self-contained HTML file** at `career-graph/documents/portfolios/port
 **What goes inside:**
 
 - **Identity card** — photo, name, headline, stats row, contact row, and summary, over a 32×32 grid texture, with the LIVE pill top-right.
+- **Summary band (opt-in)** — `#summary-band`, directly after the identity card and before the section grid: up to 4 curated hero stats as large hex badges plus a quiet interests line. Renders **only** when the user opted in (`CuratedPortfolio.show_summary` is true) and `Person.headline_stats` exist — see "Summary band — substitution contract" below.
 - **Summary** — 2–4 sentences in Hope's voice. Specific, not generic. Hints at tension before resolution.
 - **Selected experience** — 3 to 5 most relevant Experiences as cards, each with: title, company, dates, a 1-sentence framing, the strongest contribution (STAR with a metric), and the skills demonstrated.
 - **Selected projects** — same shape as experience, for portfolio-worthy projects outside formal employment.
@@ -62,7 +63,7 @@ Read the user's career graph. If a target Job is named (`hope make portfolio for
 
 If no target Job is named, generate a **general portfolio** representing the user's strongest work overall.
 
-Either way, **create a CuratedPortfolio node** in the graph linking to the included Experiences/Skills/Projects. This means the user's graph remembers which curation went out for which role.
+Either way, **create a CuratedPortfolio node** in the graph linking to the included Experiences/Skills/Projects, and record the user's summary-band decision on it as `"show_summary": true|false` (see the opt-in prompt below — it's a per-portfolio presentation choice, not a Person fact). This means the user's graph remembers which curation went out for which role.
 
 ## Voice in the portfolio copy
 
@@ -123,6 +124,25 @@ The Projects pane uses the **same collapsible `.item-card` structure as Experien
 
 Mark the **first** project card `expanded` (so the pane opens populated). The card reuses Experience's `.item-card[data-expand] .item-head` markup verbatim, so the card-expand JS and the section-grid "Projects" filter work on project cards with no extra wiring. There is **no** project tile, hero gradient, or metric tag — those were removed.
 
+### Summary band — substitution contract (opt-in, zero residue)
+
+The template carries `<section id="summary-band" class="summary-band materialize stagger-1">` inside `.wrap`, directly **after the identity card and before the section grid**, wrapped in `{{#show_summary}} … {{/show_summary}}` conditional markers (same conditional style as `{{#target_company}}`). It's two calm rows under a 2px-orange-ledge mono "OVERVIEW" eyebrow: a KPI row of up to 4 large (~44px) hex badges, and a quiet "INTERESTS" line of neutral pill chips. The look is template-owned and token-driven — your job is the content.
+
+**Render gate:** the band renders **only** when `CuratedPortfolio.show_summary` is `true` AND `Person.headline_stats` is non-empty. In every other case — `show_summary` false or absent, or no stats captured — **strip the entire `{{#show_summary}}…{{/show_summary}}` block from the output. Zero residue:** no empty `<section>`, no leftover loop comments, no stray tokens.
+
+When rendering, substitute:
+
+| Loop / token | Source | Notes |
+|---|---|---|
+| `<!-- HOPE:summary_stats_loop --> … <!-- /HOPE:summary_stats_loop -->` | `Person.headline_stats` (optional field, max **4**) | One hex badge + stacked value/label per stat. These are **curated by the human — never auto-summed**: metrics are heterogeneous, so don't invent, aggregate, or derive them from other graph nodes. |
+| `{{stat_icon}}` | `headline_stats[].icon` | Material Symbols name, e.g. `rocket_launch`, `payments`, `groups`, `public`. |
+| `{{stat_value}}` | `headline_stats[].value` | The hero number, e.g. `$2M+` — renders bold sans over the label. |
+| `{{stat_label}}` | `headline_stats[].label` | Short, e.g. `client pipeline` — renders mono uppercase, muted. |
+| `<!-- HOPE:summary_interests_loop --> … <!-- /HOPE:summary_interests_loop -->` | `Person.interests` (optional field, max **6**) | One neutral pill chip per interest — no category colors. If `interests` is empty but stats exist, drop the interests row entirely and keep the KPI row. |
+| `{{interest}}` | `interests[]` | Genuinely personal (typography, trail running) — not skill keywords. |
+
+**Print behavior is template-owned, but don't break it:** the band prints in all three **portfolio** styles (classic keeps color, ink goes monochrome, showcase keeps it right after identity) and is hidden in every **résumé** print mode. Never duplicate stats or interests into `#resume-view`.
+
 ### Resume view — substitution contract
 
 The template carries `<div id="resume-view" hidden>` as a **sibling of the portfolio content inside `.wrap`**. On screen it never renders (`#resume-view{display:none}`); it exists solely for the print path — when the user picks **Resume** in the export chooser, `body.print-doc-resume` hides the portfolio panes and shows this view instead. **Populate it on every generation.** An empty resume view passes a visual check (it's hidden) but silently prints a blank résumé.
@@ -155,7 +175,7 @@ find . -maxdepth 2 -type f \( \
   -print 2>/dev/null | head -5
 ```
 
-If the user named a specific file ("use `~/Pictures/jane.jpg`"), use that path instead. If you find more than one candidate, ask which to use rather than guessing.
+If the user named a specific file ("use `~/Pictures/jane.jpg`"), use that path instead. If you find more than one candidate, ask which to use rather than guessing — list them as numbered choices (voice-guide rule #6), recommending the most headshot-looking one.
 
 **2 — Resize to ~480px and base64-encode it.** Keep the file small so the HTML stays portable. On macOS use `sips` (always present); otherwise fall back to Python/PIL:
 
@@ -187,7 +207,7 @@ Either way the localStorage "change your photo" widget stays in the file as a fa
 **Before saving the user's files, clean and verify the output:**
 - **Strip the template-authoring comment** — the `<!-- Hope portfolio template · v0.4 … See skills/portfolio/SKILL.md for the substitution contract -->` block. It documents the template for *you*; it must not ship in the user's portfolio (it also contains a literal `{{single_tokens}}` that fails a "no unsubstituted tokens" check). Keep the disclosed provenance comments (share-url, generator) — those are intentional.
 - **"Generated" means all of it** — the portfolio HTML with a **populated `#resume-view`**, plus **`share-card.html` and `share-card-square.html`** next to it (see "Share cards & link-preview meta"). A run that produces only the portfolio file is incomplete.
-- **Verify zero unsubstituted placeholders remain** — grep **every generated file** (the portfolio AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, and the `resume_*` loop blocks — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé. If any survive, the substitution is incomplete; fix before saving. Never hand the user a file with raw template tokens.
+- **Verify zero unsubstituted placeholders remain** — grep **every generated file** (the portfolio AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the `resume_*` loop blocks, AND the summary-band tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, and a half-stripped summary band only fails for users who opted out. If any survive, the substitution is incomplete; fix before saving. Never hand the user a file with raw template tokens.
 
 ## Share cards & link-preview meta (generate alongside the portfolio)
 
@@ -219,27 +239,54 @@ Most portfolios should fit in 2–3 screens of vertical scroll on desktop. Long-
 
 ## What to ask the user before generating
 
-If the user has provided a target Job, just confirm: "Generating a portfolio targeted at {company} for {role}. The angle I'm taking is {angle in one sentence}. Continue?"
+Every question this skill asks follows **voice-guide rule #6 — "Choices, not blanks"**: numbered options (2–4), exactly one "(recommended)" with a one-clause why, free text always honored as the escape hatch. Numbered so the user can answer "2".
 
-If no target Job, ask: "Are we tailoring this for a specific role, or should I make a general portfolio that represents your strongest work overall?"
+If the user has provided a target Job, just confirm: "Generating a portfolio targeted at {company} for {role}. The angle I'm taking is {angle in one sentence}. Continue?" (A plain yes/no confirm IS rule-#6 compliant — don't pad it with fake options.)
 
-If the answer is "general", check whether they have any constraint: "Anything to play down or feature? Sometimes people want their consulting work pushed forward, sometimes pulled back."
+If no target Job, ask as a choice:
+
+> Should this portfolio aim somewhere specific?
+> 1. **General portfolio of your strongest work** (recommended — you can always tailor a copy when a specific role shows up)
+> 2. **Tailored to a role you have in mind** — name the company or role and I'll angle everything at it
+>
+> Or tell me in your own words.
+
+If the answer is "general", scaffold the constraint question instead of leaving it blank:
+
+> Anything to feature or play down? For example:
+> 1. **Keep the balance as-is** (recommended — I'll order by strength of evidence)
+> 2. **Push the consulting/freelance work forward**
+> 3. **Pull the older roles back** — lead with recent work
+>
+> Or tell me in your own words — these are just sparks.
+
+**Summary band opt-in — ask once per portfolio.** If `Person.headline_stats` exist and this CuratedPortfolio has no recorded `show_summary` decision yet, ask before first including the band:
+
+> Want a summary band up top — your proudest numbers and a line of interests, right under the identity card?
+> 1. **Show it** (recommended — recruiters skim, and your strongest numbers deserve the first screen)
+> 2. **Skip it** — go straight from your identity card to the work
+>
+> Or tell me in your own words.
+
+Record the answer on the CuratedPortfolio node as `"show_summary": true|false`; it's a per-portfolio presentation choice, so don't re-ask while iterating on the same portfolio. If the Person has **no** `headline_stats` and no `interests`, don't ask at all — skip the band silently (leave `show_summary` absent; the conditional block strips with zero residue).
 
 Then generate. Show them. Iterate.
 
 ## Iteration loop
 
-After first generation, **always ask:** "What's off?" Don't ask "do you like it?" — that's a yes/no trap. "What's off" invites correction.
+After first generation, **always ask "What's off?"** Don't ask "do you like it?" — that's a yes/no trap; "what's off" invites correction. It's an inherently narrative question, so per voice-guide rule #6 the options are **example-scaffolds** that spark the user's own answer — no "(recommended)" pick, because there's no right answer to what's bothering them:
 
-Common iterations:
-- Voice too cold or too warm
-- Wrong work featured
-- Section ordering
-- Length adjustment
-- Color preference (dark vs. light)
-- Specific phrasing in a card
+> What's off? Pick anything that itches:
+> 1. **Voice** — too cold, too warm, too salesy somewhere
+> 2. **Featured work** — wrong roles or projects up front
+> 3. **Order** — sections or cards in the wrong sequence
+> 4. **Length** — too much scroll, or too thin
+> 5. **Theme** — light vs. dark default
+> 6. **Phrasing** — a specific line in a card reads wrong
+>
+> Or tell me in your own words.
 
-Update the artifact. Update the CuratedPortfolio in the graph if the curation changed.
+Update the artifact. Update the CuratedPortfolio in the graph if the curation changed (including a changed `show_summary` decision).
 
 ## Show it — then hand over the keys
 
@@ -273,9 +320,13 @@ The moment they like it, lead them to put it online. That's what turns a file on
 
 ## Closing the loop — after publish, or when they come back
 
-Once the portfolio is live (or any time the user returns), there's exactly one loop to offer — keep them inside it:
+Once the portfolio is live (or any time the user returns), there's exactly one loop to offer — keep them inside it (numbered per voice-guide rule #6, no "(recommended)" — both paths are equally right depending on where they are):
 
-> "Want to **update your portfolio** — feature different work, change the angle, edit a card — or **publish the changes** you've made? I can do either."
+> Where are we picking up?
+> 1. **Update your portfolio** — feature different work, change the angle, edit a card
+> 2. **Publish the changes** you've made — I'll push them live
+>
+> Or tell me in your own words.
 
 - Want to change what's in it? Re-run this skill's iteration loop, then route back to `hope-publish` to push the update.
 - Happy with it and just want it online (or re-published after edits)? Route to `hope-publish`.
