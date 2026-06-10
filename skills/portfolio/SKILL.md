@@ -41,7 +41,7 @@ A **single self-contained HTML file** at `career-graph/documents/portfolios/port
 **What goes inside:**
 
 - **Identity card** — photo, name, headline, stats row, contact row, and summary, over a 32×32 grid texture, with the LIVE pill top-right.
-- **Summary band (opt-in)** — `#summary-band`, directly after the identity card and before the section grid: up to 4 curated hero stats as large hex badges plus a quiet interests line. Renders **only** when the user opted in (`CuratedPortfolio.show_summary` is true) and `Person.headline_stats` exist — see "Summary band — substitution contract" below.
+- **Overview app (opt-in)** — a section-grid tab, not a standalone band: a grid tile (`data-section="overview"`, labeled "Overview", icon `insights`, meta-count "`{{stat_count}} highlights`") plus a pane (`id="pane-overview"`) that sits first among the panes and opens by default when present. Inside: up to 4 curated hero stats as large hex badges plus a quiet interests line. Renders **only** when the user opted in (`CuratedPortfolio.show_summary` is true) and `Person.headline_stats` exist — see "Overview app — substitution contract" below.
 - **Summary** — 2–4 sentences in Hope's voice. Specific, not generic. Hints at tension before resolution.
 - **Selected experience** — 3 to 5 most relevant Experiences as cards, each with: title, company, dates, a 1-sentence framing, the strongest contribution (STAR with a metric), and the skills demonstrated.
 - **Selected projects** — same shape as experience, for portfolio-worthy projects outside formal employment.
@@ -63,7 +63,7 @@ Read the user's career graph. If a target Job is named (`hope make portfolio for
 
 If no target Job is named, generate a **general portfolio** representing the user's strongest work overall.
 
-Either way, **create a CuratedPortfolio node** in the graph linking to the included Experiences/Skills/Projects, and record the user's summary-band decision on it as `"show_summary": true|false` (see the opt-in prompt below — it's a per-portfolio presentation choice, not a Person fact). This means the user's graph remembers which curation went out for which role.
+Either way, **create a CuratedPortfolio node** in the graph linking to the included Experiences/Skills/Projects, and record the user's Overview-app decision on it as `"show_summary": true|false` (see the opt-in prompt below — it's a per-portfolio presentation choice, not a Person fact). This means the user's graph remembers which curation went out for which role.
 
 ## Voice in the portfolio copy
 
@@ -124,16 +124,24 @@ The Projects pane uses the **same collapsible `.item-card` structure as Experien
 
 Mark the **first** project card `expanded` (so the pane opens populated). The card reuses Experience's `.item-card[data-expand] .item-head` markup verbatim, so the card-expand JS and the section-grid "Projects" filter work on project cards with no extra wiring. There is **no** project tile, hero gradient, or metric tag — those were removed.
 
-### Summary band — substitution contract (opt-in, zero residue)
+### Overview app — substitution contract (opt-in, zero residue)
 
-The template carries `<section id="summary-band" class="summary-band materialize stagger-1">` inside `.wrap`, directly **after the identity card and before the section grid**, wrapped in `{{#show_summary}} … {{/show_summary}}` conditional markers (same conditional style as `{{#target_company}}`). It's two calm rows under a 2px-orange-ledge mono "OVERVIEW" eyebrow: a KPI row of up to 4 large (~44px) hex badges, and a quiet "INTERESTS" line of neutral pill chips. The look is template-owned and token-driven — your job is the content.
+The old standalone `#summary-band` between the identity card and the section grid is **gone** — its content (the hex-stat row + interests row) now lives in an **Overview app** inside the section grid. The template carries two pieces, **both** wrapped in `{{#show_summary}} … {{/show_summary}}` conditional markers (same conditional style as `{{#target_company}}`):
 
-**Render gate:** the band renders **only** when `CuratedPortfolio.show_summary` is `true` AND `Person.headline_stats` is non-empty. In every other case — `show_summary` false or absent, or no stats captured — **strip the entire `{{#show_summary}}…{{/show_summary}}` block from the output. Zero residue:** no empty `<section>`, no leftover loop comments, no stray tokens.
+- **Tile** — `<button class="section-btn" data-section="overview">`, labeled "Overview", Material Symbols icon `insights`, meta-count line "`{{stat_count}} highlights`".
+- **Pane** — `<div class="section-pane" data-pane="overview" id="pane-overview">`, placed **first** among the panes. Inside it the band's content classes are unchanged — `.summary-stats` / `.summary-stat` / `.stat-value` / `.stat-label` / `.summary-interests` — so the premium styling carries over (a KPI row of up to 4 large hex badges, a quiet interests line of neutral pill chips), and the pane's inner panel keeps the 32×32 grid texture.
+
+The look is template-owned and token-driven — your job is the content.
+
+**Render gate:** the app renders **only** when `CuratedPortfolio.show_summary` is `true` AND `Person.headline_stats` is non-empty. In every other case — `show_summary` false or absent, or no stats captured — **strip every `{{#show_summary}}…{{/show_summary}}` block (tile AND pane) from the output. Zero residue:** no empty tile, no empty pane, no leftover loop comments, no stray tokens. When stripped, the section grid is the old 5 tiles and Experience stays the default app.
+
+**Default-open:** on load, the active app is **Overview when the pane exists, else Experience**. The template's init JS handles this — it promotes Overview (activating both pane and tile classes) at/before first paint; the markup may keep Experience's static `active` as the fallback the JS overrides. Don't strip or fight that JS during substitution.
 
 When rendering, substitute:
 
 | Loop / token | Source | Notes |
 |---|---|---|
+| `{{stat_count}}` | count of rendered `headline_stats` | The tile's meta-count line, e.g. `4 highlights` — a number, nothing else. |
 | `<!-- HOPE:summary_stats_loop --> … <!-- /HOPE:summary_stats_loop -->` | `Person.headline_stats` (optional field, max **4**) | One hex badge + stacked value/label per stat. These are **curated by the human — never auto-summed**: metrics are heterogeneous, so don't invent, aggregate, or derive them from other graph nodes. |
 | `{{stat_icon}}` | `headline_stats[].icon` | Material Symbols name, e.g. `rocket_launch`, `payments`, `groups`, `public`. |
 | `{{stat_value}}` | `headline_stats[].value` | The hero number, e.g. `$2M+` — renders bold sans over the label. |
@@ -141,7 +149,7 @@ When rendering, substitute:
 | `<!-- HOPE:summary_interests_loop --> … <!-- /HOPE:summary_interests_loop -->` | `Person.interests` (optional field, max **6**) | One neutral pill chip per interest — no category colors. If `interests` is empty but stats exist, drop the interests row entirely and keep the KPI row. |
 | `{{interest}}` | `interests[]` | Genuinely personal (typography, trail running) — not skill keywords. |
 
-**Print behavior is template-owned, but don't break it:** the band prints in all three **portfolio** styles (classic keeps color, ink goes monochrome, showcase keeps it right after identity) and is hidden in every **résumé** print mode. Never duplicate stats or interests into `#resume-view`.
+**Print behavior is template-owned, but don't break it:** the Overview pane prints **first** among the panes (DOM order), and the print TOC carries a **conditional Overview entry** — the TOC chips' numbers are CSS counters, not the old static 01–05, so numbering self-adjusts when Overview is absent (no "02-first" lists). Every **résumé** print mode still hides all of it. The ink/showcase print rules that used to reference `#summary-band` now point at the pane — don't reintroduce the old id or leave selectors dangling. Never duplicate stats or interests into `#resume-view`.
 
 ### Resume view — substitution contract
 
@@ -207,7 +215,7 @@ Either way the localStorage "change your photo" widget stays in the file as a fa
 **Before saving the user's files, clean and verify the output:**
 - **Strip the template-authoring comment** — the `<!-- Hope portfolio template · v0.4 … See skills/portfolio/SKILL.md for the substitution contract -->` block. It documents the template for *you*; it must not ship in the user's portfolio (it also contains a literal `{{single_tokens}}` that fails a "no unsubstituted tokens" check). Keep the disclosed provenance comments (share-url, generator) — those are intentional.
 - **"Generated" means all of it** — the portfolio HTML with a **populated `#resume-view`**, plus **`share-card.html` and `share-card-square.html`** next to it (see "Share cards & link-preview meta"). A run that produces only the portfolio file is incomplete.
-- **Verify zero unsubstituted placeholders remain** — grep **every generated file** (the portfolio AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the `resume_*` loop blocks, AND the summary-band tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, and a half-stripped summary band only fails for users who opted out. If any survive, the substitution is incomplete; fix before saving. Never hand the user a file with raw template tokens.
+- **Verify zero unsubstituted placeholders remain** — grep **every generated file** (the portfolio AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the `resume_*` loop blocks, AND the Overview-app tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_count}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, and a half-stripped Overview app (a stray tile with no pane, or vice versa) only fails for users who opted out. If any survive, the substitution is incomplete; fix before saving. Never hand the user a file with raw template tokens.
 - **Verify the PDF export — produce and inspect, don't assume.** After generating, print one résumé PDF and check it. When `python3` is available, run the bundled checker against the generated file: `python3 "$PLUGIN_ROOT/scripts/verify_portfolio_pdf.py" <portfolio.html> --modes resume-classic`. Read its PASS/FAIL table and fix any FAIL before handing the file over. If `python3` isn't available, say so plainly instead of claiming the export was verified.
 
 ## Share cards & link-preview meta (generate alongside the portfolio)
@@ -261,15 +269,15 @@ If the answer is "general", scaffold the constraint question instead of leaving 
 >
 > Or tell me in your own words — these are just sparks.
 
-**Summary band opt-in — ask once per portfolio.** If `Person.headline_stats` exist and this CuratedPortfolio has no recorded `show_summary` decision yet, ask before first including the band:
+**Overview app opt-in — ask once per portfolio.** If `Person.headline_stats` exist and this CuratedPortfolio has no recorded `show_summary` decision yet, ask before first including the app:
 
-> Want a summary band up top — your proudest numbers and a line of interests, right under the identity card?
+> Want an Overview tab opening the section grid — your proudest numbers and a line of interests, the first thing a recruiter sees?
 > 1. **Show it** (recommended — recruiters skim, and your strongest numbers deserve the first screen)
-> 2. **Skip it** — go straight from your identity card to the work
+> 2. **Skip it** — open straight on your Experience
 >
 > Or tell me in your own words.
 
-Record the answer on the CuratedPortfolio node as `"show_summary": true|false`; it's a per-portfolio presentation choice, so don't re-ask while iterating on the same portfolio. If the Person has **no** `headline_stats` and no `interests`, don't ask at all — skip the band silently (leave `show_summary` absent; the conditional block strips with zero residue).
+Record the answer on the CuratedPortfolio node as `"show_summary": true|false`; it's a per-portfolio presentation choice, so don't re-ask while iterating on the same portfolio — and an existing decision is honored when regenerating (see "Updating an existing portfolio" below). If the Person has **no** `headline_stats` and no `interests`, don't ask at all — skip the app silently (leave `show_summary` absent; the conditional blocks strip with zero residue).
 
 Then generate. Show them. Iterate.
 
@@ -333,6 +341,10 @@ Once the portfolio is live (or any time the user returns), there's exactly one l
 - Happy with it and just want it online (or re-published after edits)? Route to `hope-publish`.
 
 That's the whole flow: collect their story → show the portfolio → put it online → update or re-publish on demand. Don't point them anywhere outside this loop.
+
+### Updating an existing portfolio
+
+**Regenerating from the user's existing graph against the current bundled template is THE update path** — never patch old HTML in place. New template features (like the Overview app and the published-mode gates) flow into the regenerated file automatically; then re-publishing via `hope-publish` re-stages the file and re-stamps the published flag, so updates stay sustainable release after release. Honor the existing `CuratedPortfolio.show_summary` decision without re-asking. One distinction to keep straight: **the local file is the owner's editable copy — it never carries `data-hope-mode="published"`; the published copy is the one the publish skill stamps read-only.**
 
 ## What you do not do
 

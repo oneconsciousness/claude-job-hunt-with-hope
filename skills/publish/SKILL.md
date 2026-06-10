@@ -61,7 +61,7 @@ Find the generated file (default `career-graph/documents/portfolios/portfolio-*.
 Create `site/` and copy **only** the portfolio HTML (as `index.html`) + any local assets it references. Exclude `career.json`, notes, drafts. Hope portfolios are self-contained, so this is usually one copy.
 
 ### 3. Pre-flight — re-publish check, then setup
-- If `.publish.json` exists → **re-publish**: reuse the recorded repo/URL, re-run step 6 (share-link + link-preview stamps, share images), then take step 7's re-publish path.
+- If `.publish.json` exists → **re-publish**: reuse the recorded repo/URL, re-run step 6 (share-link + link-preview stamps, share images, published-mode stamp), then take step 7's re-publish path.
 - Else (first publish): quietly check for `git`, `gh`, and `gh auth status`.
   - **All present** → say it simply ("Setup's good — I can put this online for you"), then scan + confirm.
   - **Something missing** → **Setup help** (below). Guide, don't dump.
@@ -154,7 +154,18 @@ Use **absolute paths** for both `--screenshot` and the `file://` URL — Chrome 
 
 **d) The allowlist grows by exactly two files: `og-image.png` and `og-image-square.png`.** Nothing else new enters `site/`. The `share-card.html` / `share-card-square.html` sources stay local — only their screenshots ship — and, as always, `career.json`, notes, drafts, and everything else in the job-hunt folder **never** leave the machine.
 
-Confirm the stamps landed before pushing — `grep -E 'hope:share-url|og:url|og:image' site/index.html` should show the live URL(s), with no leftover empty `content=""` on any tag you stamped. On **re-publish**, re-run this whole step anyway — the URLs are the same, but it self-heals copies generated before the page first went live and re-screenshots a share card that may have changed since last time.
+**e) The published-mode stamp — staged copy ONLY.** A published copy carries `data-hope-mode="published"` on its `<html>` element; the template gates editing affordances on it. Stamp it into `site/index.html`, guarded by a grep so a re-publish never double-stamps:
+
+```bash
+grep -q '<html data-hope-mode="published"' site/index.html \
+  || sed -i '' 's|<html |<html data-hope-mode="published" |' site/index.html
+```
+
+(On Linux, `sed -i 's|...|...|'` — drop the `''`.) **Never stamp the user's local saved copy** — unlike the stamps in (a)/(b), this one goes into the staged `site/index.html` only. The local file stays unstamped (owner mode, the owner's editable copy); re-publish re-stages and re-stamps every time, which is what makes this sustainable.
+
+**Published copies are read-only.** On the live site the flag disables visitor *editing* — photo upload goes fully inert, and a visitor's stale localStorage never shadows the owner's baked photo. Visitor *features* stay: theme toggle, the Share menu, Save-as-PDF, section navigation, card expansion. This is the same PUBLISHED-MODE CONTRACT documented in the template CSS: **any future editable affordance added to the portfolio must gate on `html[data-hope-mode="published"]`** — that's what keeps published sites read-only as the template grows.
+
+Confirm the stamps landed before pushing — `grep -E 'hope:share-url|og:url|og:image|<html data-hope-mode' site/index.html` should show the live URL(s) and the `data-hope-mode="published"` flag on the `<html` tag (the `<html ` anchor matters — the template's CSS gate rules also contain the literal string `data-hope-mode="published"`, so an unanchored grep passes even when the tag was never stamped), with no leftover empty `content=""` on any tag you stamped. On **re-publish**, re-run this whole step anyway — the URLs are the same, but it self-heals copies generated before the page first went live and re-screenshots a share card that may have changed since last time.
 
 ### 7. Execute (run it; narrate in plain words)
 Say what's happening simply — "Putting it online…", "Setting up the page…", "Almost there — the web address is waking up." Run:
@@ -188,7 +199,7 @@ git add -A && git commit -m "Update portfolio" && git push
 Same repo, same URL — never a second site for the same portfolio. Pages rebuilds on its own when the branch changes; no API calls needed.
 
 ### 8. Return the URL
-Plainly and warmly: "Done — your portfolio is live at **<url>**. Copy it into any application. It can take a minute to appear the first time." Offer to open it for them. The page's own **Share** button now copies this exact link too.
+Plainly and warmly: "Done — your portfolio is live at **<url>**. Copy it into any application. It can take a minute to appear the first time. And your live site is view-only for visitors — only you can change it, by republishing." Offer to open it for them. The page's own **Share** button now copies this exact link too.
 
 If the share images shipped (step 6c), add — plainly: "Paste this link on LinkedIn and it shows your share card. og-image-square.png is yours to attach to posts." (The square image lives in `site/` and at `<SITE_URL>og-image-square.png`.) If they later say the LinkedIn preview looks stale or missing, point them to LinkedIn's **Post Inspector** — https://www.linkedin.com/post-inspector/ — paste the link there and hit Inspect to force a fresh scrape; LinkedIn caches previews for about a week, and posts already published keep their old card. If the images were skipped (no Chrome), don't promise a card — the link still works everywhere, just without the picture preview.
 

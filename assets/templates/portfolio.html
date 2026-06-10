@@ -119,7 +119,7 @@ img { display: block; }
 
 /* z-index 950: the materialize animation gives .topbar its own stacking context,
    so the share menu's z-index is trapped inside it — without this, later siblings
-   (identity card, summary band) paint OVER the open menu. 950 beats content (0-2)
+   (identity card, section panes) paint OVER the open menu. 950 beats content (0-2)
    and stays under the export modal (1000). */
 .topbar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 14px; position: relative; z-index: 950; }
 .theme-toggle { width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--card-bg); border: 1px solid var(--border-default); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -165,7 +165,7 @@ img { display: block; }
   /* Keep SMALL units intact; let big containers (pane, card, group) break across
      pages. Keeping .section-pane/.item-card/.contrib-group together is what caused
      page-sized blank gaps — a container taller than one page can never "avoid". */
-  .identity-card, #summary-band, .item-head, .contrib, .skill-cell, .edu-card {
+  .identity-card, .summary-band, .item-head, .contrib, .skill-cell, .edu-card {
     break-inside: avoid; page-break-inside: avoid;
   }
   /* Headers never strand at the bottom of a page — they stay with their content. */
@@ -182,7 +182,7 @@ img { display: block; }
      own rule sets a literal shadow later in source order.) */
   :root { --accent-orange-glow: none; --accent-emerald-glow: none; --shadow-sm: none; --shadow-md: none; }
   .live-pill, .active-pill, .metric-badge, .metric-badge.achieved,
-  .summary-eyebrow .ledge, .skill-cat-header .ledge { box-shadow: none !important; }
+  .skill-cat-header .ledge { box-shadow: none !important; }
   /* Scanlines stay (they're brand) — but as a pre-tiled 1×3 PNG with the
      light-theme --scan-line color baked in (print forces light), instead of a
      repeating-linear-gradient that becomes a viewer-hostile Type-4 PostScript
@@ -242,12 +242,10 @@ img { display: block; }
     --grid-line: transparent; --scan-line: transparent;
   }
   body.print-doc-portfolio.print-style-ink .identity-card::before,
-  body.print-doc-portfolio.print-style-ink #summary-band::before,
+  body.print-doc-portfolio.print-style-ink .summary-band::before,
   body.print-doc-portfolio.print-style-ink .item-card::before { display: none !important; }
-  /* Summary band in ink: hexes + chips are already covered by the .hex-kpi .hex
-     and .skill-chip rules below; the ledge/eyebrow go #111 via the token — only
-     the ledge's literal glow needs killing (paired with skill-cat's, further down). */
-  body.print-doc-portfolio.print-style-ink .summary-eyebrow .ledge { box-shadow: none; }
+  /* Overview panel in ink: hexes + chips are already covered by the .hex-kpi
+     .hex and .skill-chip rules below — no extra rules needed. */
   body.print-doc-portfolio.print-style-ink .item-card.is-current .accent-bar { background: #111 !important; box-shadow: none; }
   body.print-doc-portfolio.print-style-ink .live-pill,
   body.print-doc-portfolio.print-style-ink .active-pill { background: transparent; border-color: #c8c8c8; color: #111; box-shadow: none; }
@@ -282,12 +280,13 @@ img { display: block; }
   body.print-doc-portfolio.print-style-showcase .wrap { display: flex; flex-direction: column; }
   body.print-doc-portfolio.print-style-showcase .wrap > * { order: 2; }
   body.print-doc-portfolio.print-style-showcase .wrap > .identity-card { order: 0; }
-  /* Same order as identity — the flexbox DOM-order tie-break keeps the summary
-     band right after it, ahead of the elevated projects pane. */
-  body.print-doc-portfolio.print-style-showcase .wrap > #summary-band { order: 0; }
-  /* Contents strip rides at the same order — the DOM tie-break keeps it right
-     after the band (or straight after identity when the band is stripped). */
+  /* Contents strip rides at the same order as identity — the flexbox DOM-order
+     tie-break keeps it right after the identity card. */
   body.print-doc-portfolio.print-style-showcase .wrap > .print-toc { order: 0; }
+  /* The Overview pane (when shipped) rides at order 0 too — the DOM tie-break
+     lands it right after the contents strip, ahead of the elevated projects
+     pane. When show_summary is stripped, the selector simply matches nothing. */
+  body.print-doc-portfolio.print-style-showcase .wrap > .section-pane[data-pane="overview"] { order: 0; }
   body.print-doc-portfolio.print-style-showcase .wrap > .section-pane[data-pane="projects"] { order: 1; }
   body.print-doc-portfolio.print-style-showcase .wrap > .footer { order: 3; }
   body.print-doc-portfolio.print-style-showcase { font-size: 11.5px; }
@@ -323,7 +322,6 @@ img { display: block; }
         never from smaller type. */
   body.print-doc-resume .topbar,
   body.print-doc-resume .identity-card,
-  body.print-doc-resume #summary-band,
   body.print-doc-resume .print-toc,
   body.print-doc-resume .section-grid,
   body.print-doc-resume .section-pane,
@@ -427,6 +425,31 @@ img { display: block; }
 .photo-remove .material-symbols-rounded { font-size: 11px; }
 .photo-upload.has-photo:hover .photo-remove { display: flex; }
 
+/* ─── PUBLISHED-MODE CONTRACT — every editing affordance gates on
+   html[data-hope-mode=published] ─────────────────────────────────────────
+   A published copy carries data-hope-mode="published" on the <html> element,
+   stamped by the publish skill into the STAGED site/index.html only. The
+   generated/local file NEVER carries it — it stays the owner's editable copy.
+   Under the flag a visitor sees a finished site, not an editor:
+     · photo upload fully inert — pointer-events none (which also kills the
+       :hover ring — hover can't engage on a pointer-events:none element),
+       upload prompt hidden, remove × never shown, and with no baked photo
+       the box hides entirely rather than invite an upload;
+     · the matching JS gate (document.documentElement.dataset.hopeMode ===
+       'published') disables the file input and SKIPS the photo localStorage
+       read/write, so a visitor's stale localStorage never shadows the
+       owner's baked photo.
+   Visitor FEATURES are deliberately NOT gated: theme toggle (its
+   localStorage persistence is a per-visitor preference), Share menu,
+   Save-as-PDF, section-grid navigation, card expansion.
+   ANY FUTURE editable added to this template MUST ride the same flag —
+   CSS scoped under html[data-hope-mode="published"], JS behind the same
+   dataset.hopeMode check. */
+html[data-hope-mode="published"] .photo-upload { pointer-events: none; cursor: default; }
+html[data-hope-mode="published"] .photo-upload .upload-prompt { display: none; }
+html[data-hope-mode="published"] .photo-upload:not(.has-photo) { display: none; }
+html[data-hope-mode="published"] .photo-remove { display: none !important; }
+
 .identity-info { flex: 1; min-width: 0; }
 .identity-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .identity-name-block { flex: 1; min-width: 0; }
@@ -446,17 +469,15 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
 .contact-row .item:hover { opacity: 0.8; }
 .summary { margin: 12px 0 0; color: var(--text-secondary); font-size: 13.5px; line-height: 1.65; max-width: 640px; }
 
-/* ─── Summary band (opt-in) — curated hero stats + interests ───────────
+/* ─── Overview panel (opt-in) — curated hero stats + interests ─────────
+   The inner panel of the Overview app (#pane-overview > .summary-band).
    Identity-card family: same panel tokens + 32px grid texture, no new colors.
    Rendered only when the user opted in (CuratedPortfolio.show_summary); the
-   portfolio skill strips the conditional block otherwise, so these rules are
-   inert on no-summary pages. */
+   portfolio skill strips the Overview tile + pane conditionals otherwise, so
+   these rules are inert on no-summary pages. */
 .summary-band { position: relative; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-panel); padding: 16px 24px 18px; margin-bottom: 14px; box-shadow: var(--shadow-sm); overflow: hidden; }
 .summary-band::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.55; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 32px 32px; z-index: 0; }
 .summary-band > * { position: relative; z-index: 1; }
-.summary-eyebrow { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.summary-eyebrow .ledge { width: 18px; height: 2px; border-radius: 1px; background: var(--accent-orange); box-shadow: 0 0 6px color-mix(in srgb, var(--accent-orange) 50%, transparent); }
-.summary-eyebrow .name { font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--accent-orange); opacity: 0.92; }
 .summary-stats { display: flex; flex-wrap: wrap; gap: 14px 28px; }
 /* Scaled-up hex KPI: same clip-path/orange tint via the .hex-kpi classes, ~2×
    size. Scoped selectors out-rank the later .hex-kpi base rules (specificity),
@@ -679,13 +700,16 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
    down the single tall page, in paginated they land on the section labels.
    Chips are border-based on purpose — no background-color reliance — so they
    survive viewers/printers with "Background graphics" off. Colors ride the
-   tokens, so ink's monochrome palette covers them for free. */
+   tokens, so ink's monochrome palette covers them for free.
+   Chip numbers are CSS counters (decimal-leading-zero), not static text —
+   the list self-renumbers when the conditional Overview entry is stripped. */
 .print-toc, .backtotop { display: none; }
 .print-toc { margin: 0 0 14px; padding: 10px 14px 12px; border: 1px solid var(--border-default); border-radius: var(--radius-card); }
 .print-toc-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--accent-orange); margin: 0 0 8px; }
-.print-toc-links { display: flex; flex-wrap: wrap; gap: 7px 18px; }
-.print-toc-links a { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: var(--text-primary); font-size: 11px; font-weight: 600; letter-spacing: -0.005em; }
+.print-toc-links { display: flex; flex-wrap: wrap; gap: 7px 18px; counter-reset: toc; }
+.print-toc-links a { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: var(--text-primary); font-size: 11px; font-weight: 600; letter-spacing: -0.005em; counter-increment: toc; }
 .toc-chip { display: inline-flex; align-items: center; justify-content: center; padding: 1px 7px; border: 1px solid currentColor; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent-orange); }
+.toc-chip::before { content: counter(toc, decimal-leading-zero); }
 .backtotop { margin: 6px 0 0; padding: 2px 9px; border: 1px solid currentColor; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; }
 @media print {
   .print-toc { display: block; }
@@ -824,67 +848,47 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
     </div>
   </div>
 
-  <!-- SUMMARY BAND (opt-in) ======================================== -->
-  {{#show_summary}}
-  <!-- Renders ONLY when the user opted in (CuratedPortfolio.show_summary == true).
-       Opted out / nothing captured → the portfolio skill strips this whole
-       conditional block (markers included), zero placeholder residue — the page
-       renders exactly as it does without the band.
-       Portfolio skill substitutes:
-         summary_stats_loop     — up to 4 curated hero stats (Person.headline_stats,
-                                  human-curated, never auto-summed): stat_icon is a
-                                  Material Symbols name (e.g. rocket_launch / payments /
-                                  groups / public), stat_value e.g. "$2M+", stat_label
-                                  e.g. "client pipeline".
-         summary_interests_loop — up to 6 genuinely personal interests
-                                  (Person.interests, e.g. typography, trail running),
-                                  one neutral chip per interest.
-       Omit a whole row (.summary-stats or .summary-interests) when its source
-       list is empty — never render an eyebrow over nothing. -->
-  <section id="summary-band" class="summary-band materialize stagger-1">
-    <div class="summary-eyebrow">
-      <span class="ledge"></span>
-      <span class="name">Overview</span>
-    </div>
-    <div class="summary-stats">
-      <!-- HOPE:summary_stats_loop -->
-      <div class="summary-stat hex-kpi">
-        <span class="hex"><span class="material-symbols-rounded">{{stat_icon}}</span></span>
-        <span class="stat-text">
-          <span class="stat-value">{{stat_value}}</span>
-          <span class="stat-label">{{stat_label}}</span>
-        </span>
-      </div>
-      <!-- /HOPE:summary_stats_loop -->
-    </div>
-    <div class="summary-interests">
-      <span class="interests-eyebrow">Interests</span>
-      <!-- HOPE:summary_interests_loop -->
-      <span class="skill-chip">{{interest}}</span>
-      <!-- /HOPE:summary_interests_loop -->
-    </div>
-  </section>
-  {{/show_summary}}
-
   <!-- PRINT CONTENTS (print/PDF only) ============================== -->
   <!-- Never visible on screen — the section tabs do this job interactively.
        In the PDF the anchors become real link annotations: on the continuous
        single page they jump down the page; in paginated they land on the
-       section labels. Static 01–05 chips, border-styled so they survive
-       viewers that skip background graphics. -->
+       section labels. Chips number themselves with a CSS counter
+       (decimal-leading-zero), so the numbering self-adjusts when the
+       conditional Overview entry is stripped — never an 02-first list.
+       Border-styled so they survive viewers that skip background graphics. -->
   <nav class="print-toc" aria-hidden="true">
     <div class="print-toc-title">Contents</div>
     <div class="print-toc-links">
-      <a href="#pane-experience"><span class="toc-chip">01</span>Experience</a>
-      <a href="#pane-skills"><span class="toc-chip">02</span>Skills</a>
-      <a href="#pane-education"><span class="toc-chip">03</span>Education</a>
-      <a href="#pane-certifications"><span class="toc-chip">04</span>Certifications</a>
-      <a href="#pane-projects"><span class="toc-chip">05</span>Projects</a>
+      {{#show_summary}}
+      <a href="#pane-overview"><span class="toc-chip"></span>Overview</a>
+      {{/show_summary}}
+      <a href="#pane-experience"><span class="toc-chip"></span>Experience</a>
+      <a href="#pane-skills"><span class="toc-chip"></span>Skills</a>
+      <a href="#pane-education"><span class="toc-chip"></span>Education</a>
+      <a href="#pane-certifications"><span class="toc-chip"></span>Certifications</a>
+      <a href="#pane-projects"><span class="toc-chip"></span>Projects</a>
     </div>
   </nav>
 
   <!-- SECTION TABS ================================================= -->
   <div class="section-grid materialize stagger-2">
+    {{#show_summary}}
+    <!-- Overview app tile — ships ONLY together with the Overview pane below
+         (same show_summary conditional; both strip with zero residue, leaving
+         the classic 5-tile grid with Experience as the default app).
+         No integrity bar: curated highlights carry no confidence score.
+         The init JS promotes this tile + its pane to active when present —
+         the static "active" on Experience below is the stripped-state fallback. -->
+    <button class="section-btn" data-section="overview" type="button">
+      <span class="icon"><span class="material-symbols-rounded">insights</span></span>
+      <span class="body">
+        <span class="label">Overview</span>
+        <span class="meta">
+          <span class="count">{{stat_count}} highlights</span>
+        </span>
+      </span>
+    </button>
+    {{/show_summary}}
     <button class="section-btn active" data-section="experience" style="--conf-color: {{experience_conf_color}}" type="button">
       <span class="icon"><span class="material-symbols-rounded">work</span></span>
       <span class="body">
@@ -951,6 +955,52 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
       </span>
     </button>
   </div>
+
+  <!-- OVERVIEW PANE (opt-in, default-open) ========================= -->
+  {{#show_summary}}
+  <!-- Renders ONLY when the user opted in (CuratedPortfolio.show_summary == true).
+       Opted out / nothing captured → the portfolio skill strips this whole
+       conditional block (markers included) plus the Overview tile and the TOC
+       entry above (same conditional), zero placeholder residue — the page
+       renders exactly as it does without the Overview app.
+       Placed FIRST among the panes so it prints first (print walks DOM order);
+       on screen the init JS promotes it to the default-open app.
+       Portfolio skill substitutes:
+         stat_count             — number of curated hero stats (feeds the tile's
+                                  "{{stat_count}} highlights" meta line).
+         summary_stats_loop     — up to 4 curated hero stats (Person.headline_stats,
+                                  human-curated, never auto-summed): stat_icon is a
+                                  Material Symbols name (e.g. rocket_launch / payments /
+                                  groups / public), stat_value e.g. "$2M+", stat_label
+                                  e.g. "client pipeline".
+         summary_interests_loop — up to 6 genuinely personal interests
+                                  (Person.interests, e.g. typography, trail running),
+                                  one neutral chip per interest.
+       Omit a whole row (.summary-stats or .summary-interests) when its source
+       list is empty — never render an eyebrow over nothing. -->
+  <div class="section-pane" data-pane="overview" id="pane-overview">
+    <section class="summary-band">
+      <div class="summary-stats">
+        <!-- HOPE:summary_stats_loop -->
+        <div class="summary-stat hex-kpi">
+          <span class="hex"><span class="material-symbols-rounded">{{stat_icon}}</span></span>
+          <span class="stat-text">
+            <span class="stat-value">{{stat_value}}</span>
+            <span class="stat-label">{{stat_label}}</span>
+          </span>
+        </div>
+        <!-- /HOPE:summary_stats_loop -->
+      </div>
+      <div class="summary-interests">
+        <span class="interests-eyebrow">Interests</span>
+        <!-- HOPE:summary_interests_loop -->
+        <span class="skill-chip">{{interest}}</span>
+        <!-- /HOPE:summary_interests_loop -->
+      </div>
+    </section>
+    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
+  </div>
+  {{/show_summary}}
 
   <!-- EXPERIENCE PANE ============================================== -->
   <div class="section-pane active" data-pane="experience" id="pane-experience">
@@ -1351,6 +1401,12 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
 
 <script>
 (function() {
+  // PUBLISHED-MODE CONTRACT (see the matching CSS block by the same title):
+  // a published copy carries data-hope-mode="published" on <html>; the local
+  // generated file never does. Every EDITING affordance below checks this
+  // flag; visitor FEATURES (theme toggle, Share, Save-as-PDF, section
+  // navigation, card expansion) deliberately do not.
+  var isPublished = document.documentElement.dataset.hopeMode === 'published';
   const STORAGE_KEY = 'hope-portfolio-theme';
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
@@ -1669,6 +1725,18 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
     if (exportModal && !exportModal.hidden) closeExportModal();
     closeShareMenu();
   });
+  // Default-open app: Overview when its pane shipped (show_summary kept),
+  // else the markup's static Experience fallback stands. This script runs
+  // synchronously before first paint, so there's no active-tab flash.
+  var overviewPane = document.getElementById('pane-overview');
+  if (overviewPane) {
+    document.querySelectorAll('.section-btn').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-section') === 'overview');
+    });
+    document.querySelectorAll('.section-pane').forEach(function (p) {
+      p.classList.toggle('active', p === overviewPane);
+    });
+  }
   document.querySelectorAll('.section-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.getAttribute('data-section');
@@ -1699,7 +1767,15 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
   // Normalize the load-time state: drop an empty src="" (no baked photo) so it
   // never fires a spurious request, and honor whatever's correct on first paint.
   if (photoPreview) { if (bakedPhoto) setPhoto(bakedPhoto); else setPhoto(null); }
-  if (photoInput) {
+  // PUBLISHED-MODE CONTRACT: on a published copy the photo is the owner's
+  // baked-in one, full stop. The file input is disabled (the CSS gate already
+  // makes the box inert) and the photo localStorage is neither read nor
+  // written — a visitor's stale local photo must never shadow the owner's
+  // baked photo.
+  if (photoInput && isPublished) {
+    photoInput.disabled = true;
+  }
+  if (photoInput && !isPublished) {
     photoInput.addEventListener('change', () => {
       const file = photoInput.files && photoInput.files[0];
       if (!file || !file.type.startsWith('image/')) return;
@@ -1713,7 +1789,7 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
     // A locally-uploaded photo wins over the baked-in one for this viewer.
     try { const stored = localStorage.getItem(PHOTO_KEY); if (stored) setPhoto(stored); } catch (e) {}
   }
-  if (photoRemove) {
+  if (photoRemove && !isPublished) {
     photoRemove.addEventListener('click', (e) => {
       e.preventDefault(); e.stopPropagation();
       try { localStorage.removeItem(PHOTO_KEY); } catch (e) {}
