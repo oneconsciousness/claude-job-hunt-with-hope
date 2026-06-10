@@ -143,11 +143,19 @@ img { display: block; }
   /* Expand all collapsed cards and hide the now-meaningless chevron. */
   .item-body { max-height: none !important; overflow: visible !important; }
   .chevron { display: none !important; }
-  /* Never split a card/section across a page. */
-  .identity-card, .item-card, .skill-cat, .skill-cell, .edu-card,
-  .contrib, .contrib-group, .section-pane {
+  /* Keep SMALL units intact; let big containers (pane, card, group) break across
+     pages. Keeping .section-pane/.item-card/.contrib-group together is what caused
+     page-sized blank gaps — a container taller than one page can never "avoid". */
+  .identity-card, .item-head, .contrib, .skill-cell, .edu-card {
     break-inside: avoid; page-break-inside: avoid;
   }
+  /* Headers never strand at the bottom of a page — they stay with their content. */
+  .section-pane[data-pane]::before, .item-head, .group-header, .skill-cat-header {
+    break-after: avoid; page-break-after: avoid;
+  }
+  /* When a card fragments across pages, give each fragment its full border/bg. */
+  .item-card, .contrib-group { box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  p { orphans: 3; widows: 3; }
   .footer { break-before: avoid; page-break-before: avoid; }
 }
 
