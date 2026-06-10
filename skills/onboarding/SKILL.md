@@ -67,17 +67,19 @@ Ask **once**, up front, covering everything (voice-guide rule #6: numbered, one 
 > 2. Your LinkedIn profile
 > 3. GitHub, Behance, or a personal site
 > 4. A professional photo
-> 5. None of these — we'll build it from a conversation, that works too."
+> 5. A folder on this computer with career files — old résumés, bios, project write-ups; just point me to it
+> 6. None of these — we'll build it from a conversation, that works too."
 
-Any subset in any phrasing is legal — "check my linkedin, that's all I have", "resume + linkedin, also behance and github". Parse it; whatever they name becomes the work list. Items already found in Step 0 are acknowledged, never re-asked.
+Any subset in any phrasing is legal — "check my linkedin, that's all I have", "resume + linkedin, also behance and github", "there's a folder at ~/Documents/career-stuff". Parse it; whatever they name becomes the work list. Items already found in Step 0 are acknowledged, never re-asked.
 
 ### Step 2 · Gather, cheapest-first
 
 Minimize user work; announce each move before you make it. If a named source isn't in hand yet — a file that's not in the folder, a GitHub/Behance with no handle or URL — ask for it in the same announcement: "drop the file here, or paste the link."
 
 1. **Folder files** — read them now.
-2. **Public URLs** (GitHub / Behance / personal site) — fetch **directly**: `gh api` for the GitHub profile, pinned/top repos, and their READMEs; curl/web-fetch for Behance and personal sites. No browser permission needed — they're public. Say what you're reading: "Pulling your GitHub — public, just reading."
-3. **LinkedIn** — auth-walled; the one source that needs the user's browser. If a browser integration is available in this environment (Claude in Chrome / a connected browser tool), **ask permission**:
+2. **A local folder they point you to** (e.g. `~/Documents/career-stuff`) — read it **where it lives**, read-only: scan for resume-like docs, bios, project write-ups, and headshot candidates; list what you found and confirm which to use ("I found 3 résumés and 2 photos in there — the 2024 résumé and `headshot.jpg` look right; use those?"). Never reorganize or modify their folder. Copy **only what you actually use** into the project folder (e.g. the chosen headshot, so future regenerations work), and say so. If the path doesn't exist or can't be read (macOS may ask permission for Documents/Desktop/Downloads — that prompt is theirs to grant), say it plainly and ask for a corrected path or the drop-it-here fallback.
+3. **Public URLs** (GitHub / Behance / personal site) — fetch **directly**: `gh api` for the GitHub profile, pinned/top repos, and their READMEs; curl/web-fetch for Behance and personal sites. No browser permission needed — they're public. Say what you're reading: "Pulling your GitHub — public, just reading."
+4. **LinkedIn** — auth-walled; the one source that needs the user's browser. If a browser integration is available in this environment (Claude in Chrome / a connected browser tool), **ask permission**:
 
    > "LinkedIn needs your logged-in browser. Want me to read your profile through the browser? I'll only read the page you give me — nothing else, no clicks."
 
@@ -86,7 +88,7 @@ Minimize user work; announce each move before you make it. If a named source isn
    > "No problem — on your profile: More (or Resources) → Save to PDF, then drop the file here or paste the text."
 
    **Never** attempt credentialed access yourself; never scrape past the wall.
-4. **Photo** — if found in Step 0, confirm it; otherwise invite (optional, openly skippable): drop an image into the folder.
+5. **Photo** — if found in Step 0 (or in a pointed-to folder), confirm it; otherwise invite (optional, openly skippable): drop an image into the folder.
 
 **Guardrails:** browser use is read-only and only on URLs the user gave you; announce public fetches before fetching; nothing leaves the machine.
 
