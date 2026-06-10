@@ -117,7 +117,11 @@ img { display: block; }
 .wrap { max-width: 880px; margin: 0 auto; padding: 24px 24px 80px; }
 .material-symbols-rounded { font-variation-settings: 'opsz' 20, 'wght' 500, 'FILL' 0, 'GRAD' 0; user-select: none; vertical-align: middle; }
 
-.topbar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 14px; }
+/* z-index 950: the materialize animation gives .topbar its own stacking context,
+   so the share menu's z-index is trapped inside it — without this, later siblings
+   (identity card, summary band) paint OVER the open menu. 950 beats content (0-2)
+   and stays under the export modal (1000). */
+.topbar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 14px; position: relative; z-index: 950; }
 .theme-toggle { width: 32px; height: 32px; border-radius: var(--radius-pill); background: var(--card-bg); border: 1px solid var(--border-default); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
 .theme-toggle:hover { border-color: var(--accent-orange); color: var(--accent-orange); transform: translateY(-1px); }
 .theme-toggle svg { width: 14px; height: 14px; }
@@ -203,7 +207,12 @@ img { display: block; }
      body.print-doc-portfolio + .print-style-classic | -ink | -showcase
      body.print-doc-resume    + .print-style-classic | -modern | -compact
    print-doc-portfolio.print-style-classic intentionally has no rules — it
-   IS the foundation. */
+   IS the foundation.
+   PORTFOLIO PDF — gated for the next release; re-enable by restoring the
+   Document fieldset. THIS RELEASE the modal sets the resume classes only,
+   so the print-doc-portfolio variants below are inert (kept intact). The
+   default no-class browser print (Cmd+P) still prints the paginated classic
+   portfolio — that's the browser's native path, untouched. */
 @media print {
   /* In-page chrome never prints, whichever document was chosen. */
   #export-modal, #share-menu { display: none !important; }
@@ -295,14 +304,35 @@ img { display: block; }
   body.print-doc-portfolio.print-style-showcase .item-head { padding: 16px 18px 16px 21px; }
   body.print-doc-portfolio.print-style-showcase .item-body-inner { padding-bottom: 22px; gap: 16px; }
 
-@media print {
-  /* ── RESUME document — swap the portfolio for #resume-view. ── */
+/* ── RESUME document — swap the portfolio for #resume-view. ──
+     Intentionally NOT @media-print gated (same reasoning as the portfolio
+     variants above): the export modal's Auto-fit measures #resume-view's
+     height ON SCREEN while these body classes are set — they exist only
+     during the export lifecycle — so the measured layout must BE the printed
+     layout. A brief restyle flash before the print dialog opens is fine. */
+  /* ── READABILITY FLOOR — recruiters reject smaller ──
+        Hard constraints for every resume style and for auto-fit:
+          · body text never below 10pt   (compact's base IS 10pt — it never shrinks)
+          · line-height never below 1.2  (compact sits exactly at the 1.2 floor)
+          · page margins never below 0.5in (@page 0.5in/0.55in is already the floor)
+        Auto-fit scales type via --rfs on #resume-view (default 1), clamped in
+        JS (RESUME_MIN_BODY_PT / RESUME_MIN_LEADING) to
+        floor-scale = 10pt / style-base-pt:
+          classic 11pt → 0.909 · modern 10.5pt → 0.952 · compact 10pt → 1.0.
+        Density beyond the floor comes from spacing, margins and leading —
+        never from smaller type. */
+  body.print-doc-resume .topbar,
   body.print-doc-resume .identity-card,
   body.print-doc-resume #summary-band,
   body.print-doc-resume .print-toc,
   body.print-doc-resume .section-grid,
   body.print-doc-resume .section-pane,
   body.print-doc-resume .footer { display: none !important; }
+  /* Measurement = print geometry: the on-screen auto-fit measure must see the
+     same content box the printed page lays out (the print block's .wrap reset
+     only applies at print time). */
+  body.print-doc-resume { background: #fff; }
+  body.print-doc-resume .wrap { max-width: none; padding: 0; }
   body.print-doc-resume #resume-view { display: block !important; background: #fff; color: #111; }
   /* Shared resume bones — ATS-safe, style-independent. */
   body.print-doc-resume #resume-view h1,
@@ -319,61 +349,66 @@ img { display: block; }
 
   /* ── RESUME · CLASSIC — the timeless serif résumé: single column, black
         on white, centered name, ruled caps headings, traditional margins
-        (#resume-view padding + the 0.5in/0.55in @page margin ≈ 1in). ── */
+        (#resume-view padding + the 0.5in/0.55in @page margin ≈ 1in).
+        Font sizes ride --rfs (auto-fit scale, floor 0.909) and the family
+        rides --resume-font (the dialog's Font override). ── */
   body.print-doc-resume.print-style-classic #resume-view {
-    font-family: Georgia, 'Charter', 'Times New Roman', serif;
-    font-size: 11pt; line-height: 1.35; padding: 0.5in 0.45in;
+    font-family: var(--resume-font, Georgia, 'Charter', 'Times New Roman', serif);
+    font-size: calc(11pt * var(--rfs, 1)); line-height: 1.35; padding: 0.5in 0.45in;
   }
-  body.print-doc-resume.print-style-classic #resume-view h1 { font-size: 22pt; font-weight: 400; text-align: center; letter-spacing: 0.04em; }
-  body.print-doc-resume.print-style-classic .resume-headline { text-align: center; font-size: 11pt; margin-top: 2pt; }
-  body.print-doc-resume.print-style-classic .resume-contact { text-align: center; font-size: 10pt; margin-top: 3pt; }
+  body.print-doc-resume.print-style-classic #resume-view h1 { font-size: calc(22pt * var(--rfs, 1)); font-weight: 400; text-align: center; letter-spacing: 0.04em; }
+  body.print-doc-resume.print-style-classic .resume-headline { text-align: center; font-size: calc(11pt * var(--rfs, 1)); margin-top: 2pt; }
+  body.print-doc-resume.print-style-classic .resume-contact { text-align: center; font-size: calc(10pt * var(--rfs, 1)); margin-top: 3pt; }
   body.print-doc-resume.print-style-classic .resume-header { margin-bottom: 16pt; }
-  body.print-doc-resume.print-style-classic #resume-view h2 { font-size: 11pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em; border-bottom: 0.75pt solid #111; padding-bottom: 2pt; margin: 14pt 0 6pt; }
-  body.print-doc-resume.print-style-classic #resume-view h3 { font-size: 11pt; font-weight: 700; }
+  body.print-doc-resume.print-style-classic #resume-view h2 { font-size: calc(11pt * var(--rfs, 1)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em; border-bottom: 0.75pt solid #111; padding-bottom: 2pt; margin: 14pt 0 6pt; }
+  body.print-doc-resume.print-style-classic #resume-view h3 { font-size: calc(11pt * var(--rfs, 1)); font-weight: 700; }
   body.print-doc-resume.print-style-classic .resume-entry { margin: 0 0 9pt; }
   body.print-doc-resume.print-style-classic .resume-org,
-  body.print-doc-resume.print-style-classic .resume-dates { font-size: 10.5pt; font-style: italic; }
+  body.print-doc-resume.print-style-classic .resume-dates { font-size: calc(10.5pt * var(--rfs, 1)); font-style: italic; }
   body.print-doc-resume.print-style-classic #resume-view ul { margin: 3pt 0 0; padding-left: 14pt; }
   body.print-doc-resume.print-style-classic #resume-view li { margin: 0 0 2.5pt; }
 
   /* ── RESUME · MODERN — Inter, compact left-aligned header, thin rules,
         one restrained orange accent on the name + section rules only.
-        Fixed #D97706 (not the token) so dark-theme printing stays correct. ── */
+        Fixed #D97706 (not the token) so dark-theme printing stays correct.
+        Font sizes ride --rfs (floor 0.952); family rides --resume-font. ── */
   body.print-doc-resume.print-style-modern #resume-view {
-    font-family: var(--font-sans);
-    font-size: 10.5pt; line-height: 1.4; color: #1a1a1a; padding: 0.35in 0.45in;
+    font-family: var(--resume-font, var(--font-sans));
+    font-size: calc(10.5pt * var(--rfs, 1)); line-height: 1.4; color: #1a1a1a; padding: 0.35in 0.45in;
   }
-  body.print-doc-resume.print-style-modern #resume-view h1 { font-size: 23pt; font-weight: 700; letter-spacing: -0.01em; color: #D97706; }
-  body.print-doc-resume.print-style-modern .resume-headline { font-size: 11pt; font-weight: 600; margin-top: 1pt; }
-  body.print-doc-resume.print-style-modern .resume-contact { font-size: 9.5pt; color: #555; margin-top: 2pt; }
+  /* No negative letter-spacing anywhere in #resume-view — ATS-safety rule. */
+  body.print-doc-resume.print-style-modern #resume-view h1 { font-size: calc(23pt * var(--rfs, 1)); font-weight: 700; color: #D97706; }
+  body.print-doc-resume.print-style-modern .resume-headline { font-size: calc(11pt * var(--rfs, 1)); font-weight: 600; margin-top: 1pt; }
+  body.print-doc-resume.print-style-modern .resume-contact { font-size: calc(9.5pt * var(--rfs, 1)); color: #555; margin-top: 2pt; }
   body.print-doc-resume.print-style-modern .resume-header { margin-bottom: 14pt; }
-  body.print-doc-resume.print-style-modern #resume-view h2 { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #444; border-bottom: 0.5pt solid #D97706; padding-bottom: 2pt; margin: 16pt 0 6pt; }
-  body.print-doc-resume.print-style-modern #resume-view h3 { font-size: 11pt; font-weight: 600; }
+  body.print-doc-resume.print-style-modern #resume-view h2 { font-size: calc(9pt * var(--rfs, 1)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #444; border-bottom: 0.5pt solid #D97706; padding-bottom: 2pt; margin: 16pt 0 6pt; }
+  body.print-doc-resume.print-style-modern #resume-view h3 { font-size: calc(11pt * var(--rfs, 1)); font-weight: 600; }
   body.print-doc-resume.print-style-modern .resume-entry { margin: 0 0 9pt; }
   body.print-doc-resume.print-style-modern .resume-org,
-  body.print-doc-resume.print-style-modern .resume-dates { font-size: 9.5pt; color: #555; }
+  body.print-doc-resume.print-style-modern .resume-dates { font-size: calc(9.5pt * var(--rfs, 1)); color: #555; }
   body.print-doc-resume.print-style-modern #resume-view ul { margin: 4pt 0 0; padding-left: 13pt; }
   body.print-doc-resume.print-style-modern #resume-view li { margin: 0 0 3pt; }
 
-  /* ── RESUME · COMPACT — dense one-pager: 10px body, tight leading and
-        margins (the 0.5in/0.55in @page margin IS the floor — no padding),
-        maximizes content per page. ── */
+  /* ── RESUME · COMPACT — dense one-pager AT the readability floor: body is
+        exactly 10pt (never smaller — its --rfs floor scale is 1.0, so
+        auto-fit cannot shrink it), leading exactly 1.2, the 0.5in/0.55in
+        @page margin IS the margin floor (no extra padding). Density is bought
+        with tight spacing and margins only — never with sub-10pt type. ── */
   body.print-doc-resume.print-style-compact #resume-view {
-    font-family: var(--font-sans);
-    font-size: 10px; line-height: 1.22; padding: 0;
+    font-family: var(--resume-font, var(--font-sans));
+    font-size: calc(10pt * var(--rfs, 1)); line-height: 1.2; padding: 0;
   }
-  body.print-doc-resume.print-style-compact #resume-view h1 { font-size: 21px; font-weight: 700; }
-  body.print-doc-resume.print-style-compact .resume-headline { font-size: 11px; font-weight: 600; margin-top: 1px; }
-  body.print-doc-resume.print-style-compact .resume-contact { font-size: 9.5px; color: #444; margin-top: 1px; }
-  body.print-doc-resume.print-style-compact .resume-header { margin-bottom: 10px; }
-  body.print-doc-resume.print-style-compact #resume-view h2 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 0.5px solid #999; padding-bottom: 1px; margin: 9px 0 3px; }
-  body.print-doc-resume.print-style-compact #resume-view h3 { font-size: 10px; font-weight: 700; }
-  body.print-doc-resume.print-style-compact .resume-entry { margin: 0 0 6px; }
+  body.print-doc-resume.print-style-compact #resume-view h1 { font-size: calc(16pt * var(--rfs, 1)); font-weight: 700; }
+  body.print-doc-resume.print-style-compact .resume-headline { font-size: calc(10.5pt * var(--rfs, 1)); font-weight: 600; margin-top: 1pt; }
+  body.print-doc-resume.print-style-compact .resume-contact { font-size: calc(10pt * var(--rfs, 1)); color: #444; margin-top: 1pt; }
+  body.print-doc-resume.print-style-compact .resume-header { margin-bottom: 8pt; }
+  body.print-doc-resume.print-style-compact #resume-view h2 { font-size: calc(10pt * var(--rfs, 1)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 0.5pt solid #999; padding-bottom: 1pt; margin: 7pt 0 2.5pt; }
+  body.print-doc-resume.print-style-compact #resume-view h3 { font-size: calc(10pt * var(--rfs, 1)); font-weight: 700; }
+  body.print-doc-resume.print-style-compact .resume-entry { margin: 0 0 4.5pt; }
   body.print-doc-resume.print-style-compact .resume-org,
-  body.print-doc-resume.print-style-compact .resume-dates { font-size: 9px; color: #444; }
-  body.print-doc-resume.print-style-compact #resume-view ul { margin: 1.5px 0 0; padding-left: 12px; }
-  body.print-doc-resume.print-style-compact #resume-view li { margin: 0 0 1.5px; }
-}
+  body.print-doc-resume.print-style-compact .resume-dates { font-size: calc(10pt * var(--rfs, 1)); color: #444; }
+  body.print-doc-resume.print-style-compact #resume-view ul { margin: 1pt 0 0; padding-left: 11pt; }
+  body.print-doc-resume.print-style-compact #resume-view li { margin: 0 0 1pt; }
 
 .identity-card { position: relative; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-panel); padding: 22px 24px; margin-bottom: 14px; box-shadow: var(--shadow-sm); overflow: hidden; }
 .identity-card::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.55; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 32px 32px; z-index: 0; }
@@ -581,10 +616,12 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
 .share-item:hover { background: var(--card-bg-hover); color: var(--text-primary); }
 
 /* ─── Export chooser (modal) ────────────────────────────────────────────
-   Opened by #pdf-btn. Picks document (portfolio | resume) + print style —
-   plus, for the portfolio only, a layout (continuous | paginated) — then
-   sets body.print-doc-<type>.print-style-<style> (and enables continuous
-   mode when chosen) and calls window.print(). */
+   Opened by #pdf-btn. THIS RELEASE it is the "Save résumé as PDF" dialog:
+   picks resume style + font + fit, sets body.print-doc-resume.print-style-
+   <style> (plus --resume-font and, for Auto-fit, --rfs on #resume-view) and
+   calls window.print().
+   PORTFOLIO PDF — gated for the next release; re-enable by restoring the
+   Document fieldset. */
 #export-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
 #export-modal[hidden] { display: none; }
 .export-backdrop { position: absolute; inset: 0; background: rgba(26,22,18,0.45); }
@@ -612,9 +649,13 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
 .export-confirm:hover { background: var(--accent-orange-hover); }
 @media (max-width: 640px) { .export-opts-2 { grid-template-columns: 1fr; } }
 
-/* ─── Resume view — never rendered on screen. Print-only, via the export
-   chooser setting body.print-doc-resume (see the print blocks above). ─── */
-#resume-view { display: none; }
+/* ─── Resume view — hidden on screen except during the export lifecycle,
+   when body.print-doc-resume (set by the export chooser) reveals it for
+   auto-fit measurement and printing (see the resume blocks above).
+   --rfs is the resume font scale auto-fit steps down (floor-clamped in JS);
+   --resume-font is the dialog's font override. Both are inline-set on this
+   element by the confirm handler and removed on afterprint. ─── */
+#resume-view { display: none; --rfs: 1; }
 
 @media (max-width: 640px) {
   .wrap { padding: 16px 14px 60px; }
@@ -652,6 +693,9 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
 }
 
 /* ─── Continuous single-page export (Layout: Continuous) ────────────────
+   PORTFOLIO PDF — gated for the next release; re-enable by restoring the
+   Document fieldset. No UI path sets body.print-continuous this release;
+   the engine below stays intact for the re-enable.
    body.print-continuous is set by the export confirm handler, which then
    measures document.documentElement.scrollHeight and injects a one-off
    `@page { size: 816px <H>px; margin: 0 }` as the LAST style in <head> (the
@@ -1225,86 +1269,76 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
 </div>
 
 <!-- EXPORT CHOOSER (modal) ========================================= -->
-<!-- Opened by #pdf-btn. Self-contained: picks document + style (+ layout for
-     the portfolio: continuous one-page PDF, the default, or paginated Letter),
-     sets body.print-doc-<type>.print-style-<style>, closes, calls
-     window.print(). Last choice persists in localStorage ('hope-export-pref'). -->
+<!-- Opened by #pdf-btn. THIS RELEASE it is the "Save résumé as PDF" dialog:
+     picks resume style + font + fit, sets body.print-doc-resume.print-style-
+     <style>, applies --resume-font (and floor-aware auto-fit --rfs when
+     chosen) on #resume-view, closes, calls window.print(). Last choice
+     persists in localStorage ('hope-resume-pref').
+     PORTFOLIO PDF — gated for the next release; re-enable by restoring the
+     Document fieldset (and the portfolio Style + Layout fieldsets that hung
+     off it). The print engine — continuous-mode JS, portfolio print styles,
+     print TOC, body-class plumbing — is kept intact; only this UI entry
+     point is gone. The default no-class browser print (Cmd+P) still prints
+     the paginated classic portfolio. -->
 <div id="export-modal" hidden role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
   <div class="export-backdrop" data-export-close></div>
   <div class="export-dialog">
     <div class="export-head">
-      <h2 id="export-modal-title">Save as PDF</h2>
+      <h2 id="export-modal-title">Save résumé as PDF</h2>
       <button class="export-x" type="button" aria-label="Close" data-export-close>&times;</button>
     </div>
-    <fieldset class="export-group">
-      <legend class="export-group-label">Document</legend>
-      <div class="export-opts export-opts-2">
-        <label class="export-opt">
-          <input type="radio" name="export-doc" value="portfolio" checked />
-          <span class="opt-name">Portfolio</span>
-          <span class="opt-desc">The full portfolio — your story, evidence and projects.</span>
-        </label>
-        <label class="export-opt">
-          <input type="radio" name="export-doc" value="resume" />
-          <span class="opt-name">Resume</span>
-          <span class="opt-desc">A traditional ATS-friendly résumé built from the same data.</span>
-        </label>
-      </div>
-    </fieldset>
-    <fieldset class="export-group" id="export-styles-portfolio">
-      <legend class="export-group-label">Style</legend>
-      <div class="export-opts">
-        <label class="export-opt">
-          <input type="radio" name="export-style-portfolio" value="classic" checked />
-          <span class="opt-name">Classic<span class="opt-tag">Recommended</span></span>
-          <span class="opt-desc">The signature cream-and-orange look, tuned for paper.</span>
-        </label>
-        <label class="export-opt">
-          <input type="radio" name="export-style-portfolio" value="ink" />
-          <span class="opt-name">Ink</span>
-          <span class="opt-desc">Conservative black-and-white for corporate submissions.</span>
-        </label>
-        <label class="export-opt">
-          <input type="radio" name="export-style-portfolio" value="showcase" />
-          <span class="opt-name">Showcase</span>
-          <span class="opt-desc">Designer-forward: big type, extra whitespace, projects first.</span>
-        </label>
-      </div>
-    </fieldset>
-    <fieldset class="export-group" id="export-styles-resume" hidden>
+    <fieldset class="export-group" id="export-styles-resume">
       <legend class="export-group-label">Style</legend>
       <div class="export-opts">
         <label class="export-opt">
           <input type="radio" name="export-style-resume" value="classic" checked />
-          <span class="opt-name">Classic</span>
+          <span class="opt-name">Classic<span class="opt-tag">Recommended</span></span>
           <span class="opt-desc">Timeless serif résumé — black on white, single column.</span>
         </label>
         <label class="export-opt">
           <input type="radio" name="export-style-resume" value="modern" />
           <span class="opt-name">Modern</span>
-          <span class="opt-desc">Clean sans-serif with one restrained orange accent.</span>
+          <span class="opt-desc">Clean Inter sans-serif with one restrained orange accent.</span>
         </label>
         <label class="export-opt">
           <input type="radio" name="export-style-resume" value="compact" />
           <span class="opt-name">Compact</span>
-          <span class="opt-desc">Dense one-pager that fits the most onto a single page.</span>
+          <span class="opt-desc">Dense — fits more per page, never below the readability floor.</span>
         </label>
       </div>
     </fieldset>
-    <!-- Layout applies to the portfolio document only; the resume is always
-         paginated US Letter (the ATS-safe shape recruiters expect). -->
-    <fieldset class="export-group" id="export-layout-portfolio">
-      <legend class="export-group-label">Layout</legend>
-      <div class="export-opts export-opts-2">
+    <!-- Per-style default pre-selected by JS (classic → Georgia,
+         modern/compact → Inter). Picking one overrides the résumé family via
+         --resume-font on #resume-view. All ATS-safe system stacks. -->
+    <fieldset class="export-group" id="export-font-resume">
+      <legend class="export-group-label">Font</legend>
+      <div class="export-opts">
         <label class="export-opt">
-          <input type="radio" name="export-layout-portfolio" value="continuous" checked />
-          <span class="opt-name">Continuous<span class="opt-tag">Recommended</span></span>
-          <span class="opt-desc">One tall page — looks exactly like the page.</span>
+          <input type="radio" name="export-font-resume" value="georgia" checked />
+          <span class="opt-name">Georgia (serif)</span>
         </label>
         <label class="export-opt">
-          <input type="radio" name="export-layout-portfolio" value="paginated" />
-          <span class="opt-name">Paginated</span>
-          <span class="opt-desc">US Letter pages — for printing on paper.</span>
+          <input type="radio" name="export-font-resume" value="times" />
+          <span class="opt-name">Times New Roman (serif)</span>
+        </label>
+        <label class="export-opt">
+          <input type="radio" name="export-font-resume" value="inter" />
+          <span class="opt-name">Inter (sans)</span>
+        </label>
+      </div>
+    </fieldset>
+    <fieldset class="export-group" id="export-fit-resume">
+      <legend class="export-group-label">Fit</legend>
+      <div class="export-opts export-opts-2">
+        <label class="export-opt">
+          <input type="radio" name="export-fit-resume" value="comfortable" checked />
+          <span class="opt-name">Comfortable<span class="opt-tag">Recommended</span></span>
+          <span class="opt-desc">Standard sizing.</span>
+        </label>
+        <label class="export-opt">
+          <input type="radio" name="export-fit-resume" value="auto" />
+          <span class="opt-name">Auto-fit</span>
+          <span class="opt-desc">Tighten to fit fewer pages, never below the readability floor.</span>
         </label>
       </div>
     </fieldset>
@@ -1431,16 +1465,64 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
       if (!shareMenu.hidden && !e.target.closest('.share-wrap')) closeShareMenu();
     });
   }
-  // Save as PDF — #pdf-btn opens the #export-modal chooser. "Save as PDF"
-  // sets body.print-doc-<type> + .print-style-<style>, closes the modal and
-  // calls window.print(); 'afterprint' removes the classes. The last choice
-  // persists in localStorage ('hope-export-pref') and is preselected next time.
-  // The portfolio document adds a Layout choice: 'continuous' (default — one
-  // tall page sized to the content, looks exactly like the screen) or
-  // 'paginated' (US Letter pages, for printing on paper). The resume is
-  // always paginated Letter.
+  // Save as PDF — #pdf-btn opens the #export-modal chooser. THIS RELEASE the
+  // export is RESUME-ONLY: the dialog picks style + font + fit, "Save as PDF"
+  // sets body.print-doc-resume + .print-style-<style>, applies the chosen
+  // family via --resume-font on #resume-view, optionally runs floor-aware
+  // auto-fit (--rfs), closes the modal and calls window.print(); 'afterprint'
+  // tears it all down (classes, --rfs, --resume-font, width pin). The last
+  // choice persists in localStorage ('hope-resume-pref') and is preselected
+  // next time. The default no-class browser print (Cmd+P) still prints the
+  // paginated classic portfolio — the browser's native path, untouched.
   var pdfBtn = document.getElementById('pdf-btn');
   var exportModal = document.getElementById('export-modal');
+  var resumeView = document.getElementById('resume-view');
+
+  // ── READABILITY FLOOR — recruiters reject smaller. Hard constraints:
+  // body text never below 10pt; line-height never below 1.2 (encoded in the
+  // resume style blocks — auto-fit never touches leading); page margins never
+  // below 0.5in (the @page rule already sits at the floor).
+  var RESUME_MIN_BODY_PT = 10;
+  var RESUME_MIN_LEADING = 1.2;
+  // Per-style base body size in pt. Auto-fit's floor scale is
+  // RESUME_MIN_BODY_PT / base: classic → 0.909, modern → 0.952,
+  // compact → 1.0 (compact never shrinks — it already sits at the floor).
+  var RESUME_BASE_PT = { classic: 11, modern: 10.5, compact: 10 };
+
+  var RESUME_PREF_KEY = 'hope-resume-pref';
+  var RESUME_STYLES = ['classic', 'modern', 'compact'];
+  var RESUME_FONTS = ['georgia', 'times', 'inter'];
+  var RESUME_FITS = ['comfortable', 'auto'];
+  // ATS-safe system families only — no decorative faces, no icon fonts.
+  var RESUME_FONT_STACKS = {
+    georgia: "Georgia, 'Times New Roman', serif",
+    times: "'Times New Roman', Times, serif",
+    inter: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  };
+  var RESUME_DEFAULT_FONT = { classic: 'georgia', modern: 'inter', compact: 'inter' };
+  // {style, font, fit} — validated field-by-field; anything unexpected falls
+  // back to the defaults (font's default depends on the resolved style).
+  var readResumePref = function () {
+    var pref = { style: 'classic', font: '', fit: 'comfortable' };
+    try {
+      var raw = localStorage.getItem(RESUME_PREF_KEY);
+      if (raw) {
+        var p = JSON.parse(raw);
+        if (p && RESUME_STYLES.indexOf(p.style) !== -1) pref.style = p.style;
+        if (p && RESUME_FONTS.indexOf(p.font) !== -1) pref.font = p.font;
+        if (p && RESUME_FITS.indexOf(p.fit) !== -1) pref.fit = p.fit;
+      }
+    } catch (e) {}
+    if (!pref.font) pref.font = RESUME_DEFAULT_FONT[pref.style] || 'georgia';
+    return pref;
+  };
+
+  /* PORTFOLIO PDF — gated for the next release; re-enable by restoring the
+     Document fieldset. Everything from here through enableContinuousPrint is
+     the portfolio print engine's plumbing: kept intact, but no UI path
+     reaches it this release. hope-export-pref (the old combined pref) is
+     still read harmlessly by readExportPref; the resume dialog persists to
+     hope-resume-pref instead. */
   var EXPORT_PREF_KEY = 'hope-export-pref';
   var EXPORT_STYLES = { portfolio: ['classic', 'ink', 'showcase'], resume: ['classic', 'modern', 'compact'] };
   var EXPORT_LAYOUTS = ['continuous', 'paginated'];
@@ -1489,52 +1571,84 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
     pageStyle.textContent = '@page { size: ' + CONT_PAGE_W_PX + 'px ' + h + 'px; margin: 0; }';
     document.head.appendChild(pageStyle);
   };
+  /* end PORTFOLIO PDF gate */
+
+  // ── Resume auto-fit ──
+  // Paginated Letter geometry at 96dpi: page = 816×1056px; @page margin is
+  // 0.5in (vertical) / 0.55in (horizontal) → printable content 710.4×960px.
+  var RESUME_PAGE_CONTENT_W_PX = 816 - 2 * (0.55 * 96); // 710.4
+  var RESUME_PAGE_CONTENT_H_PX = 1056 - 2 * (0.5 * 96); // 960
+  var RESUME_RFS_STEP = 0.02;
+  var measureResumePages = function () {
+    void resumeView.offsetHeight; // force reflow before measuring
+    return Math.max(1, Math.ceil(resumeView.scrollHeight / RESUME_PAGE_CONTENT_H_PX));
+  };
+  // Step --rfs down 0.02 per iteration, re-measuring, until either the
+  // estimated page count drops (target: one page less than start, or a
+  // single page) or the chosen style's floor scale is hit. Compact's floor
+  // scale is 1.0 — it never shrinks. If the floor is hit before fitting,
+  // print anyway at the floor — that's correct behavior, never go smaller.
+  var runResumeAutoFit = function (style) {
+    var basePt = RESUME_BASE_PT[style] || RESUME_BASE_PT.classic;
+    var floorScale = RESUME_MIN_BODY_PT / basePt;
+    document.body.style.width = RESUME_PAGE_CONTENT_W_PX + 'px'; // pin measurement to print width
+    resumeView.style.setProperty('--rfs', '1');
+    var startPages = measureResumePages();
+    if (startPages <= 1) return; // already a single page — nothing to tighten
+    var targetPages = Math.max(1, startPages - 1);
+    var scale = 1;
+    while (scale > floorScale) {
+      scale = Math.max(floorScale, +(scale - RESUME_RFS_STEP).toFixed(4));
+      resumeView.style.setProperty('--rfs', String(scale));
+      if (measureResumePages() <= targetPages) return; // page-count drop — stop
+    }
+    // Floor reached without fitting: keep the floor scale and print.
+  };
   var checkedValue = function (name) {
     var el = exportModal ? exportModal.querySelector('input[name="' + name + '"]:checked') : null;
     return el ? el.value : '';
   };
   var syncExportUI = function () {
-    var doc = checkedValue('export-doc') || 'portfolio';
-    document.getElementById('export-styles-portfolio').hidden = doc !== 'portfolio';
-    document.getElementById('export-styles-resume').hidden = doc !== 'resume';
-    // Layout is a portfolio-only dimension — the resume is always paginated Letter.
-    document.getElementById('export-layout-portfolio').hidden = doc !== 'portfolio';
     exportModal.querySelectorAll('.export-opt').forEach(function (opt) {
       var input = opt.querySelector('input');
       opt.classList.toggle('selected', !!(input && input.checked));
     });
   };
   var closeExportModal = function () { if (exportModal) exportModal.hidden = true; };
-  if (pdfBtn && exportModal) {
+  if (pdfBtn && exportModal && resumeView) {
     pdfBtn.addEventListener('click', function () {
-      var pref = readExportPref();
-      var docRadio = exportModal.querySelector('input[name="export-doc"][value="' + pref.doc + '"]');
-      if (docRadio) docRadio.checked = true;
-      var styleRadio = exportModal.querySelector('input[name="export-style-' + pref.doc + '"][value="' + pref.style + '"]');
+      var pref = readResumePref();
+      var styleRadio = exportModal.querySelector('input[name="export-style-resume"][value="' + pref.style + '"]');
       if (styleRadio) styleRadio.checked = true;
-      var layoutRadio = exportModal.querySelector('input[name="export-layout-portfolio"][value="' + pref.layout + '"]');
-      if (layoutRadio) layoutRadio.checked = true;
+      var fontRadio = exportModal.querySelector('input[name="export-font-resume"][value="' + pref.font + '"]');
+      if (fontRadio) fontRadio.checked = true;
+      var fitRadio = exportModal.querySelector('input[name="export-fit-resume"][value="' + pref.fit + '"]');
+      if (fitRadio) fitRadio.checked = true;
       syncExportUI();
       exportModal.hidden = false;
     });
-    exportModal.addEventListener('change', syncExportUI);
+    exportModal.addEventListener('change', function (e) {
+      // Style drives the Font default: switching style pre-selects that
+      // style's default family (the user can still override it after).
+      if (e.target && e.target.name === 'export-style-resume') {
+        var def = RESUME_DEFAULT_FONT[e.target.value] || 'georgia';
+        var defRadio = exportModal.querySelector('input[name="export-font-resume"][value="' + def + '"]');
+        if (defRadio) defRadio.checked = true;
+      }
+      syncExportUI();
+    });
     exportModal.addEventListener('click', function (e) {
       if (e.target.closest('[data-export-close]')) closeExportModal();
     });
     document.getElementById('export-confirm').addEventListener('click', function () {
-      var doc = checkedValue('export-doc') || 'portfolio';
-      var style = checkedValue('export-style-' + doc) || 'classic';
-      var layout = doc === 'portfolio' ? (checkedValue('export-layout-portfolio') || 'continuous') : 'paginated';
-      // Resume is always paginated, but that's forced — don't let it overwrite
-      // the user's saved PORTFOLIO layout choice (continuous by default).
-      var persistLayout = doc === 'portfolio' ? layout : readExportPref().layout;
-      try { localStorage.setItem(EXPORT_PREF_KEY, JSON.stringify({ doc: doc, style: style, layout: persistLayout })); } catch (e) {}
-      document.body.classList.add('print-doc-' + doc, 'print-style-' + style);
+      var style = checkedValue('export-style-resume') || 'classic';
+      var font = checkedValue('export-font-resume') || RESUME_DEFAULT_FONT[style] || 'georgia';
+      var fit = checkedValue('export-fit-resume') || 'comfortable';
+      try { localStorage.setItem(RESUME_PREF_KEY, JSON.stringify({ style: style, font: font, fit: fit })); } catch (e) {}
+      document.body.classList.add('print-doc-resume', 'print-style-' + style);
+      resumeView.style.setProperty('--resume-font', RESUME_FONT_STACKS[font] || RESUME_FONT_STACKS.georgia);
       closeExportModal();
-      // Continuous applies to the portfolio document only. Without it the
-      // default print path stays the classic paginated Letter stylesheet —
-      // also the fail-soft for engines that ignore the injected @page size.
-      if (doc === 'portfolio' && layout === 'continuous') enableContinuousPrint();
+      if (fit === 'auto') runResumeAutoFit(style);
       window.print();
     });
     window.addEventListener('afterprint', function () {
@@ -1543,7 +1657,11 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
         if (c.indexOf('print-doc-') === 0 || c.indexOf('print-style-') === 0) stale.push(c);
       });
       stale.forEach(function (c) { document.body.classList.remove(c); });
-      disableContinuousPrint();
+      // Resume teardown: auto-fit scale, font override, measurement width pin.
+      resumeView.style.removeProperty('--rfs');
+      resumeView.style.removeProperty('--resume-font');
+      document.body.style.width = '';
+      disableContinuousPrint(); // gated portfolio engine — keep its state clean too
     });
   }
   document.addEventListener('keydown', function (e) {
