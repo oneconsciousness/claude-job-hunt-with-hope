@@ -397,6 +397,7 @@
       projects: { sel: '.section-pane[data-pane="projects"]', pane: 'projects' }
     };
     var spotEl = null;
+    var spotCleanup = null;
     var spotTimer = 0;
     function clearSpotlightHash() {
       // replaceState, not location.hash = '' — no history entry, no stray '#'.
@@ -419,12 +420,35 @@
       var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
       el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
       if (spotTimer) { clearTimeout(spotTimer); spotTimer = 0; }
+      if (spotCleanup) { spotCleanup(); spotCleanup = null; }
       if (spotEl && spotEl !== el) spotEl.classList.remove('hope-spotlight');
       el.classList.remove('hope-spotlight');
       void el.offsetWidth; // restart the pulse on a repeated directive
       el.classList.add('hope-spotlight');
       spotEl = el;
-      spotTimer = setTimeout(function () { el.classList.remove('hope-spotlight'); spotTimer = 0; spotEl = null; }, 3200);
+      // Pulse until the user actually ENGAGES — the whole point is being
+      // seen, and a fixed 3s could finish before they even look. First
+      // pointer move / click / wheel / touch / key counts as "they're
+      // looking": then exactly TWO more full flashes and stop. The smooth
+      // scrollIntoView above fires no pointer/wheel events, so it can't
+      // self-trigger. 60s hard cap so an untouched tab never pulses forever.
+      var engaged = false, flashesLeft = 2;
+      var ENGAGE_EVENTS = ['pointermove', 'pointerdown', 'wheel', 'touchstart', 'keydown'];
+      function spotTeardown() {
+        el.removeEventListener('animationiteration', onIter);
+        ENGAGE_EVENTS.forEach(function (t) { window.removeEventListener(t, onEngage, true); });
+      }
+      function spotDone() {
+        el.classList.remove('hope-spotlight');
+        if (spotTimer) { clearTimeout(spotTimer); spotTimer = 0; }
+        spotTeardown(); spotCleanup = null; spotEl = null;
+      }
+      function onIter() { if (engaged && --flashesLeft <= 0) spotDone(); }
+      function onEngage() { engaged = true; ENGAGE_EVENTS.forEach(function (t) { window.removeEventListener(t, onEngage, true); }); }
+      spotCleanup = spotTeardown;
+      el.addEventListener('animationiteration', onIter);
+      ENGAGE_EVENTS.forEach(function (t) { window.addEventListener(t, onEngage, true); });
+      spotTimer = setTimeout(spotDone, 60000);
       clearSpotlightHash();
     }
     // One tick deferred: the throughline build AND the initial

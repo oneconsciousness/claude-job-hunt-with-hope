@@ -834,7 +834,7 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
    spotlight would scroll but never glow. Reduced-motion stays safe — the
    #throughline media rule outranks this (1,0,0 vs 0,1,0, both !important). */
 @keyframes hope-spotlight-pulse { 0%, 100% { box-shadow: 0 4px 14px transparent, 0 0 0 2px transparent; } 50% { box-shadow: var(--accent-orange-glow), 0 0 0 2px var(--accent-orange); } }
-.hope-spotlight { animation: hope-spotlight-pulse 1s ease-in-out 3 !important; }
+.hope-spotlight { animation: hope-spotlight-pulse 1s ease-in-out infinite !important; } /* runs until the user engages (JS counts 2 more flashes, then stops; 60s cap) */
 /* Timeline spotlight needs air: the strip's own box hugs the rail and sits
    tight under the summary text, so the generic ring overlapped both. For the
    timeline the ring draws on an absolute OVERLAY instead — pushed down off
@@ -843,9 +843,9 @@ body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
    zero layout shift during the pulse. */
 #throughline.hope-spotlight { animation: none !important; }
 #throughline.hope-spotlight::after {
-  content: ""; position: absolute; inset: 4px -14px -12px;
+  content: ""; position: absolute; inset: -4px -24px -26px;
   border-radius: var(--radius-panel); pointer-events: none;
-  animation: hope-spotlight-pulse 1s ease-in-out 3;
+  animation: hope-spotlight-pulse 1s ease-in-out infinite;
 }
 /* Hover mini-card (T5) — token panel. Lives at BODY level: the identity
    card's overflow:hidden plus its materialize transform (fill-mode keeps a
