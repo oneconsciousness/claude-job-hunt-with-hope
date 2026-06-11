@@ -47,6 +47,19 @@ The schema is in `$PLUGIN_ROOT/references/career-graph-schema.md`. Use determini
 
 Onboarding is **smart intake**: find what already exists, gather it with the least possible user effort, and interview only for what's still missing. The whole thing should feel like "give me what you've got, I'll do the work."
 
+### The welcome tour — show the system, don't lecture it (first-time users only)
+
+Before the intake, give a brand-new user the 10-second picture of how Hope works — **shown, not quizzed**. As part of your FIRST message (the same message that carries the Step 0 findings or the Step 1 inventory — never a separate turn):
+
+1. **Show the flow diagram.** Use the bundled image — prefer `$PLUGIN_ROOT/assets/readme/how-hope-works.png`; if it doesn't exist, fall back to `$PLUGIN_ROOT/assets/readme/publish-flow.png`. Present it as a markdown image with the absolute path (the desktop app renders it inline / opens it on click; in a terminal it's a clickable path — fine either way, because the narration carries the content on its own).
+2. **Narrate it in three plain lines** (calibrated to their vocabulary, per voice-guide rule #4):
+
+   > "Here's the whole journey: you hand me what you already have → I build your career file (it stays on your computer) → we make your portfolio and résumé → it goes live on one link you own. That's it — let's start."
+
+3. **Do not pause.** No "did you see this?", no "ready to continue?", no confirmation of any kind — flow straight into the findings/inventory in the same message. The only exceptions: the user themselves interrupts, or the session's permission mode forces a stop.
+
+**Returning users never get the tour** (a graph with a Person node exists — skip it entirely). And the tour never replaces the opener; it's the two sentences and one picture that come *before* it.
+
 ### Step 0 · Silent folder scan — before any question
 
 Scan the project folder before saying anything:
