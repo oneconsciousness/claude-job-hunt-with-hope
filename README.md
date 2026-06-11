@@ -2,7 +2,7 @@
 
 > Tell Claude about your work. Get a designed portfolio website, a recruiter-ready résumé, and **one link you own** — free.
 
-**[agenthope.ai](https://agenthope.ai)** · free · open-source (MIT) · your data never leaves your machine
+Free · open-source (MIT) · your data never leaves your machine
 
 I built Hope while job-hunting. The one thing I've submitted with it — my portfolio — is getting interview calls.
 
@@ -16,8 +16,6 @@ Hope is a free plugin for Claude. You talk to it; it builds your job-hunt presen
 - **A portfolio website that looks designed, not like a form** — with a living timeline of your career that visitors can play, hover, and click. Busy years rise like mountain peaks. A little character of your choice travels it.
 - **A résumé PDF recruiters respect** — pick a style and font; key phrases bolded for the 7-second skim; your links clickable; the text never too small to read. Application systems read it perfectly.
 - **One link you own** — published free to a page in *your* name. Paste it on LinkedIn and it unfurls with your own preview card. Visitors see a finished site; only you can change it.
-
-**See it live:** the demo at **[agenthope.ai](https://agenthope.ai)** is a portfolio Hope built for a fictional designer — play the timeline, flip the theme, try Save as PDF.
 
 Your facts live in one file on your computer: `career.json`. Hope also keeps a small notebook, `user-story.md` — how you like to work. Both are yours: open them, edit them, delete them. **No tracking. No accounts. Nothing leaves your machine** except the page you choose to publish.
 
@@ -52,8 +50,8 @@ Your facts live in one file on your computer: `career.json`. Hope also keeps a s
 
 This release does **presentation** — portfolio, résumé, publish — and does it well. Designed and waiting for later releases: weighing roles, tailored cover letters, applying with care, interview prep, negotiation support, deciding, and a dashboard across all of it.
 
-<!-- IMAGE: roadmap — swap in assets/readme/roadmap.png when generated (prompt in tasks/readme-image-prompts/roadmap.md). journey.png stands in until then. -->
-<p align="center"><img src="assets/readme/journey.png" alt="The full journey Hope is built toward — onboarding through portfolio, applications, interviews, negotiation, and deciding, with a dashboard across all of it" width="760"></p>
+<!-- IMAGE: roadmap — see tasks/readme-image-prompts/roadmap.md for the generation prompt -->
+<p align="center"><img src="assets/readme/roadmap.png" alt="A road with two zones — NOW: portfolio, resume, your link, filled in; NEXT: weighing roles, cover letters, applying, interview prep, negotiation, deciding, outlined — with a dashboard band spanning both" width="720"></p>
 
 ## How to contribute
 
