@@ -6,6 +6,8 @@ Free · open-source (MIT) · your data never leaves your machine
 
 I built Hope while job-hunting. The one thing I've submitted with it — my portfolio — is getting interview calls.
 
+Hope has been evolving since 2023 — born inside my startup CareerX on early ChatGPT, rebuilt across many models and stacks since, and at home now with Claude. Tools that do good should meet people wherever they are — this is Hope's best form yet.
+
 <!-- IMAGE: portfolio-hero — see tasks/readme-image-prompts/ for the generation prompt -->
 <p align="center"><img src="assets/readme/portfolio-hero.png" alt="A finished Hope portfolio website, shown in its light theme and its dark theme side by side" width="720"></p>
 
