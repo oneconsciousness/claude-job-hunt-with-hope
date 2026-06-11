@@ -171,6 +171,29 @@ Substitute, from the graph:
 
 **ATS rules — non-negotiable inside `#resume-view`:** real text only, standard section headings (Experience, Education, Skills), semantic markup — real `<h1>`/`<h2>` and `<ul><li>` — **no tables, no images or icons, no icon fonts, no text rendered as graphics.** Recruiters' parsers must be able to read every word.
 
+### Icons for links — bundled first, fetched when missing
+
+Contact-row and share-menu links carry **monochrome single-path inline SVG** brand marks (Simple-Icons-style, `viewBox="0 0 24 24"`, `fill="currentColor"`), sized to match the Material Symbols they sit beside (contact row ~13–14px, share menu ~14px). Because they're `currentColor`, they inherit their parent's color — the LinkedIn link stays `--accent-cyan` per the design tokens, other contact items `--text-secondary`, share-menu items their existing color — and theme automatically. **Never full-color brand logos, never icon fonts, never external `<img>`/`url()` icon loads** — icons are **inlined** so the portfolio stays self-contained.
+
+**Bundled set first.** Match each contact/site link by hostname and inline the bundled SVG from `$PLUGIN_ROOT/assets/icons/brands/<slug>.svg` directly into the markup:
+
+| Hostname | Icon |
+|---|---|
+| `linkedin.com` | `linkedin.svg` |
+| `github.com` | `github.svg` |
+| `x.com` / `twitter.com` | `x.svg` |
+| `whatsapp.com` / `wa.me` | `whatsapp.svg` |
+| `instagram.com` | `instagram.svg` |
+| `behance.net` | `behance.svg` |
+| `dribbble.com` | `dribbble.svg` |
+| `medium.com` | `medium.svg` |
+| `youtube.com` / `youtu.be` | `youtube.svg` |
+| personal site / no brand match | `globe.svg` (generic fallback) |
+
+**Unknown platform → announce, fetch, cache, inline.** When a link's hostname is a recognizable brand with no bundled icon (e.g. `gitlab.com`, `mastodon.social`), announce one line — "grabbing the <site> icon" — and fetch the monochrome SVG from `https://cdn.simpleicons.org/<slug>` (slug = the brand name, lowercase). On success, **cache a copy** to the project's `career-graph/assets/icons/` AND inline it into the HTML. On failure, fall back to `globe.svg` silently. Either way the fetch happens at generation time only — **the generated file never references a network icon URL.**
+
+**Resume view is excluded.** `#resume-view` never gets icons — real text and worded anchors only, per the ATS rules in "Resume view — substitution contract" above.
+
 ## Bake the headshot into the file (do this at generation time)
 
 The published portfolio must **already contain the user's photo**. The template still ships a client-side upload widget, but that only lives in *this* browser's `localStorage` — it never reaches the published file, so a published site with no baked-in photo shows an empty upload box to recruiters. Fix that by embedding the photo as a `data:` URL when you generate the HTML.
@@ -218,7 +241,8 @@ Either way the localStorage "change your photo" widget stays in the file as a fa
 **Before saving the user's files, clean and verify the output:**
 - **Strip the template-authoring comment** — the `<!-- Hope portfolio template · v0.4 … See skills/portfolio/SKILL.md for the substitution contract -->` block. It documents the template for *you*; it must not ship in the user's portfolio (it also contains a literal `{{single_tokens}}` that fails a "no unsubstituted tokens" check). Keep the disclosed provenance comments (share-url, generator) — those are intentional.
 - **"Generated" means all of it** — the portfolio HTML with a **populated `#resume-view`**, plus **`share-card.html` and `share-card-square.html`** next to it (see "Share cards & link-preview meta"). A run that produces only the portfolio file is incomplete.
-- **Verify zero unsubstituted placeholders remain** — grep **every generated file** (the portfolio AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the `resume_*` loop blocks, AND the Overview-app tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_count}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, and a half-stripped Overview app (a stray tile with no pane, or vice versa) only fails for users who opted out. If any survive, the substitution is incomplete; fix before saving. Never hand the user a file with raw template tokens.
+- **Verify zero unsubstituted placeholders remain** — grep **every generated file** (the portfolio AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the contact-row site tokens `{{site_url}}`/`{{site_handle}}` (drop that item entirely when the user has no site link), the `resume_*` loop blocks, AND the Overview-app tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_count}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, and a half-stripped Overview app (a stray tile with no pane, or vice versa) only fails for users who opted out. If any survive, the substitution is incomplete; fix before saving. Never hand the user a file with raw template tokens.
+- **Verify zero external icon URLs** — grep the saved portfolio HTML for `simpleicons` and `cdn.simpleicons.org` (e.g. `grep -nE 'simpleicons|cdn\.simpleicons\.org' <portfolio.html>`) and require **zero matches**. Per "Icons for links — bundled first, fetched when missing", any CDN fetch happens at generation time and the SVG lands inline; a surviving network icon URL means an icon was referenced instead of inlined — fix before saving.
 - **Verify the PDF export — produce and inspect, don't assume.** After generating, print one résumé PDF and check it. When `python3` is available, run the bundled checker against the generated file: `python3 "$PLUGIN_ROOT/scripts/verify_portfolio_pdf.py" <portfolio.html> --modes resume-classic`. Read its PASS/FAIL table and fix any FAIL before handing the file over. If `python3` isn't available, say so plainly instead of claiming the export was verified.
 
 ## Share cards & link-preview meta (generate alongside the portfolio)

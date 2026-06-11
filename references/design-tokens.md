@@ -89,7 +89,7 @@ Treat custom as "swap the accent(s), keep everything else." That's the whole fea
 |---|---|
 | **Inter** (`--font-sans`) | All body text, headings, labels. **Required — not Space Grotesk** (humanist and warm, not geometric). |
 | **JetBrains Mono** (`--font-mono`) | All metadata, dates, counts, badges, IDs, contribution numbers, eyebrow text. |
-| **Material Symbols Rounded** | Icons (via Google Fonts when available; fall back to inline SVG). |
+| **Material Symbols Rounded** | Icons (via Google Fonts when available; fall back to inline SVG). **Brand icons** (LinkedIn, GitHub, …) are monochrome single-path inline SVGs — `viewBox="0 0 24 24"`, `fill="currentColor"` — sized to match the Material Symbols they sit beside, inheriting their parent's color (and theme) via `currentColor`. Never full-color logos, never icon fonts, never external icon loads — always inlined; never inside `#resume-view` (real text only). |
 
 Weights: 400 body · 500 emphasis · 600 headlines/labels/companies · 700 section labels/titles/names/numbers · 800 sparingly. Base size 14.5px. Mono uppercase letter-spacing 0.04–0.10em; large sans headings −0.02em.
 
