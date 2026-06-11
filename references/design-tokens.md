@@ -127,6 +127,31 @@ Three calm textures give Hope its "technical-but-warm" identity. Without them th
 - Use raw hex in components — always `var(--token)`.
 - Ship without the theme toggle or without the texture signatures.
 
+## 10. Modular structure
+
+A generated portfolio is a **folder of four named files**, opened by double-clicking `index.html` offline — classic `<script src>` / `<link rel="stylesheet">` only. The boundaries are canon:
+
+| File | Owns |
+|---|---|
+| `index.html` | Skeleton + all content markup (plus JSON-LD, OG metas, stamping targets) |
+| `portfolio.css` | The full stylesheet — including the `:root` token block (§2–§3) |
+| `portfolio.js` | The full behavior script |
+| `data.js` | Exactly one global — `window.HOPE_DATA = {…}` — the dataset the Throughline (§11) reads |
+
+- **Tokens stay single-source.** `:root` lives in `portfolio.css` and nowhere else; components reference `var(--token)` only (§1).
+- **No inline `<style>`/`<script>` in `index.html`**, with the **theme-init snippet** as the one named exception (it MUST stay inline in `<head>` to avoid theme flash) — plus the JSON-LD data block.
+- **Cross-file id/class contracts** — any id or class one file defines and another consumes — live in the markup's authoring comments, never implied.
+- **The zero-token grep** (no raw color values outside the token blocks) runs across **ALL files in the folder**, not just the stylesheet.
+
+## 11. The Throughline
+
+The career timeline strip. Canon by citation:
+
+- **Structure is brand**: the strip is part of the identity-card structure — full-width at the bottom of the card (`id="throughline"`, `tl-*` classes), thin track on `--border-default`, mono 9px `--text-dim` year ticks, brand-hex nodes. The 32×32 grid texture (§8) does **not** repeat here — the card already carries it.
+- **Node colors** follow the accent semantics of §5: experience `--accent-orange` · project `--accent-cyan` · education `--accent-violet` · certification `--accent-amber`; ongoing entries take a subtle `--accent-emerald` edge. Tokens only — never restated hex.
+- **The traveler** (playhead glyph) obeys the brand-icon law (§6): monochrome single-path inline SVG, `currentColor`, ~16px. Default is the soft orange glow dot.
+- **Animation is `transform`/`opacity` only** — no layout properties. It pauses under exactly four conditions: hover (anywhere on the strip), `document.hidden`, strip off-viewport, and `prefers-reduced-motion` (which renders the static rail instead).
+
 ---
 
 *The deep rationale (per-component anatomy, schema→UI mapping, the production lineage) lives in the maintainers' design cookbook. This file is the shippable canon every skill and template depends on.*

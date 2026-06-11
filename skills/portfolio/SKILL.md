@@ -1,6 +1,6 @@
 ---
 name: hope-portfolio
-description: Use when a user wants to generate a portfolio — their work, their story, their evidence — as a self-contained branded HTML page they can send to a recruiter, post as a link, or save as a PDF. This is Hope's signature skill. Trigger phrases include "make my portfolio", "generate a portfolio", "create my portfolio for {company}", "I need a portfolio", "show off my work", "tailor a portfolio for this role", "build me something to send", or any request where the deliverable is a curated showcase of who the user is professionally.
+description: Use when a user wants to generate a portfolio — their work, their story, their evidence — as a self-contained branded portfolio folder (double-click index.html, works offline) they can send to a recruiter, post as a link, or save as a PDF. This is Hope's signature skill. Trigger phrases include "make my portfolio", "generate a portfolio", "create my portfolio for {company}", "I need a portfolio", "show off my work", "tailor a portfolio for this role", "build me something to send", or any request where the deliverable is a curated showcase of who the user is professionally.
 user-invocable: true
 ---
 
@@ -12,7 +12,7 @@ You are running Hope's portfolio generation. This is the skill that defines Hope
 
 ## Locate the plugin files first (do this before anything else)
 
-Hope's reference docs and the HTML template ship **inside the plugin**, not in the user's project. The paths below (`references/…`, `assets/templates/…`) are **relative to the plugin root** — they are NOT relative to your working directory (which is the user's project folder). `${CLAUDE_PLUGIN_ROOT}` is **not** substituted inside this Markdown, so you must resolve the plugin root yourself with Bash, once, before you read anything:
+Hope's reference docs and the portfolio template folder ship **inside the plugin**, not in the user's project. The paths below (`references/…`, `assets/templates/…`) are **relative to the plugin root** — they are NOT relative to your working directory (which is the user's project folder). `${CLAUDE_PLUGIN_ROOT}` is **not** substituted inside this Markdown, so you must resolve the plugin root yourself with Bash, once, before you read anything:
 
 ```bash
 # Resolve the Hope plugin root (references/, assets/, scripts/ live there).
@@ -39,11 +39,21 @@ cat "$PLUGIN_ROOT/references/milestones.md"
 
 ## What this skill outputs
 
-A **single self-contained HTML file** at `career-graph/documents/portfolios/portfolio-<slug>-<date>.html`, plus two **share-card pages** (`share-card.html` and `share-card-square.html`) in the same folder — see "Share cards & link-preview meta" below. The HTML uses Hope's design tokens — light by default (warm cream + orange), with a dark theme via the toggle and the same layout across both — embeds all CSS inline, generates inline SVG for any graphics, and works opened in any browser with no network connection required.
+A **portfolio folder** at `career-graph/documents/portfolios/portfolio-<slug>-<date>/` containing exactly four named files —
+
+- `index.html` — skeleton + all content markup. Also home to everything that gets stamped or stripped: the JSON-LD block, the OG metas, the `hope:share-url` meta, and the `{{#show_summary}}` conditional structure (stamping + strip semantics unchanged).
+- `portfolio.css` — the full stylesheet; the design tokens (`:root`) live here and nowhere else.
+- `portfolio.js` — the full script.
+- `data.js` — a classic script defining one global, `window.HOPE_DATA = {…}`: the chronological dataset the Throughline reads, plus the traveler choice — see "The Throughline — timeline data contract" below.
+
+— plus two **share-card pages** (`share-card.html` and `share-card-square.html`) in the same folder — see "Share cards & link-preview meta" below.
+
+**The self-contained promise is folder-level: double-click `index.html` and it works offline.** That's law — classic `<script src>` and `<link rel="stylesheet">` only; **no `type="module"`, no `fetch()`, no `import`**. No inline `<style>`/`<script>` in `index.html` except the theme-init snippet (inline in `<head>` by design — it prevents theme flash) and the JSON-LD. What belongs in which file is canon — `design-tokens.md` § "Modular structure" (loaded above); cite it, don't restate it. The page uses Hope's design tokens — light by default (warm cream + orange), with a dark theme via the toggle and the same layout across both — generates inline SVG for any graphics, and opens in any browser with no network connection required.
 
 **What goes inside:**
 
 - **Identity card** — photo, name, headline, stats row, contact row, and summary, over a 32×32 grid texture, with the LIVE pill top-right.
+- **The Throughline** — the animated career-timeline strip at the bottom of the identity card (`id="throughline"`): one hex node per included experience / education / project / certification, a playhead riding the rail, hover mini-cards, click-to-navigate to each entry's card. The strip's look and motion are template-owned; **your job is the dataset and the card anchors** — see "The Throughline — timeline data contract" below.
 - **Overview app (opt-in)** — a section-grid tab, not a standalone band: a grid tile (`data-section="overview"`, labeled "Overview", icon `insights`, meta-count "`{{stat_count}} highlights`") plus a pane (`id="pane-overview"`) that sits first among the panes and opens by default when present. Inside: up to 4 curated hero stats as large hex badges plus a quiet interests line. Renders **only** when the user opted in (`CuratedPortfolio.show_summary` is true) and `Person.headline_stats` exist — see "Overview app — substitution contract" below.
 - **Summary** — 2–4 sentences in Hope's voice. Specific, not generic. Hints at tension before resolution.
 - **Selected experience** — 3 to 5 most relevant Experiences as cards, each with: title, company, dates, a 1-sentence framing, the strongest contribution (STAR with a metric), and the skills demonstrated.
@@ -66,7 +76,7 @@ Read the user's career graph. If a target Job is named (`hope make portfolio for
 
 If no target Job is named, generate a **general portfolio** representing the user's strongest work overall.
 
-Either way, **create a CuratedPortfolio node** in the graph linking to the included Experiences/Skills/Projects, and record the user's Overview-app decision on it as `"show_summary": true|false` (see the opt-in prompt below — it's a per-portfolio presentation choice, not a Person fact). This means the user's graph remembers which curation went out for which role.
+Either way, **create a CuratedPortfolio node** in the graph linking to the included Experiences/Skills/Projects, and record on it the user's Overview-app decision as `"show_summary": true|false` and their traveler choice as `"timeline_traveler"` (see the opt-in prompt and the traveler picker below — both per-portfolio presentation choices, not Person facts). This means the user's graph remembers which curation went out for which role.
 
 ## Voice in the portfolio copy
 
@@ -98,15 +108,17 @@ This is the **visible** differentiator. The portfolio looks unmistakably like a 
 - Scanline overlay on cards + 32×32 grid texture on the identity header + subtle glows. These textures are signatures — without them the design looks generic.
 - Inter for text, JetBrains Mono for all metadata. Material Symbols Rounded with inline-SVG fallback.
 - Real org logos via Google Favicon with a lettermark fallback.
-- All assets self-contained. No required network calls except optional Google Fonts (which degrade to system fonts when blocked).
+- Self-contained at the folder level (see "What this skill outputs"). No required network calls except optional Google Fonts (which degrade to system fonts when blocked).
 
-Use the bundled HTML template as the starting structure — load it from the plugin root you resolved above:
+Use the bundled template as the starting structure — it's a **folder mirroring the output folder** (same four named files). Load it from the plugin root you resolved above:
 
 ```bash
-cat "$PLUGIN_ROOT/assets/templates/portfolio.html"
+ls "$PLUGIN_ROOT/assets/templates/portfolio/"          # index.html · portfolio.css · portfolio.js · data.js
+cat "$PLUGIN_ROOT/assets/templates/portfolio/index.html"
+cat "$PLUGIN_ROOT/assets/templates/portfolio/data.js"  # carries the authoring contract + the {{timeline_data_json}} slot
 ```
 
-Replace placeholders with content from the graph. **Do not deviate from the design tokens** in `$PLUGIN_ROOT/references/design-tokens.md` (loaded above).
+Copy `portfolio.css` and `portfolio.js` into the output folder **verbatim** — every substitution targets `index.html` and `data.js` only. Replace placeholders with content from the graph. **Do not deviate from the design tokens** in `$PLUGIN_ROOT/references/design-tokens.md` (loaded above).
 
 ### Projects loop — substitution contract (item-cards, not tiles)
 
@@ -154,6 +166,34 @@ When rendering, substitute:
 
 **Print behavior is template-owned, but don't break it:** the Overview pane prints **first** among the panes (DOM order), and the print TOC carries a **conditional Overview entry** — the TOC chips' numbers are CSS counters, not the old static 01–05, so numbering self-adjusts when Overview is absent (no "02-first" lists). Every **résumé** print mode still hides all of it. The ink/showcase print rules that used to reference `#summary-band` now point at the pane — don't reintroduce the old id or leave selectors dangling. Never duplicate stats or interests into `#resume-view`.
 
+### The Throughline — timeline data contract (`{{timeline_data_json}}`)
+
+The Throughline strip itself — rail, hex nodes, playhead, pause/hover/click/print behavior — is template-owned (`portfolio.css` + `portfolio.js`, token-styled per canon). **You generate what it reads**: the template's `data.js` carries the authoring contract and a `{{timeline_data_json}}` substitution slot — fill it from the graph so the shipped `data.js` defines `window.HOPE_DATA` with two keys, `timeline` and `traveler`.
+
+**`timeline`** — an **ordered, chronological array**, one entry per Experience, Education, Project, and Certification included in the portfolio:
+
+| Field | Contract |
+|---|---|
+| `id` | Stable slug, unique in the array — it also names the entry's anchor (below). |
+| `type` | `experience` \| `education` \| `project` \| `certification` — drives the node's token color (template-owned; colors are tokens per canon, never restate hex values). |
+| `date_start` / `date_end` | `YYYY-MM` strings (the template's parser format — full ISO `YYYY-MM-DD` also accepted, day ignored) position the node proportionally on the rail; `date_end: null` = ongoing (renders the emerald edge). |
+| `label` | Short phrase, **≤40 chars** — see the label rules below. |
+| `org` | Organization name, or `null`. |
+| `domain` | Hostname for the favicon, or `null`. |
+| `metric` | ONE short line — the entry's strongest number — or `null`. |
+| `skills` | ≤4 strings; the hover mini-card renders them as `.skill-chip`s. |
+| `pane` | `"experience"` \| `"education"` \| `"projects"` \| `"certifications"` — the section-grid pane a click activates. |
+| `anchor` | The DOM id of the entry's card in `index.html` — see anchors, next. |
+
+**Anchors — every item-card gets one at generation.** Give each rendered item-card a stable `id="tl-<id>"` matching its timeline entry's `id` (the template's example cards carry the pattern). Click-to-navigate activates the pane, scrolls to this anchor, and highlights the card — an anchor without a card is a dead click. Verify the pairing before saving (see the verification checklist below).
+
+**Label rules** — labels float above the playhead in small type and must scan in under a second:
+
+- **Short phrases, never sentences.** "Lead AI Engineer @ EY" — not "Worked as a Lead AI Engineer at EY where I…".
+- **Voice: specific, not generic.** "Unified Figma's design system" beats "Design work". Same specificity bar as the cards, compressed to ≤40 chars.
+
+**`traveler`** — the playhead glyph the user chose (see the traveler picker in "What to ask the user before generating"): `"dot"` (the default soft-orange glow dot) · `"<slug>"` for one of the bundled travelers in `$PLUGIN_ROOT/assets/icons/travelers/` (`paper-plane`, `car`, `train`, `sailboat`, `bicycle`, `rocket`, `footprints`) · `{"inline": "<svg…>"}` for a found or hand-made glyph, which **you inline at generation**. **No picker UI ships in the artifact** — choosing happens in chat; the artifact just renders the choice.
+
 ### Resume view — substitution contract
 
 The template carries `<div id="resume-view" hidden>` as a **sibling of the portfolio content inside `.wrap`**. On screen it never renders (`#resume-view{display:none}`); it exists solely for the print path — when the user picks **Resume** in the export chooser, `body.print-doc-resume` hides the portfolio panes and shows this view instead. **Populate it on every generation.** An empty resume view passes a visual check (it's hidden) but silently prints a blank résumé.
@@ -190,13 +230,13 @@ Contact-row and share-menu links carry **monochrome single-path inline SVG** bra
 | `youtube.com` / `youtu.be` | `youtube.svg` |
 | personal site / no brand match | `globe.svg` (generic fallback) |
 
-**Unknown platform → announce, fetch, cache, inline.** When a link's hostname is a recognizable brand with no bundled icon (e.g. `gitlab.com`, `mastodon.social`), announce one line — "grabbing the <site> icon" — and fetch the monochrome SVG from `https://cdn.simpleicons.org/<slug>` (slug = the brand name, lowercase). On success, **cache a copy** to the project's `career-graph/assets/icons/` AND inline it into the HTML. On failure, fall back to `globe.svg` silently. Either way the fetch happens at generation time only — **the generated file never references a network icon URL.**
+**Unknown platform → announce, fetch, cache, inline.** When a link's hostname is a recognizable brand with no bundled icon (e.g. `gitlab.com`, `mastodon.social`), announce one line — "grabbing the <site> icon" — and fetch the monochrome SVG from `https://cdn.simpleicons.org/<slug>` (slug = the brand name, lowercase). On success, **cache a copy** to the project's `career-graph/assets/icons/` AND inline it into the HTML. On failure, fall back to `globe.svg` silently. Either way the fetch happens at generation time only — **the generated folder never references a network icon URL.**
 
 **Resume view is excluded.** `#resume-view` never gets icons — real text and worded anchors only, per the ATS rules in "Resume view — substitution contract" above.
 
 ## Bake the headshot into the file (do this at generation time)
 
-The published portfolio must **already contain the user's photo**. The template still ships a client-side upload widget, but that only lives in *this* browser's `localStorage` — it never reaches the published file, so a published site with no baked-in photo shows an empty upload box to recruiters. Fix that by embedding the photo as a `data:` URL when you generate the HTML.
+The published portfolio must **already contain the user's photo**. The template still ships a client-side upload widget, but that only lives in *this* browser's `localStorage` — it never reaches the published file, so a published site with no baked-in photo shows an empty upload box to recruiters. Fix that by embedding the photo as a `data:` URL when you generate `index.html`.
 
 **1 — Find a headshot in the user's project folder.** Look for the obvious names first, then any image the user points you at:
 
@@ -239,19 +279,20 @@ printf 'data:image/jpeg;base64,%s' "$(base64 < "$OUT" | tr -d '\n')"
 Either way the localStorage "change your photo" widget stays in the file as a fallback the user can use after publishing.
 
 **Before saving the user's files, clean and verify the output:**
-- **Strip the template-authoring comment** — the `<!-- Hope portfolio template · v0.4 … See skills/portfolio/SKILL.md for the substitution contract -->` block. It documents the template for *you*; it must not ship in the user's portfolio (it also contains a literal `{{single_tokens}}` that fails a "no unsubstituted tokens" check). Keep the disclosed provenance comments (share-url, generator) — those are intentional.
-- **"Generated" means all of it** — the portfolio HTML with a **populated `#resume-view`**, plus **`share-card.html` and `share-card-square.html`** next to it (see "Share cards & link-preview meta"). A run that produces only the portfolio file is incomplete.
-- **Verify zero unsubstituted placeholders remain** — grep **every generated file** (the portfolio AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the contact-row site tokens `{{site_url}}`/`{{site_handle}}` (drop that item entirely when the user has no site link), the `resume_*` loop blocks, AND the Overview-app tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_count}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, and a half-stripped Overview app (a stray tile with no pane, or vice versa) only fails for users who opted out. If any survive, the substitution is incomplete; fix before saving. Never hand the user a file with raw template tokens.
-- **Verify zero external icon URLs** — grep the saved portfolio HTML for `simpleicons` and `cdn.simpleicons.org` (e.g. `grep -nE 'simpleicons|cdn\.simpleicons\.org' <portfolio.html>`) and require **zero matches**. Per "Icons for links — bundled first, fetched when missing", any CDN fetch happens at generation time and the SVG lands inline; a surviving network icon URL means an icon was referenced instead of inlined — fix before saving.
-- **Verify the PDF export — produce and inspect, don't assume.** After generating, print one résumé PDF and check it. When `python3` is available, run the bundled checker against the generated file: `python3 "$PLUGIN_ROOT/scripts/verify_portfolio_pdf.py" <portfolio.html> --modes resume-classic`. Read its PASS/FAIL table and fix any FAIL before handing the file over. If `python3` isn't available, say so plainly instead of claiming the export was verified.
+- **Strip the template-authoring comments** — the `<!-- Hope portfolio template · … See skills/portfolio/SKILL.md for the substitution contract -->` block in `index.html` AND the authoring-contract comment in `data.js` (it documents the timeline shape and names `{{timeline_data_json}}` literally, which fails the "no unsubstituted tokens" check). They document the template for *you*; they must not ship in the user's portfolio. Keep the disclosed provenance comments (share-url, generator) — those are intentional.
+- **"Generated" means all of it** — the full folder per "What this skill outputs": `index.html` with a **populated `#resume-view`**, `portfolio.css` and `portfolio.js` carried over verbatim, `data.js` with the **timeline dataset and traveler substituted**, plus **`share-card.html` and `share-card-square.html`** (see "Share cards & link-preview meta"). A run that produces only `index.html` is incomplete.
+- **Verify zero unsubstituted placeholders remain** — grep **every file in the generated folder** (all four named files AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the contact-row site tokens `{{site_url}}`/`{{site_handle}}` (drop that item entirely when the user has no site link), the `resume_*` loop blocks, the Overview-app tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_count}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments, AND `{{timeline_data_json}}` in `data.js` — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, a half-stripped Overview app (a stray tile with no pane, or vice versa) only fails for users who opted out, and an unsubstituted `data.js` leaves the `{{timeline_data_json}}` slot in place — the template ships it inside a comment so the file still parses, but the Throughline renders empty and the traveler choice is lost. If any survive, the substitution is incomplete; fix before saving. Never hand the user files with raw template tokens.
+- **Verify the anchor pairing** — every `anchor` in the timeline dataset must resolve to an `id="tl-<id>"` on a card in `index.html`, and every included item-card must carry its `tl-` id (per "The Throughline — timeline data contract"). Compare `grep -o 'id="tl-[^"]*"' index.html` against the dataset's `anchor` values — a dataset anchor with no card is a dead click on the rail; fix both directions before saving.
+- **Verify zero external icon URLs** — grep **every file in the saved folder** for `simpleicons` and `cdn.simpleicons.org` (e.g. `grep -rnE 'simpleicons|cdn\.simpleicons\.org' <portfolio-folder>/`) and require **zero matches**. Per "Icons for links — bundled first, fetched when missing", any CDN fetch happens at generation time and the SVG lands inline; a surviving network icon URL means an icon was referenced instead of inlined — fix before saving.
+- **Verify the PDF export — produce and inspect, don't assume.** After generating, print one résumé PDF and check it. When `python3` is available, run the bundled checker against the generated folder — it accepts the folder (or its `index.html`) and stages its /tmp copies folder-aware, all siblings included: `python3 "$PLUGIN_ROOT/scripts/verify_portfolio_pdf.py" <portfolio-folder>/ --modes resume-classic`. Read its PASS/FAIL table and fix any FAIL before handing the folder over. If `python3` isn't available, say so plainly instead of claiming the export was verified.
 
 ## Share cards & link-preview meta (generate alongside the portfolio)
 
 A bare URL pasted into LinkedIn/X/WhatsApp unfurls as a rich card only when the page's OG meta points at a real image. **You make the content and the image sources; the publish skill stamps URLs and takes the screenshots.** Division of labor:
 
-**1 — `{{og_description}}`.** The template's `og:description` / `twitter:description` carry this token. Write a **1–2 sentence third-person hook** distilled from the summary — recruiter-facing, specific, no hype. ("Product designer who unified Figma's design system across twelve teams" — not "Visionary design leader passionate about impact.") Also substitute the OG/Twitter title tokens (`{{name}} — {{headline}}`). **Leave `og:url`, `og:image`, and `twitter:image` with `content=""` exactly as the template ships them** — the publish skill stamps absolute URLs once it knows `SITE_URL`.
+**1 — `{{og_description}}`.** `index.html`'s `og:description` / `twitter:description` carry this token. Write a **1–2 sentence third-person hook** distilled from the summary — recruiter-facing, specific, no hype. ("Product designer who unified Figma's design system across twelve teams" — not "Visionary design leader passionate about impact.") Also substitute the OG/Twitter title tokens (`{{name}} — {{headline}}`). **Leave `og:url`, `og:image`, and `twitter:image` with `content=""` exactly as the template ships them** — the publish skill stamps absolute URLs once it knows `SITE_URL`.
 
-**2 — Generate two share-card pages next to the portfolio** (same folder, exactly these names — the publish skill looks for them):
+**2 — Generate two share-card pages in the portfolio folder, next to `index.html`** (exactly these names — the publish skill looks for them):
 
 - `share-card.html` — fixed **1200×630** (the OG link-preview size).
 - `share-card-square.html` — fixed **1080×1080** (IG / WhatsApp avatar variant).
@@ -275,7 +316,7 @@ Most portfolios should fit in 2–3 screens of vertical scroll on desktop. Long-
 
 ## What to ask the user before generating
 
-Every question this skill asks follows **voice-guide rule #6 — "Choices, not blanks"**: numbered options (2–4), exactly one "(recommended)" with a one-clause why, free text always honored as the escape hatch. Numbered so the user can answer "2". Per the rule, **weighty or personal questions also carry a final "💬 Chat about this first" option** — picking it means Hope talks it through before deciding; it complements the free-text escape hatch, it doesn't replace it. In this skill that's the Overview opt-in below and the update menu (see "Updating — always start with the menu"); the "What's off?" diagnostic stays chat-option-free — it's a scannable checklist, and chat just adds noise there.
+Every question this skill asks follows **voice-guide rule #6 — "Choices, not blanks"**: numbered options (2–4), exactly one "(recommended)" with a one-clause why, free text always honored as the escape hatch. Numbered so the user can answer "2". Per the rule, **weighty or personal questions also carry a final "💬 Chat about this first" option** — picking it means Hope talks it through before deciding; it complements the free-text escape hatch, it doesn't replace it. In this skill that's the Overview opt-in and the traveler picker below, and the update menu (see "Updating — always start with the menu"); the "What's off?" diagnostic stays chat-option-free — it's a scannable checklist, and chat just adds noise there.
 
 If the user has provided a target Job, just confirm: "Generating a portfolio targeted at {company} for {role}. The angle I'm taking is {angle in one sentence}. Continue?" (A plain yes/no confirm IS rule-#6 compliant — don't pad it with fake options.)
 
@@ -307,6 +348,22 @@ If the answer is "general", scaffold the constraint question instead of leaving 
 
 Record the answer on the CuratedPortfolio node as `"show_summary": true|false`; it's a per-portfolio presentation choice, so don't re-ask while iterating on the same portfolio — and an existing decision is honored when regenerating (see "Updating an existing portfolio" below). If the Person has **no** `headline_stats` and no `interests`, don't ask at all — skip the app silently (leave `show_summary` absent; the conditional blocks strip with zero residue).
 
+**Traveler picker — ask once per portfolio.** The Throughline's playhead carries a glyph — the traveler — and it's the user's to choose. If this CuratedPortfolio has no recorded `timeline_traveler` yet, ask at generation:
+
+> Your timeline has a little traveler — the glyph that rides along your career. Who's yours?
+> 1. **The glow dot** (recommended — calm, classic, lets the work do the talking)
+> 2. **One of the kept seven** — paper plane, car, train, sailboat, bicycle, rocket, footprints
+> 3. **Find one that's me** — I'll suggest a few from what I know you love, and go get it
+> 4. **Make me one** — I'll draw you a tiny original
+> 5. **💬 Chat about this first** — we'll talk about what fits before deciding
+>
+> Or tell me in your own words.
+
+- **3 — Find one.** Recommend candidates from `Person.interests` (a trail runner hears footprints first; a sailor, the sailboat — or something better off the shelf). When it's not in the bundled seven, fetch it via the same announce → fetch → cache → inline protocol as "Icons for links — bundled first, fetched when missing" above; the brand-icon law applies (monochrome single-path, `viewBox="0 0 24 24"`, `fill="currentColor"` — canon §6).
+- **4 — Make one.** Author a tiny single-path SVG by hand to the same law, save it to the project's `career-graph/assets/icons/`, and inline it.
+
+Whatever they pick lands in `data.js` as `window.HOPE_DATA.traveler` (see "The Throughline — timeline data contract") and is recorded on the CuratedPortfolio node as `"timeline_traveler"` — a per-portfolio presentation choice like `show_summary`: don't re-ask while iterating, and honor it on regeneration without re-asking (see "Updating an existing portfolio").
+
 Then generate. Show them. Iterate.
 
 ## Iteration loop
@@ -323,23 +380,23 @@ After first generation, **always ask "What's off?"** Don't ask "do you like it?"
 >
 > Or tell me in your own words.
 
-Update the artifact. Update the CuratedPortfolio in the graph if the curation changed (including a changed `show_summary` decision).
+Update the artifact. Update the CuratedPortfolio in the graph if the curation changed (including a changed `show_summary` or `timeline_traveler` decision).
 
 ## Show it — then hand over the keys
 
 The portfolio is the payoff. Don't just save a file and move on — **present it.** Preview it the robust way, in this order — stop at the first one that works for the user's environment:
 
-1. **Render it in the viewer — this is the primary path.** Save the file (step 2), then surface its path in the chat as the deliverable so the Claude app's **preview pane renders it inline**. Clicking an HTML path in the chat opens it in the embedded preview — no local server, no macOS permission prompts, no working-directory pitfalls. This is the canonical, most reliable path; reach for it first and you're usually done.
-2. **Hand over the file path.** Save to `career-graph/documents/portfolios/portfolio-<slug>-<date>.html` and tell them the exact path in plain words.
-3. **Open it in the browser via `file://` — the simple fallback.** If they want the full-browser view (and the cleanest PDF), open the file directly — no server needed: `open "file://<absolute-path>"` (or `open -a "Google Chrome" "<absolute-path>"`) on macOS; `xdg-open "<absolute-path>"` on Linux; `start "" "<absolute-path>"` on Windows. Tell them they can also just double-click the file.
-4. **Only if a local server is genuinely required** (rare — a `file://` page can't do something the user specifically needs), **never run `python -m http.server` from a `~/Documents` / `~/Desktop` / `~/Downloads` working directory.** On macOS those folders sit behind the TCC sandbox, and a process Claude spawns can't read them even when Claude itself can — and a pyenv-shimmed `python` will also fail because it calls `getcwd()` on an unreadable directory. Instead, **copy the file into a temp dir, `chdir` there first, then serve with a pinned system Python:**
+1. **Render it in the viewer — this is the primary path.** Save the folder (step 2), then surface **the folder's `index.html` path** in the chat as the deliverable so the Claude app's **preview pane renders it inline**. Clicking an HTML path in the chat opens it in the embedded preview — no local server, no macOS permission prompts, no working-directory pitfalls. This is the canonical, most reliable path; reach for it first and you're usually done.
+2. **Hand over the path — always the folder's `index.html`.** Save the folder to `career-graph/documents/portfolios/portfolio-<slug>-<date>/` and tell them the exact path to its `index.html` in plain words — that's the file they open; the siblings ride along.
+3. **Open it in the browser via `file://` — the simple fallback.** If they want the full-browser view (and the cleanest PDF), open `index.html` directly — no server needed; the folder works offline by contract (see "What this skill outputs"): `open "file://<absolute-path-to-folder>/index.html"` (or `open -a "Google Chrome" "<…>/index.html"`) on macOS; `xdg-open "<…>/index.html"` on Linux; `start "" "<…>\index.html"` on Windows. Tell them they can also just double-click `index.html`.
+4. **Only if a local server is genuinely required** (rare — a `file://` page can't do something the user specifically needs), **never run `python -m http.server` from a `~/Documents` / `~/Desktop` / `~/Downloads` working directory.** On macOS those folders sit behind the TCC sandbox, and a process Claude spawns can't read them even when Claude itself can — and a pyenv-shimmed `python` will also fail because it calls `getcwd()` on an unreadable directory. Instead, **copy the whole folder into a temp dir** (never a lone `index.html` — the CSS/JS/data siblings must travel with it), **`chdir` there first, then serve with a pinned system Python:**
 
    ```bash
    TMP="$(mktemp -d)"
-   cp "<absolute-path-to-portfolio.html>" "$TMP/portfolio.html"
+   cp -R "<absolute-path-to-portfolio-folder>" "$TMP/portfolio"   # the WHOLE folder — siblings included
    cd "$TMP"                     # chdir FIRST so getcwd() never touches a TCC folder
    /usr/bin/python3 -m http.server --bind 127.0.0.1 --directory "$TMP" 8080
-   # → http://127.0.0.1:8080/portfolio.html
+   # → http://127.0.0.1:8080/portfolio/index.html
    ```
 
    Use `/usr/bin/python3` (the system interpreter), not a bare `python`/`python3` that may be a pyenv shim. Pin `--directory` to the absolute temp path. Never serve from the user's project folder under `~/Documents`.
@@ -401,12 +458,12 @@ Then ask, substituting `<LIVE>`:
 - **5 — Check for all updates.** Compare everything, then propose the lot in one message and let them pick what to act on:
   1. **Graph changes since the last generation** — anything added or edited in the graph after the newest portfolio file's date (the CuratedPortfolio node records what went out, and when).
   2. **Plugin version** — this skill's version marker vs `<LIVE>` (the stale-session check below).
-  3. **Republish staleness** — compare the local portfolio file's modified time against `published_at` in `.publish.json` (hope-publish stamps it on every publish, including re-publishes). Local file newer → the live link is behind the local copy. No `.publish.json` → never published; no `published_at` in it → published by an older Hope, just say "worth a republish to be safe."
+  3. **Republish staleness** — compare the local portfolio folder's newest file-modified time against `published_at` in `.publish.json` (hope-publish stamps it on every publish, including re-publishes). Local file newer → the live link is behind the local copy. No `.publish.json` → never published; no `published_at` in it → published by an older Hope, just say "worth a republish to be safe."
 - **6 — Chat about it first.** No checklist, no regeneration yet — talk through what's on their mind (voice-guide rule #6's chat option), then land on whichever option fits.
 
 ### Updating an existing portfolio
 
-Options 1–3 (and any updates the user accepts from option 5) land here. **Regenerating from the user's existing graph against the current bundled template is THE update path** — never patch old HTML in place. New template features (like the Overview app and the published-mode gates) flow into the regenerated file automatically; then re-publishing via `hope-publish` re-stages the file and re-stamps the published flag, so updates stay sustainable release after release. Honor the existing `CuratedPortfolio.show_summary` decision without re-asking. One distinction to keep straight: **the local file is the owner's editable copy — it never carries `data-hope-mode="published"`; the published copy is the one the publish skill stamps read-only.**
+Options 1–3 (and any updates the user accepts from option 5) land here. **Regenerating from the user's existing graph against the current bundled template is THE update path** — never patch old files in place. New template features (like the Overview app, the Throughline, and the published-mode gates) flow into the regenerated folder automatically; then re-publishing via `hope-publish` re-stages the files and re-stamps the published flag, so updates stay sustainable release after release. Honor the existing `CuratedPortfolio.show_summary` and `timeline_traveler` decisions without re-asking. One distinction to keep straight: **the local folder is the owner's editable copy — its `index.html` never carries `data-hope-mode="published"`; the published copy is the one the publish skill stamps read-only (the stamp lives on `index.html`'s `<html>` tag).**
 
 ## Stale-session check — is this chat running an older Hope?
 

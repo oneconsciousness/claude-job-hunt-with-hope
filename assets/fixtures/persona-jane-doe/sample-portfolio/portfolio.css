@@ -1,0 +1,2127 @@
+/* ────────────────────────────────────────────────────────────────────────
+   Hope plugin v0.4 sample — design-cookbook v1.1 conformant.
+   Light cream + orange is a deliberate plugin-level brand choice; the
+   underlying hope-mvp app defaults to dark. Adopts production patterns
+   from PortfolioPanelComponent.tsx (hex KPIs, real org logos, numbered
+   contributions, scope/domain/metric badges, IC vs Leadership groups,
+   level bars, Instagram-style project grid) softened for the portfolio
+   document context (rounded radii, pill chips, calmer scanlines).
+   ──────────────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: light dark;
+
+  /* Surfaces — warm cream */
+  --bg:               #F0EBE3;
+  --surface:          #E8E2D8;
+  --surface-2:        #EDE8DF;
+  --card-bg:          #F5F0E8;
+  --card-bg-hover:    #FAF6EE;
+  --card-bg-active:   #FFFCF3;
+
+  /* Text */
+  --text-primary:     #1A1612;
+  --text-secondary:   #5C4F3D;
+  --text-muted:       #8C7E6D;
+  --text-dim:         #B5AC9E;
+
+  /* Brand accents */
+  --accent-orange:    #D97706;     /* primary CTA / active */
+  --accent-orange-hover: #B45309;
+  --accent-orange-bg: rgba(217, 119, 6, 0.10);
+  --accent-orange-glow: 0 4px 14px rgba(217, 119, 6, 0.22);
+
+  --accent-cyan:      #0891B2;     /* headline + linkedin link */
+  --accent-cyan-soft: rgba(8, 145, 178, 0.08);
+  --accent-cyan-edge: rgba(8, 145, 178, 0.20);
+
+  --accent-emerald:   #16A34A;     /* LIVE / metric increase / positive */
+  --accent-emerald-bg: rgba(22, 163, 74, 0.10);
+  --accent-emerald-edge: rgba(22, 163, 74, 0.30);
+  --accent-emerald-glow: 0 0 10px rgba(22, 163, 74, 0.20);
+
+  --accent-violet:    #7C5BBF;     /* leadership contributions, scope badges */
+  --accent-violet-bg: rgba(124, 91, 191, 0.10);
+  --accent-violet-edge: rgba(124, 91, 191, 0.25);
+
+  --accent-amber:     #C27D0E;     /* warnings / "no date" */
+  --accent-amber-bg:  rgba(194, 125, 14, 0.12);
+  --accent-amber-edge:rgba(194, 125, 14, 0.30);
+
+  --accent-rose:      #D43450;     /* destructive / remove */
+
+  /* Borders */
+  --border-default:   rgba(31, 22, 14, 0.10);
+  --border-subtle:    rgba(31, 22, 14, 0.05);
+  --border-hover:     rgba(31, 22, 14, 0.20);
+
+  /* Radii — softer than production HUD; deliberate for portfolio context */
+  --radius-card:      8px;
+  --radius-panel:     10px;
+  --radius-button:    6px;
+  --radius-pill:      9999px;
+  --radius-tight:     3px;          /* for production-style square badges */
+
+  /* Shadows */
+  --shadow-sm:        0 1px 2px rgba(31, 22, 14, 0.04);
+  --shadow-md:        0 2px 8px rgba(31, 22, 14, 0.06);
+
+  /* Texture */
+  --grid-line:        rgba(31, 22, 14, 0.04);
+  --scan-line:        rgba(31, 22, 14, 0.02);
+
+  /* Fonts */
+  --font-sans:        "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono:        "JetBrains Mono", "SF Mono", Consolas, monospace;
+}
+[data-theme="dark"] {
+  --bg:               #1A1612;
+  --surface:          #221D17;
+  --surface-2:        #2A241D;
+  --card-bg:          #1F1A14;
+  --card-bg-hover:    #261F18;
+  --card-bg-active:   #2D261D;
+
+  --text-primary:     #F0E7D5;
+  --text-secondary:   #B5A78F;
+  --text-muted:       #8C7E6D;
+  --text-dim:         #5C4F3D;
+
+  --accent-orange:    #FB923C;
+  --accent-orange-hover: #FDBA74;
+  --accent-orange-bg: rgba(251, 146, 60, 0.14);
+  --accent-orange-glow: 0 4px 14px rgba(251, 146, 60, 0.30);
+
+  --accent-cyan:      #22D3EE;
+  --accent-cyan-soft: rgba(34, 211, 238, 0.10);
+  --accent-cyan-edge: rgba(34, 211, 238, 0.25);
+
+  --accent-emerald:   #34D572;
+  --accent-emerald-bg: rgba(52, 213, 114, 0.14);
+  --accent-emerald-edge:rgba(52, 213, 114, 0.30);
+  --accent-emerald-glow: 0 0 12px rgba(52, 213, 114, 0.25);
+
+  --accent-violet:    #A78BFA;
+  --accent-violet-bg: rgba(167, 139, 250, 0.12);
+  --accent-violet-edge: rgba(167, 139, 250, 0.30);
+
+  --accent-amber:     #F59E0B;
+  --accent-amber-bg:  rgba(245, 158, 11, 0.14);
+  --accent-amber-edge:rgba(245, 158, 11, 0.30);
+
+  --accent-rose:      #F43F5E;
+
+  --border-default:   rgba(240, 231, 213, 0.08);
+  --border-subtle:    rgba(240, 231, 213, 0.04);
+  --border-hover:     rgba(240, 231, 213, 0.20);
+
+  --grid-line:        rgba(240, 231, 213, 0.04);
+  --scan-line:        rgba(240, 231, 213, 0.02);
+}
+
+/* ─── Reset + base ─────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+*::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.55;
+  font-size: 14.5px;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+button { all: unset; cursor: pointer; box-sizing: border-box; }
+img { display: block; }
+
+/* ─── Animations ───────────────────────────────────────────────────── */
+@keyframes materialize {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
+}
+@keyframes scale-bar {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+.materialize { animation: materialize 0.4s ease-out forwards; }
+.stagger-1 { animation-delay: 0.04s; opacity: 0; animation-fill-mode: forwards; }
+.stagger-2 { animation-delay: 0.08s; opacity: 0; animation-fill-mode: forwards; }
+.stagger-3 { animation-delay: 0.12s; opacity: 0; animation-fill-mode: forwards; }
+.stagger-4 { animation-delay: 0.16s; opacity: 0; animation-fill-mode: forwards; }
+
+/* ─── Layout ───────────────────────────────────────────────────────── */
+/* Sample layout: left demo-controls column + right portfolio column.
+   Production template (assets/templates/portfolio.html) does NOT carry
+   the controls panel — it's a sample-only configurator that lets the
+   reviewer see how the design scales across career-length and density.
+*/
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+}
+.wrap {
+  flex: 1;
+  min-width: 0;
+  max-width: 880px;
+}
+.material-symbols-rounded {
+  font-variation-settings: 'opsz' 20, 'wght' 500, 'FILL' 0, 'GRAD' 0;
+  user-select: none;
+  vertical-align: middle;
+}
+
+/* ─── Demo controls panel (sample-only) ────────────────────────────── */
+.demo-controls {
+  flex: 0 0 270px;
+  position: sticky;
+  top: 24px;
+  align-self: flex-start;
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-panel);
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-sans);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.demo-controls::-webkit-scrollbar { width: 6px; }
+.demo-controls::-webkit-scrollbar-track { background: transparent; }
+.demo-controls::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
+
+.dc-header {
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-default);
+}
+.dc-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent-orange);
+}
+.dc-eyebrow::before {
+  content: "";
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-orange);
+  box-shadow: 0 0 6px rgba(217, 119, 6, 0.50);
+  flex-shrink: 0;
+}
+.dc-title {
+  margin: 6px 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.dc-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.dc-section { margin-bottom: 14px; }
+.dc-section:last-child { margin-bottom: 0; }
+.dc-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.dc-label .dc-readout {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-orange);
+  letter-spacing: 0.04em;
+}
+
+/* Segmented buttons */
+.dc-segmented {
+  display: flex;
+  gap: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-button);
+  padding: 2px;
+}
+.dc-segmented button {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 0;
+  padding: 5px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.dc-segmented button:hover {
+  color: var(--text-primary);
+  background: var(--card-bg-hover);
+}
+.dc-segmented button.active {
+  background: var(--accent-orange);
+  color: white;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.30);
+}
+
+/* Range slider */
+.dc-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  outline: none;
+}
+.dc-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent-orange);
+  border: 2px solid var(--card-bg);
+  box-shadow: 0 0 0 1px var(--accent-orange), 0 2px 6px rgba(217, 119, 6, 0.35);
+  cursor: pointer;
+}
+.dc-range::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent-orange);
+  border: 2px solid var(--card-bg);
+  box-shadow: 0 0 0 1px var(--accent-orange), 0 2px 6px rgba(217, 119, 6, 0.35);
+  cursor: pointer;
+}
+
+/* Multi-checkbox tag list */
+.dc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.dc-tags label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.dc-tags label:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+.dc-tags label.active {
+  background: var(--accent-orange-bg);
+  border-color: var(--accent-orange-edge);
+  color: var(--accent-orange);
+}
+.dc-tags input { display: none; }
+
+/* Reset button */
+.dc-reset {
+  margin-top: 12px;
+  width: 100%;
+  padding: 7px 10px;
+  background: transparent;
+  border: 1px dashed var(--border-hover);
+  border-radius: var(--radius-button);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dc-reset:hover {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+  border-style: solid;
+}
+
+/* Density modes — applied to .wrap */
+.wrap[data-density="compact"] .item-card,
+.wrap[data-density="compact"] .edu-card,
+.wrap[data-density="compact"] .skill-cell { font-size: 0.94em; }
+.wrap[data-density="compact"] .item-head { padding: 10px 14px 10px 17px; }
+.wrap[data-density="compact"] .skill-cell { padding: 6px 10px; }
+.wrap[data-density="compact"] .skill-cat { gap: 6px; }
+.wrap[data-density="compact"] .skills-hud { gap: 12px; }
+.wrap[data-density="compact"] .item-card { margin-bottom: 6px; }
+
+.wrap[data-density="spacious"] .item-head { padding: 18px 20px 18px 23px; }
+.wrap[data-density="spacious"] .item-card { margin-bottom: 14px; }
+.wrap[data-density="spacious"] .skill-cell { padding: 11px 14px; }
+.wrap[data-density="spacious"] .skills-hud { gap: 22px; }
+
+/* Visibility controls — items beyond their visible threshold are hidden */
+[data-hidden="true"] { display: none !important; }
+[data-persona-hidden="true"] { display: none !important; }
+
+/* ─── Persona picker (sample-only) ──────────────────────────────── */
+.persona-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.persona-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.persona-btn:hover {
+  border-color: var(--border-hover);
+  background: var(--card-bg-hover);
+}
+.persona-btn.active {
+  border-color: var(--accent-orange);
+  background: var(--accent-orange-bg);
+  box-shadow: 0 1px 4px rgba(217, 119, 6, 0.18);
+}
+.persona-btn .p-avatar {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cat-tone, #E8DDD0);
+  color: var(--cat-ink, #1A1612);
+  font-family: 'Century Gothic', 'Futura', 'Avenir Next', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.persona-btn .p-text {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.persona-btn .p-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.persona-btn .p-role {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.persona-btn.active .p-name { color: var(--accent-orange); }
+.persona-btn.active .p-role { color: var(--accent-orange); opacity: 0.85; }
+
+/* Responsive: collapse layout on narrow screens */
+@media (max-width: 960px) {
+  .layout {
+    flex-direction: column;
+    padding: 16px 14px 60px;
+  }
+  .demo-controls {
+    flex: 1 1 auto;
+    position: relative;
+    top: auto;
+    width: 100%;
+    max-height: none;
+    margin-bottom: 16px;
+  }
+  .wrap { max-width: none; }
+}
+
+/* ─── Top bar (Share · Save as PDF · theme toggle) ─────────────────── */
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  /* z-index 950: the materialize animation gives .topbar its own stacking
+     context, so the share menu's z-index is trapped inside it — without this,
+     later siblings (identity card, summary band) paint OVER the open menu.
+     950 beats content (0-2) and stays under the export modal (1000). */
+  position: relative;
+  z-index: 950;
+}
+.action-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.action-btn:hover {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+  transform: translateY(-1px);
+}
+.action-btn svg { width: 13px; height: 13px; }
+.action-btn.copied { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+.theme-toggle {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.theme-toggle:hover {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+  transform: translateY(-1px);
+}
+.theme-toggle svg { width: 14px; height: 14px; }
+.theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+
+/* ─── Print / Save-as-PDF ──────────────────────────────────────────────
+   One click → a clean PDF, no fiddling. We (1) force colors so the cream/orange
+   design survives, (2) expand every collapsed pane + card so the whole
+   portfolio prints (not just the open tab), (3) keep cards intact across page
+   breaks, and (4) drop the interactive chrome (topbar, chevrons). */
+@page { size: Letter; margin: 0.5in 0.55in; }
+@media print {
+  :root { color-scheme: light; }
+  html, body { background: #fff !important; }
+  *, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-size: 11px; }
+  .wrap { max-width: none; padding: 0; }
+  .topbar { display: none !important; }
+  /* Sample-only chrome never prints: the demo-controls configurator panel
+     disappears and the two-column .layout flattens to the portfolio alone. */
+  .demo-controls { display: none !important; }
+  .layout { display: block; max-width: none; padding: 0; }
+  /* Animations would otherwise leave staggered items at opacity:0 on the print canvas. */
+  .materialize, .stagger-1, .stagger-2, .stagger-3 { animation: none !important; opacity: 1 !important; }
+  /* Print every section, not just the active tab. */
+  .section-grid { display: none !important; }
+  .section-pane { display: block !important; }
+  /* The persona-gated Overview pane never leaks into another persona's
+     printout — re-assert the persona gate over the blanket pane-unhide
+     above (sample-only concern; the generated template strips the pane). */
+  .section-pane[data-persona-hidden="true"] { display: none !important; }
+  .section-pane[data-pane]::before {
+    content: attr(data-pane);
+    display: block;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.16em;
+    color: var(--accent-orange);
+    margin: 14px 0 8px;
+  }
+  .section-pane:first-of-type::before { margin-top: 4px; }
+  /* Expand all collapsed cards and hide the now-meaningless chevron. */
+  .item-body { max-height: none !important; overflow: visible !important; }
+  .chevron { display: none !important; }
+  /* Keep SMALL units intact; let big containers (pane, card, group) break across
+     pages. Keeping .section-pane/.item-card/.contrib-group together is what caused
+     page-sized blank gaps — a container taller than one page can never "avoid". */
+  .identity-card, .summary-band, .item-head, .contrib, .skill-cell, .edu-card {
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  /* Headers never strand at the bottom of a page — they stay with their content. */
+  .section-pane[data-pane]::before, .item-head, .group-header, .skill-cat-header {
+    break-after: avoid; page-break-after: avoid;
+  }
+  /* When a card fragments across pages, give each fragment its full border/bg. */
+  .item-card, .contrib-group { box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  p { orphans: 3; widows: 3; }
+  .footer { break-before: avoid; page-break-before: avoid; }
+  /* ── Print-weight diet — keep the brand, drop the rasterizers. ──
+     Blurred glows/shadows are the no.1 PDF rasterization trigger; depth is
+     carried by the existing 1px borders. (!important where the component's
+     own rule sets a literal shadow later in source order.) */
+  :root { --accent-orange-glow: none; --accent-emerald-glow: none; --shadow-sm: none; --shadow-md: none; }
+  .live-pill, .active-pill, .metric-badge, .metric-badge.achieved,
+  .skill-cat-header .ledge { box-shadow: none !important; }
+  /* Scanlines stay (they're brand) — but as a pre-tiled 1×3 PNG with the
+     light-theme --scan-line color baked in (print forces light), instead of a
+     repeating-linear-gradient that becomes a viewer-hostile Type-4 PostScript
+     shading. Opacity stays 0.30, same as on screen. */
+  .item-card::before { background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAYAAABS3WWCAAAAD0lEQVR42mNggAN5MT5WAADuAEkdWZ51AAAAAElFTkSuQmCC") repeat !important; }
+  /* Grid texture: ONE 32×32 PNG tile (light --grid-line baked in) replaces the
+     2-axis gradient pair — kills the content-stream fill-op explosion. */
+  .identity-card::before, .summary-band::before { background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAANUlEQVR42u3OoQ0AQAgEQTTiJZb+uyT5JhDMJXt6ouvlZvFvcwAAAAAAAAAAAAAAAAAA5wEDA0kS9G3fBkQAAAAASUVORK5CYII=") !important; }
+  /* Accent bars + divider rules go solid in print — gradients are PDF shading
+     functions, and a gradient with an alpha stop emits TWO (the color ramp
+     plus a function-based alpha ramp). Zero-shading budget. */
+  .item-card .accent-bar { background: var(--text-muted) !important; }
+  .item-card.is-current .accent-bar { background: var(--accent-orange) !important; box-shadow: none !important; }
+  .item-divider { background: var(--accent-cyan-edge) !important; }
+}
+
+/* ─── Export chooser print styles ──────────────────────────────────────
+   The tuned block above IS "portfolio classic" — the default look when no
+   print-doc-… / print-style-… class is on <body>, and the foundation every
+   variant builds on. Everything below is scoped to the body classes that
+   #export-modal sets right before window.print() (removed on afterprint):
+     body.print-doc-portfolio + .print-style-classic | -ink | -showcase
+     body.print-doc-resume    + .print-style-classic | -modern | -compact
+   print-doc-portfolio.print-style-classic intentionally has no rules — it
+   IS the foundation.
+   PORTFOLIO PDF — gated for the next release; re-enable by restoring the
+   Document fieldset. THIS RELEASE the modal sets the resume classes only,
+   so the print-doc-portfolio variants below are inert (kept intact). The
+   default no-class browser print (Cmd+P) still prints the paginated classic
+   portfolio — that's the browser's native path, untouched. */
+@media print {
+  /* In-page chrome never prints, whichever document was chosen. */
+  #export-modal, #share-menu { display: none !important; }
+}
+
+/* The two portfolio style variants below are intentionally NOT @media-print
+   gated: their body classes exist only during the export lifecycle (set on
+   confirm, removed on afterprint), and the Continuous layout measures the
+   document height ON SCREEN — the variant's layout must be part of that
+   measurement or the injected single page comes out the wrong height. A brief
+   restyle flash before the print dialog opens is acceptable. */
+  /* ── PORTFOLIO · INK — conservative monochrome for corporate submissions.
+        White bg, near-black text, no textures/scanlines/grid, no color
+        accents; rules, weight and spacing carry the hierarchy. ── */
+  body.print-doc-portfolio.print-style-ink {
+    --bg: #fff; --surface: #fff; --surface-2: #fff;
+    --card-bg: #fff; --card-bg-hover: #fff; --card-bg-active: #fff;
+    --text-primary: #111; --text-secondary: #333; --text-muted: #555; --text-dim: #888;
+    --accent-orange: #111; --accent-orange-hover: #111; --accent-orange-bg: transparent; --accent-orange-glow: none;
+    --accent-cyan: #111; --accent-cyan-soft: transparent; --accent-cyan-edge: #c8c8c8;
+    --accent-emerald: #111; --accent-emerald-bg: transparent; --accent-emerald-edge: #c8c8c8; --accent-emerald-glow: none;
+    --accent-violet: #111; --accent-violet-bg: transparent; --accent-violet-edge: #c8c8c8;
+    --accent-amber: #555; --accent-amber-bg: transparent; --accent-amber-edge: #c8c8c8;
+    --accent-rose: #111;
+    --border-default: #cfcfcf; --border-subtle: #e4e4e4; --border-hover: #aaa;
+    --shadow-sm: none; --shadow-md: none;
+    --grid-line: transparent; --scan-line: transparent;
+  }
+  body.print-doc-portfolio.print-style-ink .identity-card::before,
+  body.print-doc-portfolio.print-style-ink .summary-band::before,
+  body.print-doc-portfolio.print-style-ink .item-card::before { display: none !important; }
+  /* Overview panel in ink: hexes + chips are already covered by the .hex-kpi
+     .hex and .skill-chip rules below — no extra rules needed. */
+  body.print-doc-portfolio.print-style-ink .item-card.is-current .accent-bar { background: #111 !important; box-shadow: none; }
+  body.print-doc-portfolio.print-style-ink .live-pill,
+  body.print-doc-portfolio.print-style-ink .active-pill { background: transparent; border-color: #c8c8c8; color: #111; box-shadow: none; }
+  body.print-doc-portfolio.print-style-ink .live-pill .dot { background: #111; animation: none; }
+  body.print-doc-portfolio.print-style-ink .metric-badge { box-shadow: none; }
+  body.print-doc-portfolio.print-style-ink .skill-chip { background: transparent !important; color: #111 !important; border-color: #c8c8c8 !important; }
+  body.print-doc-portfolio.print-style-ink .contrib { border-left-color: #111; }
+  body.print-doc-portfolio.print-style-ink .contrib-impact p { color: #333 !important; }
+  body.print-doc-portfolio.print-style-ink .contrib-impact .material-symbols-rounded { color: #555 !important; }
+  body.print-doc-portfolio.print-style-ink .group-header .material-symbols-rounded,
+  body.print-doc-portfolio.print-style-ink .group-header .title { color: #333 !important; }
+  body.print-doc-portfolio.print-style-ink .group-header .bar { background: #d8d8d8 !important; }
+  body.print-doc-portfolio.print-style-ink .hex-kpi .hex { background: transparent; border-color: #c8c8c8; color: #111; }
+  body.print-doc-portfolio.print-style-ink .org-fallback { background: #f2f2f2; border-color: #cfcfcf; color: #111; }
+  body.print-doc-portfolio.print-style-ink .competency { color: #333; border-bottom-color: #999; }
+  /* filter: grayscale rasterizes everything it touches in the print pipeline —
+     allowed ONLY on true raster images (cost bounded to their own pixels),
+     never on anything containing text or vector fills. The level-bar segs are
+     inline-styled, so !important does the monochrome swap; the ledge follows
+     the --cat-color override (its glow is killed above). */
+  body.print-doc-portfolio.print-style-ink .org-logo,
+  body.print-doc-portfolio.print-style-ink .photo-upload img { filter: grayscale(1); }
+  body.print-doc-portfolio.print-style-ink .level-bar .seg,
+  body.print-doc-portfolio.print-style-ink .level-bar i { background: #555 !important; }
+  body.print-doc-portfolio.print-style-ink .skill-cat-header .ledge { box-shadow: none; }
+  body.print-doc-portfolio.print-style-ink .skill-cat { --cat-color: #333 !important; }
+  /* Hardcoded rgba icon accents (contrib type-icons, green check bullets) bypass
+     the token swap — force them monochrome explicitly. */
+  body.print-doc-portfolio.print-style-ink .contrib-head .type-icon { color: #555 !important; }
+  body.print-doc-portfolio.print-style-ink .ach-bullets li > .material-symbols-rounded,
+  body.print-doc-portfolio.print-style-ink .edu-card .ach .material-symbols-rounded { color: #555 !important; }
+
+  /* ── PORTFOLIO · SHOWCASE — designer-forward (Behance-inspired): bigger
+        display type for the name + section openers, more whitespace, color
+        kept, projects elevated to print FIRST after identity (CSS order). ── */
+  body.print-doc-portfolio.print-style-showcase .wrap { display: flex; flex-direction: column; }
+  body.print-doc-portfolio.print-style-showcase .wrap > * { order: 2; }
+  body.print-doc-portfolio.print-style-showcase .wrap > .identity-card { order: 0; }
+  /* Contents strip rides at the same order as identity — the flexbox DOM-order
+     tie-break keeps it right after the identity card. */
+  body.print-doc-portfolio.print-style-showcase .wrap > .print-toc { order: 0; }
+  /* The Overview pane (when shipped) rides at order 0 too — the DOM tie-break
+     lands it right after the contents strip, ahead of the elevated projects
+     pane. When the persona ships no Overview (persona-hidden in this sample;
+     show_summary stripped in a generated file), the selector matches nothing. */
+  body.print-doc-portfolio.print-style-showcase .wrap > .section-pane[data-pane="overview"] { order: 0; }
+  body.print-doc-portfolio.print-style-showcase .wrap > .section-pane[data-pane="projects"] { order: 1; }
+  body.print-doc-portfolio.print-style-showcase .wrap > .footer { order: 3; }
+  body.print-doc-portfolio.print-style-showcase { font-size: 11.5px; }
+  body.print-doc-portfolio.print-style-showcase h1.name { font-size: 30pt; line-height: 1.05; letter-spacing: -0.02em; }
+  body.print-doc-portfolio.print-style-showcase .headline { font-size: 13pt; }
+  body.print-doc-portfolio.print-style-showcase .summary { font-size: 14px; line-height: 1.7; }
+  body.print-doc-portfolio.print-style-showcase .identity-card { padding: 30px 30px; margin-bottom: 26px; }
+  body.print-doc-portfolio.print-style-showcase .section-pane[data-pane]::before {
+    font-family: var(--font-sans); font-size: 17pt; font-weight: 800;
+    text-transform: capitalize; letter-spacing: -0.01em; margin: 30px 0 14px;
+  }
+  body.print-doc-portfolio.print-style-showcase .section-pane:first-of-type::before { margin-top: 14px; }
+  body.print-doc-portfolio.print-style-showcase .item-card { margin-bottom: 14px; }
+  body.print-doc-portfolio.print-style-showcase .item-head { padding: 16px 18px 16px 21px; }
+  body.print-doc-portfolio.print-style-showcase .item-body-inner { padding-bottom: 22px; gap: 16px; }
+
+/* ── RESUME document — swap the portfolio for #resume-view. ──
+     Intentionally NOT @media-print gated (same reasoning as the portfolio
+     variants above): the export modal's Auto-fit measures #resume-view's
+     height ON SCREEN while these body classes are set — they exist only
+     during the export lifecycle — so the measured layout must BE the printed
+     layout. A brief restyle flash before the print dialog opens is fine. */
+  /* ── READABILITY FLOOR — recruiters reject smaller ──
+        Hard constraints for every resume style and for auto-fit:
+          · body text never below 10pt   (compact's base IS 10pt — it never shrinks)
+          · line-height never below 1.2  (compact sits exactly at the 1.2 floor)
+          · page margins never below 0.5in (@page 0.5in/0.55in is already the floor)
+        Auto-fit scales type via --rfs on #resume-view (default 1), clamped in
+        JS (RESUME_MIN_BODY_PT / RESUME_MIN_LEADING) to
+        floor-scale = 10pt / style-base-pt:
+          classic 11pt → 0.909 · modern 10.5pt → 0.952 · compact 10pt → 1.0.
+        Density beyond the floor comes from spacing, margins and leading —
+        never from smaller type. */
+  body.print-doc-resume .topbar,
+  body.print-doc-resume .identity-card,
+  body.print-doc-resume .print-toc,
+  body.print-doc-resume .section-grid,
+  body.print-doc-resume .section-pane,
+  body.print-doc-resume .footer { display: none !important; }
+  /* Measurement = print geometry: the on-screen auto-fit measure must see the
+     same content box the printed page lays out (the print block's .wrap reset
+     only applies at print time). */
+  body.print-doc-resume { background: #fff; }
+  body.print-doc-resume .wrap { max-width: none; padding: 0; }
+  /* Sample-only chrome: the demo-controls configurator never enters the
+     measured (= printed) layout; the two-column .layout flattens. */
+  body.print-doc-resume .demo-controls { display: none !important; }
+  body.print-doc-resume .layout { display: block; max-width: none; padding: 0; }
+  body.print-doc-resume #resume-view { display: block !important; background: #fff; color: #111; }
+  /* Shared resume bones — ATS-safe, style-independent. */
+  body.print-doc-resume #resume-view h1,
+  body.print-doc-resume #resume-view h2,
+  body.print-doc-resume #resume-view h3,
+  body.print-doc-resume #resume-view p { margin: 0; }
+  body.print-doc-resume #resume-view h2 { break-after: avoid; page-break-after: avoid; }
+  body.print-doc-resume .resume-entry { break-inside: avoid; page-break-inside: avoid; }
+  body.print-doc-resume #resume-view li { orphans: 2; widows: 2; }
+  /* Title left, dates right — flex, not a table: copies out as linear text,
+     so the PDF still passes the plain-text ATS paste test. */
+  body.print-doc-resume .resume-entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  body.print-doc-resume .resume-dates { white-space: nowrap; }
+
+  /* ── RESUME · CLASSIC — the timeless serif résumé: single column, black
+        on white, centered name, ruled caps headings, traditional margins
+        (#resume-view padding + the 0.5in/0.55in @page margin ≈ 1in).
+        Font sizes ride --rfs (auto-fit scale, floor 0.909) and the family
+        rides --resume-font (the dialog's Font override). ── */
+  body.print-doc-resume.print-style-classic #resume-view {
+    font-family: var(--resume-font, Georgia, 'Charter', 'Times New Roman', serif);
+    font-size: calc(11pt * var(--rfs, 1)); line-height: 1.35; padding: 0.5in 0.45in;
+  }
+  body.print-doc-resume.print-style-classic #resume-view h1 { font-size: calc(22pt * var(--rfs, 1)); font-weight: 400; text-align: center; letter-spacing: 0.04em; }
+  body.print-doc-resume.print-style-classic .resume-headline { text-align: center; font-size: calc(11pt * var(--rfs, 1)); margin-top: 2pt; }
+  body.print-doc-resume.print-style-classic .resume-contact { text-align: center; font-size: calc(10pt * var(--rfs, 1)); margin-top: 3pt; }
+  body.print-doc-resume.print-style-classic .resume-header { margin-bottom: 16pt; }
+  body.print-doc-resume.print-style-classic #resume-view h2 { font-size: calc(11pt * var(--rfs, 1)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em; border-bottom: 0.75pt solid #111; padding-bottom: 2pt; margin: 14pt 0 6pt; }
+  body.print-doc-resume.print-style-classic #resume-view h3 { font-size: calc(11pt * var(--rfs, 1)); font-weight: 700; }
+  body.print-doc-resume.print-style-classic .resume-entry { margin: 0 0 9pt; }
+  body.print-doc-resume.print-style-classic .resume-org,
+  body.print-doc-resume.print-style-classic .resume-dates { font-size: calc(10.5pt * var(--rfs, 1)); font-style: italic; }
+  body.print-doc-resume.print-style-classic #resume-view ul { margin: 3pt 0 0; padding-left: 14pt; }
+  body.print-doc-resume.print-style-classic #resume-view li { margin: 0 0 2.5pt; }
+  /* One bolded key sub-phrase per bullet (see #resume-view authoring comments). */
+  body.print-doc-resume.print-style-classic #resume-view strong { font-weight: 700; }
+  /* Links: resume-convention subtle — inherit the ink, thin underline.
+     No web-blue, no color shift; hrefs still print as clickable PDF annotations. */
+  body.print-doc-resume.print-style-classic #resume-view a { color: inherit; text-decoration: underline; text-decoration-thickness: 0.5pt; text-underline-offset: 2pt; }
+
+  /* ── RESUME · MODERN — Inter, compact left-aligned header, thin rules,
+        one restrained orange accent on the name + section rules only.
+        Fixed #D97706 (not the token) so dark-theme printing stays correct.
+        Font sizes ride --rfs (floor 0.952); family rides --resume-font. ── */
+  body.print-doc-resume.print-style-modern #resume-view {
+    font-family: var(--resume-font, var(--font-sans));
+    font-size: calc(10.5pt * var(--rfs, 1)); line-height: 1.4; color: #1a1a1a; padding: 0.35in 0.45in;
+  }
+  /* No negative letter-spacing anywhere in #resume-view — ATS-safety rule. */
+  body.print-doc-resume.print-style-modern #resume-view h1 { font-size: calc(23pt * var(--rfs, 1)); font-weight: 700; color: #D97706; }
+  body.print-doc-resume.print-style-modern .resume-headline { font-size: calc(11pt * var(--rfs, 1)); font-weight: 600; margin-top: 1pt; }
+  body.print-doc-resume.print-style-modern .resume-contact { font-size: calc(9.5pt * var(--rfs, 1)); color: #555; margin-top: 2pt; }
+  body.print-doc-resume.print-style-modern .resume-header { margin-bottom: 14pt; }
+  body.print-doc-resume.print-style-modern #resume-view h2 { font-size: calc(9pt * var(--rfs, 1)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #444; border-bottom: 0.5pt solid #D97706; padding-bottom: 2pt; margin: 16pt 0 6pt; }
+  body.print-doc-resume.print-style-modern #resume-view h3 { font-size: calc(11pt * var(--rfs, 1)); font-weight: 600; }
+  body.print-doc-resume.print-style-modern .resume-entry { margin: 0 0 9pt; }
+  body.print-doc-resume.print-style-modern .resume-org,
+  body.print-doc-resume.print-style-modern .resume-dates { font-size: calc(9.5pt * var(--rfs, 1)); color: #555; }
+  body.print-doc-resume.print-style-modern #resume-view ul { margin: 4pt 0 0; padding-left: 13pt; }
+  body.print-doc-resume.print-style-modern #resume-view li { margin: 0 0 3pt; }
+  /* One bolded key sub-phrase per bullet (see #resume-view authoring comments). */
+  body.print-doc-resume.print-style-modern #resume-view strong { font-weight: 700; }
+  /* Links inherit the ink; the accent tints ONLY the contact line's underline —
+     bullets keep a plain underline. Restrained accent, never web-blue. */
+  body.print-doc-resume.print-style-modern #resume-view a { color: inherit; text-decoration: underline; text-decoration-thickness: 0.5pt; text-underline-offset: 2pt; }
+  body.print-doc-resume.print-style-modern .resume-contact a { text-decoration-color: #D97706; }
+
+  /* ── RESUME · COMPACT — dense one-pager AT the readability floor: body is
+        exactly 10pt (never smaller — its --rfs floor scale is 1.0, so
+        auto-fit cannot shrink it), leading exactly 1.2, the 0.5in/0.55in
+        @page margin IS the margin floor (no extra padding). Density is bought
+        with tight spacing and margins only — never with sub-10pt type. ── */
+  body.print-doc-resume.print-style-compact #resume-view {
+    font-family: var(--resume-font, var(--font-sans));
+    font-size: calc(10pt * var(--rfs, 1)); line-height: 1.2; padding: 0;
+  }
+  body.print-doc-resume.print-style-compact #resume-view h1 { font-size: calc(16pt * var(--rfs, 1)); font-weight: 700; }
+  body.print-doc-resume.print-style-compact .resume-headline { font-size: calc(10.5pt * var(--rfs, 1)); font-weight: 600; margin-top: 1pt; }
+  body.print-doc-resume.print-style-compact .resume-contact { font-size: calc(10pt * var(--rfs, 1)); color: #444; margin-top: 1pt; }
+  body.print-doc-resume.print-style-compact .resume-header { margin-bottom: 8pt; }
+  body.print-doc-resume.print-style-compact #resume-view h2 { font-size: calc(10pt * var(--rfs, 1)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 0.5pt solid #999; padding-bottom: 1pt; margin: 7pt 0 2.5pt; }
+  body.print-doc-resume.print-style-compact #resume-view h3 { font-size: calc(10pt * var(--rfs, 1)); font-weight: 700; }
+  body.print-doc-resume.print-style-compact .resume-entry { margin: 0 0 4.5pt; }
+  body.print-doc-resume.print-style-compact .resume-org,
+  body.print-doc-resume.print-style-compact .resume-dates { font-size: calc(10pt * var(--rfs, 1)); color: #444; }
+  body.print-doc-resume.print-style-compact #resume-view ul { margin: 1pt 0 0; padding-left: 11pt; }
+  body.print-doc-resume.print-style-compact #resume-view li { margin: 0 0 1pt; }
+  /* One bolded key sub-phrase per bullet (see #resume-view authoring comments).
+     700 holds at 10pt; drop to 600 ONLY if it muddies in the printed PDF — judge by eye. */
+  body.print-doc-resume.print-style-compact #resume-view strong { font-weight: 700; }
+  /* Links: inherit the ink + thin underline. No color shift at 10pt density. */
+  body.print-doc-resume.print-style-compact #resume-view a { color: inherit; text-decoration: underline; text-decoration-thickness: 0.5pt; text-underline-offset: 1.5pt; }
+
+/* ─── Share menu (popover) ──────────────────────────────────────────────
+   Opened by #share-btn. Items: Copy link · LinkedIn · X · WhatsApp · Email.
+   Each item leads with an inline SVG glyph: LinkedIn / X / WhatsApp carry
+   their monochrome single-path brand marks (Simple-Icons-style, viewBox
+   0 0 24 24, fill="currentColor", pasted from assets/icons/brands/); Copy
+   keeps a generic link glyph and Email a mail glyph. All inherit the item's
+   color via currentColor — no per-icon color rules — and theme automatically.
+   Never full-color logos, never icon fonts, never external icon loads.
+   Token-styled so it works in both themes; never prints (topbar is hidden). */
+.share-wrap { position: relative; display: inline-flex; }
+#share-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 900; min-width: 172px; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-card); box-shadow: var(--shadow-md); padding: 5px; }
+#share-menu[hidden] { display: none; }
+.share-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 11px; border-radius: var(--radius-button); font-size: 12.5px; font-weight: 600; color: var(--text-secondary); transition: background 0.15s, color 0.15s; }
+.share-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+.share-item:hover { background: var(--card-bg-hover); color: var(--text-primary); }
+
+/* ─── Export chooser (modal) ────────────────────────────────────────────
+   Opened by #pdf-btn. THIS RELEASE it is the "Save résumé as PDF" dialog:
+   picks resume style + font + fit, sets body.print-doc-resume.print-style-
+   <style> (plus --resume-font and, for Auto-fit, --rfs on #resume-view) and
+   calls window.print().
+   PORTFOLIO PDF — gated for the next release; re-enable by restoring the
+   Document fieldset. */
+#export-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+#export-modal[hidden] { display: none; }
+.export-backdrop { position: absolute; inset: 0; background: rgba(26,22,18,0.45); }
+[data-theme="dark"] .export-backdrop { background: rgba(0,0,0,0.55); }
+.export-dialog { position: relative; width: min(460px, 100%); max-height: calc(100vh - 40px); overflow-y: auto; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-panel); box-shadow: var(--shadow-md); padding: 18px 20px 20px; }
+.export-head { display: flex; align-items: center; justify-content: space-between; }
+.export-head h2 { margin: 0; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); }
+.export-x { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-button); color: var(--text-muted); font-size: 18px; line-height: 1; transition: background 0.15s, color 0.15s; }
+.export-x:hover { background: var(--surface-2); color: var(--text-primary); }
+.export-group { border: 0; margin: 14px 0 0; padding: 0; min-width: 0; }
+.export-group-label { display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-muted); padding: 0; margin: 0 0 8px; }
+.export-opts { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.export-opts-2 { grid-template-columns: 1fr 1fr; }
+.export-opt { position: relative; display: block; background: var(--surface-2); border: 1px solid var(--border-default); border-radius: var(--radius-button); padding: 9px 12px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.export-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.export-opt:hover { border-color: var(--border-hover); }
+.export-opt.selected { border-color: var(--accent-orange); background: var(--accent-orange-bg); }
+.export-opt .opt-name { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.export-opt .opt-tag { margin-left: 6px; font-family: var(--font-mono); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.10em; color: var(--accent-orange); }
+.export-opt .opt-desc { display: block; margin-top: 2px; font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); }
+.export-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.export-cancel { height: 32px; padding: 0 14px; border-radius: var(--radius-pill); border: 1px solid var(--border-default); color: var(--text-secondary); font-size: 12.5px; font-weight: 600; transition: border-color 0.15s, color 0.15s; }
+.export-cancel:hover { border-color: var(--border-hover); color: var(--text-primary); }
+.export-confirm { height: 32px; padding: 0 16px; border-radius: var(--radius-pill); background: var(--accent-orange); color: #fff; font-size: 12.5px; font-weight: 700; box-shadow: var(--accent-orange-glow); transition: background 0.15s; }
+.export-confirm:hover { background: var(--accent-orange-hover); }
+@media (max-width: 640px) { .export-opts-2 { grid-template-columns: 1fr; } }
+
+/* ─── Resume view — hidden on screen except during the export lifecycle,
+   when body.print-doc-resume (set by the export chooser) reveals it for
+   auto-fit measurement and printing (see the resume blocks above).
+   --rfs is the resume font scale auto-fit steps down (floor-clamped in JS);
+   --resume-font is the dialog's font override. Both are inline-set on this
+   element by the confirm handler and removed on afterprint. ─── */
+#resume-view { display: none; --rfs: 1; }
+
+/* ─── Identity card ────────────────────────────────────────────────── */
+.identity-card {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-panel);
+  padding: 22px 24px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+/* Subtle grid texture — production has 32x32 grid at 0.20 opacity in header */
+.identity-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  z-index: 0;
+}
+.identity-card > * { position: relative; z-index: 1; }
+
+.identity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+/* Photo upload — 104x104 (a prominent headshot; source bakes in at ~480px so
+   it downscales crisp). Identity row aligns the photo top to the name. */
+.photo-upload {
+  position: relative;
+  width: 104px; height: 104px;
+  border-radius: var(--radius-button);
+  background: var(--surface-2);
+  border: 1.5px dashed var(--border-hover);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: all 0.2s;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.photo-upload:hover {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+  background: var(--accent-orange-bg);
+}
+.photo-upload .material-symbols-rounded { font-size: 26px; margin-bottom: 2px; }
+.photo-upload.has-photo {
+  border-style: solid;
+  border-color: var(--accent-emerald);
+  padding: 0;
+  background: transparent;
+}
+.photo-upload.has-photo .upload-prompt { display: none; }
+.photo-upload img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: none;
+}
+.photo-upload.has-photo img { display: block; }
+.photo-upload input[type="file"] {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer;
+}
+.photo-remove {
+  position: absolute;
+  top: -4px; right: -4px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent-rose);
+  border: 2px solid var(--card-bg);
+  display: none;
+  align-items: center; justify-content: center;
+  color: white;
+  cursor: pointer;
+  z-index: 2;
+}
+.photo-remove .material-symbols-rounded { font-size: 11px; }
+.photo-upload.has-photo:hover .photo-remove { display: flex; }
+
+/* ─── PUBLISHED-MODE CONTRACT — every editing affordance AND builder
+   diagnostic gates on html[data-hope-mode=published] ─────────────────────
+   A published copy carries data-hope-mode="published" on the <html> element,
+   stamped by the publish skill into the STAGED site/index.html only. The
+   generated/local file NEVER carries it — it stays the owner's editable copy.
+   Under the flag a visitor sees a finished site, not an editor or a draft:
+     · photo upload fully inert — pointer-events none (which also kills the
+       :hover ring — hover can't engage on a pointer-events:none element),
+       upload prompt hidden, remove × never shown, and with no baked photo
+       the box hides entirely rather than invite an upload;
+     · the matching JS gate (document.documentElement.dataset.hopeMode ===
+       'published') disables the file input and SKIPS the photo localStorage
+       read/write, so a visitor's stale localStorage never shadows the
+       owner's baked photo;
+     · the section-grid INTEGRITY bars (the % on each app tile) are hidden —
+       that percentage is a data-confidence diagnostic for the OWNER ("this
+       section is thin"), never a recruiter-facing grade. It already never
+       prints (the grid is hidden in all print modes); this keeps it off the
+       live site too.
+   Visitor FEATURES are deliberately NOT gated: theme toggle (its
+   localStorage persistence is a per-visitor preference), Share menu,
+   Save-as-PDF, section-grid navigation, card expansion.
+   ANY FUTURE editable or builder-facing diagnostic added to this template
+   MUST ride the same flag — CSS scoped under html[data-hope-mode="published"],
+   JS behind the same dataset.hopeMode check. */
+html[data-hope-mode="published"] .photo-upload { pointer-events: none; cursor: default; }
+html[data-hope-mode="published"] .photo-upload .upload-prompt { display: none; }
+html[data-hope-mode="published"] .photo-upload:not(.has-photo) { display: none; }
+html[data-hope-mode="published"] .photo-remove { display: none !important; }
+html[data-hope-mode="published"] .section-btn .integrity { display: none; }
+
+.identity-info { flex: 1; min-width: 0; }
+.identity-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.identity-name-block { flex: 1; min-width: 0; }
+h1.name {
+  margin: 0 0 2px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+.headline {
+  margin: 0;
+  color: var(--accent-cyan);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+/* LIVE pill — inside identity row, top-right (production-aligned) */
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  background: var(--accent-emerald-bg);
+  border: 1px solid var(--accent-emerald-edge);
+  border-radius: var(--radius-pill);
+  color: var(--accent-emerald);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  box-shadow: var(--accent-emerald-glow);
+}
+.live-pill .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.stats-row strong { color: var(--text-primary); font-weight: 700; }
+.stats-row .sep { color: var(--text-dim); margin: 0 4px; }
+
+.contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+.contact-row .item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: color 0.2s, opacity 0.2s;
+}
+.contact-row .item.location { font-family: var(--font-sans); font-size: 12.5px; }
+.contact-row .item .material-symbols-rounded { font-size: 13px; color: var(--text-muted); }
+/* Brand marks (inline SVG, fill="currentColor") — size only: color comes from
+   the item via currentColor (.linkedin → --accent-cyan, rest → --text-secondary). */
+.contact-row .item svg { width: 13px; height: 13px; flex-shrink: 0; }
+.contact-row .item .ext { font-size: 10px; color: var(--text-dim); opacity: 0.55; }
+.contact-row .item.linkedin { color: var(--accent-cyan); }
+.contact-row .item:hover { opacity: 0.8; }
+
+.summary {
+  margin: 12px 0 0;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  line-height: 1.65;
+  max-width: 640px;
+}
+
+/* ─── Overview panel (opt-in) — curated hero stats + interests ─────────
+   The inner panel of the Overview app (#pane-overview > .summary-band).
+   Identity-card family: same panel tokens + 32px grid texture, no new colors.
+   In a generated portfolio the Overview app (tile + pane) renders only when
+   the user opted in (CuratedPortfolio.show_summary); the portfolio skill
+   strips the conditionals otherwise. In this sample it's populated for
+   Jane — the default persona — only. */
+.summary-band { position: relative; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-panel); padding: 16px 24px 18px; margin-bottom: 14px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.summary-band::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.55; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 32px 32px; z-index: 0; }
+.summary-band > * { position: relative; z-index: 1; }
+.summary-stats { display: flex; flex-wrap: wrap; gap: 14px 28px; }
+/* Scaled-up hex KPI: same clip-path/orange tint via the .hex-kpi classes, ~2×
+   size. Scoped selectors out-rank the .hex-kpi base rules (specificity), and
+   ink's monochrome .hex-kpi overrides keep covering these for free. */
+.summary-band .hex-kpi { gap: 12px; }
+.summary-band .hex-kpi .hex { width: 44px; height: 44px; border-radius: 6px; flex-shrink: 0; }
+.summary-band .hex-kpi .hex .material-symbols-rounded { font-size: 22px; }
+.summary-stat .stat-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.summary-stat .stat-value { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); line-height: 1.1; }
+.summary-stat .stat-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.10em; color: var(--text-muted); }
+.summary-interests { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.summary-interests .interests-eyebrow { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--text-muted); margin-right: 6px; }
+/* Neutral chips — skill-chip bones, no category colors. */
+.summary-interests .skill-chip { background: var(--surface-2); color: var(--text-secondary); border-color: var(--border-default); }
+
+/* ─── Section grid ─────────────────────────────────────────────────── */
+.section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.section-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-button);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font-family: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+.section-btn:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+.section-btn.active {
+  background: var(--accent-orange);
+  border-color: var(--accent-orange);
+  box-shadow: var(--accent-orange-glow);
+}
+.section-btn .icon {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-button);
+  background: var(--accent-orange-bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--accent-orange);
+  transition: all 0.2s;
+}
+.section-btn.active .icon {
+  background: rgba(255, 255, 255, 0.22);
+  color: white;
+}
+.section-btn .icon .material-symbols-rounded { font-size: 20px; }
+.section-btn .body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.section-btn .label {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--text-primary);
+}
+.section-btn.active .label { color: white; }
+.section-btn .meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-btn .count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.section-btn.active .count { color: rgba(255, 255, 255, 0.78); }
+.section-btn .integrity {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.section-btn .bar-track {
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(31, 22, 14, 0.08);
+  overflow: hidden;
+}
+.section-btn.active .bar-track { background: rgba(255, 255, 255, 0.25); }
+[data-theme="dark"] .section-btn .bar-track { background: rgba(240, 231, 213, 0.10); }
+.section-btn .bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--conf-color, var(--accent-emerald));
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.section-btn.active .bar-fill { background: white; }
+.section-btn .pct {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--conf-color, var(--accent-emerald));
+}
+.section-btn.active .pct { color: white; }
+
+/* ─── Section panes ────────────────────────────────────────────────── */
+.section-pane { display: none; }
+.section-pane.active { display: block; animation: materialize 0.3s ease-out; }
+
+/* ─── Role / Project cards ─────────────────────────────────────────── */
+.item-card {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.item-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.30;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    var(--scan-line) 2px, var(--scan-line) 4px);
+  z-index: 0;
+}
+.item-card > * { position: relative; z-index: 1; }
+.item-card:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--border-hover);
+}
+.item-card.expanded {
+  background: var(--card-bg-active);
+  box-shadow: var(--shadow-md);
+}
+/* Left accent bar — solid orange for current, muted gradient for past */
+.item-card .accent-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--text-muted), transparent);
+  z-index: 2;
+}
+.item-card.is-current .accent-bar {
+  background: linear-gradient(180deg, var(--accent-orange), var(--accent-orange) 60%, transparent);
+  box-shadow: 0 0 12px rgba(217, 119, 6, 0.30);
+}
+
+.item-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px 14px 19px;          /* 16 + 3 to clear accent-bar */
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Org logo block — real favicon with lettermark fallback */
+.org-logo {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  border-radius: var(--radius-button);
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  padding: 4px;
+  object-fit: contain;
+}
+.org-fallback {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  border-radius: var(--radius-button);
+  background: #E8DDD0;
+  border: 1px solid #D4C5B3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Century Gothic', 'Futura', 'Avenir Next', sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  color: #1A1612;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.item-info { flex: 1; min-width: 0; }
+.item-info .title-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.item-info .role-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+}
+.active-pill {
+  display: inline-flex; align-items: center;
+  padding: 1px 7px;
+  background: var(--accent-emerald-bg);
+  border: 1px solid var(--accent-emerald-edge);
+  border-radius: var(--radius-pill);
+  color: var(--accent-emerald);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.item-info .role-company {
+  display: block;
+  margin-top: 2px;
+  color: var(--accent-cyan);
+  font-size: 13px;
+  font-weight: 600;
+}
+.item-info .role-dates {
+  display: block;
+  margin-top: 1px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Item meta — hex KPI trio + chevron (production-exact) */
+.item-meta {
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.item-card.expanded .contrib-pill { display: none; }
+.contrib-pill {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-tight);
+  padding: 2px 7px;
+  letter-spacing: 0.02em;
+}
+.hex-kpi { display: inline-flex; align-items: center; gap: 5px; }
+.hex-kpi .hex {
+  width: 22px; height: 22px;
+  background: rgba(217, 119, 6, 0.10);
+  border: 1.5px solid rgba(217, 119, 6, 0.20);
+  border-radius: 4px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent-orange);
+}
+.hex-kpi .hex .material-symbols-rounded { font-size: 12px; }
+.hex-kpi .num {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.chevron {
+  width: 24px; height: 24px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+  transition: transform 0.25s, color 0.2s;
+}
+.item-card.expanded .chevron { transform: rotate(180deg); color: var(--accent-orange); }
+.chevron .material-symbols-rounded { font-size: 18px; }
+
+/* Expanded body */
+.item-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+.item-card.expanded .item-body { max-height: 1500px; }
+.item-body-inner {
+  padding: 0 19px 18px 19px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.item-divider {
+  height: 1px;
+  background: linear-gradient(90deg,
+    var(--accent-cyan-edge),
+    var(--border-default),
+    transparent);
+  margin: 2px 0 4px;
+}
+
+/* IC / Leadership group header */
+.contrib-group { display: flex; flex-direction: column; gap: 10px; }
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.group-header .material-symbols-rounded { font-size: 14px; }
+.group-header .title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+.group-header .bar { flex: 1; height: 1px; transform-origin: left; animation: scale-bar 0.4s ease-out forwards; }
+.group-header.ic .material-symbols-rounded { color: rgba(8, 145, 178, 0.55); }
+.group-header.ic .title { color: rgba(8, 145, 178, 0.85); }
+.group-header.ic .bar { background: rgba(8, 145, 178, 0.25); }
+.group-header.lead .material-symbols-rounded { color: rgba(124, 91, 191, 0.55); }
+.group-header.lead .title { color: rgba(124, 91, 191, 0.90); }
+.group-header.lead .bar { background: rgba(124, 91, 191, 0.25); }
+
+/* Contribution card */
+.contrib {
+  position: relative;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--accent-cyan);
+  border-radius: var(--radius-tight);
+  padding: 12px 14px;
+}
+.contrib.lead { border-left-color: var(--accent-violet); }
+.contrib-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.contrib-num {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+.contrib-head .type-icon { font-size: 14px; }
+.contrib.ic .contrib-head .type-icon { color: rgba(8, 145, 178, 0.65); }
+.contrib.lead .contrib-head .type-icon { color: rgba(124, 91, 191, 0.65); }
+.contrib-domain {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+}
+.scope-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  background: var(--accent-violet-bg);
+  border: 1px solid var(--accent-violet-edge);
+  border-radius: var(--radius-tight);
+  color: var(--accent-violet);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+}
+.metric-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  background: var(--accent-emerald-bg);
+  border: 1px solid var(--accent-emerald-edge);
+  border-radius: var(--radius-tight);
+  font-family: var(--font-mono);
+  box-shadow: var(--accent-emerald-glow);
+}
+.metric-badge.achieved {
+  background: var(--accent-cyan-soft);
+  border-color: var(--accent-cyan-edge);
+  box-shadow: 0 0 10px rgba(8, 145, 178, 0.20);
+}
+.metric-badge .val { font-size: 12px; font-weight: 700; color: var(--accent-emerald); }
+.metric-badge .arrow { font-size: 11px; color: var(--accent-emerald); opacity: 0.7; }
+.metric-badge .subj {
+  font-size: 10.5px;
+  color: var(--accent-emerald);
+  opacity: 0.85;
+  letter-spacing: 0.04em;
+}
+.metric-badge.achieved .val,
+.metric-badge.achieved .arrow,
+.metric-badge.achieved .subj { color: var(--accent-cyan); }
+
+.contrib-action {
+  margin: 0 0 6px;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.contrib-impact {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.contrib-impact .material-symbols-rounded {
+  font-size: 12px;
+  color: rgba(22, 163, 74, 0.60);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.contrib-impact p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(22, 163, 74, 0.95);
+}
+[data-theme="dark"] .contrib-impact p { color: rgba(52, 213, 114, 0.95); }
+.contrib-skills {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin-top: 8px;
+}
+.skill-chip {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-orange-bg);
+  color: var(--accent-orange);
+  border: 1px solid rgba(217, 119, 6, 0.22);
+  letter-spacing: 0.02em;
+}
+/* Per-category accents (production SKILL_CATEGORY_ACCENT translated) */
+.skill-chip[data-cat="design"]        { background: rgba(34, 211, 238, 0.10); color: #0E7490; border-color: rgba(34,211,238,0.30); }
+.skill-chip[data-cat="methodology"]   { background: rgba(244, 114, 182, 0.10); color: #BE185D; border-color: rgba(244,114,182,0.30); }
+.skill-chip[data-cat="soft"]          { background: rgba(251, 191, 36, 0.12); color: #B45309; border-color: rgba(251,191,36,0.30); }
+.skill-chip[data-cat="domain"]        { background: rgba(129, 140, 248, 0.10); color: #4338CA; border-color: rgba(129,140,248,0.30); }
+[data-theme="dark"] .skill-chip[data-cat="design"]      { color: #22D3EE; border-color: rgba(34,211,238,0.40); }
+[data-theme="dark"] .skill-chip[data-cat="methodology"] { color: #F472B6; border-color: rgba(244,114,182,0.40); }
+[data-theme="dark"] .skill-chip[data-cat="soft"]        { color: #FBBF24; border-color: rgba(251,191,36,0.40); }
+[data-theme="dark"] .skill-chip[data-cat="domain"]      { color: #A5B4FC; border-color: rgba(129,140,248,0.40); }
+
+.contrib-competencies {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 6px;
+}
+.competency {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--text-dim);
+  padding: 0 1px 1px;
+}
+
+/* ─── Skills HUD (grouped by category) ─────────────────────────────── */
+.skills-hud { display: flex; flex-direction: column; gap: 16px; }
+.skill-cat {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.skill-cat-header {
+  display: flex; align-items: center; gap: 10px;
+}
+.skill-cat-header .ledge {
+  width: 18px; height: 2px;
+  border-radius: 1px;
+  background: var(--cat-color, var(--accent-cyan));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--cat-color, var(--accent-cyan)) 50%, transparent);
+}
+.skill-cat-header .name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--cat-color, var(--accent-cyan));
+  opacity: 0.92;
+}
+.skill-cat-header .count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-dim);
+}
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 6px;
+}
+.skill-cell {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  padding: 8px 12px;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+.skill-cell:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--accent-orange);
+}
+.level-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.level-bar .seg,
+.level-bar i {
+  width: 3px;
+  border-radius: 1px;
+  display: inline-block;
+}
+.level-bar i:nth-child(1) { height: 6px; }
+.level-bar i:nth-child(2) { height: 8px; }
+.level-bar i:nth-child(3) { height: 10px; }
+.level-bar i:nth-child(4) { height: 12px; }
+
+/* Compact level visuals via data-level on .skill-cell */
+.skill-cell[data-level="expert"] .level-bar i { background: #22D3EE; }
+
+.skill-cell[data-level="advanced"] .level-bar i { background: rgba(22,163,74,0.20); }
+.skill-cell[data-level="advanced"] .level-bar i:nth-child(2),
+.skill-cell[data-level="advanced"] .level-bar i:nth-child(3),
+.skill-cell[data-level="advanced"] .level-bar i:nth-child(4) { background: #16A34A; }
+
+.skill-cell[data-level="proficient"] .level-bar i { background: rgba(245,158,11,0.20); }
+.skill-cell[data-level="proficient"] .level-bar i:nth-child(3),
+.skill-cell[data-level="proficient"] .level-bar i:nth-child(4) { background: #F59E0B; }
+
+.skill-cell[data-level="beginner"] .level-bar i { background: rgba(167,139,250,0.20); }
+.skill-cell[data-level="beginner"] .level-bar i:nth-child(4) { background: #A78BFA; }
+.skill-cell .name {
+  flex: 1; min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.005em;
+}
+.skill-cell .years {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ─── Education / Certifications ───────────────────────────────────── */
+.edu-list { display: flex; flex-direction: column; gap: 8px; }
+.edu-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+  overflow: hidden;
+}
+.edu-card:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--border-hover);
+}
+.edu-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+}
+.edu-body {
+  padding: 0 16px 14px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.edu-card.rich .edu-head { padding-bottom: 10px; }
+.edu-card .info { flex: 1; min-width: 0; }
+.edu-card .title-row {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+}
+.edu-card .title-line {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+}
+.edu-card .sub-line {
+  margin-top: 2px;
+  color: var(--accent-cyan);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.edu-card .date-line {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.edu-meta { flex-shrink: 0; align-self: center; }
+.edu-card .ach-list {
+  margin-top: 6px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.edu-card .ach {
+  display: flex; align-items: flex-start; gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+.edu-card .ach .material-symbols-rounded {
+  font-size: 12px;
+  color: rgba(22, 163, 74, 0.55);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Status pill — used by edu/cert/project headers for honors/active/shipped */
+.status-pill {
+  display: inline-flex; align-items: center;
+  padding: 1px 7px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+}
+.status-pill.honors {
+  background: var(--accent-violet-bg);
+  border: 1px solid var(--accent-violet-edge);
+  color: var(--accent-violet);
+}
+.status-pill.shipped {
+  background: var(--accent-emerald-bg);
+  border: 1px solid var(--accent-emerald-edge);
+  color: var(--accent-emerald);
+}
+.status-pill.in-progress {
+  background: var(--accent-cyan-soft);
+  border: 1px solid var(--accent-cyan-edge);
+  color: var(--accent-cyan);
+}
+.status-pill.archived {
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+}
+
+/* Contribution-style metadata row used by rich edu/cert/project bodies */
+.contrib-domain-row {
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Achievement bullets (richer than .ach-list — supports inline emphasis) */
+.ach-bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.ach-bullets li {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.ach-bullets li > .material-symbols-rounded {
+  font-size: 12px;
+  color: rgba(22, 163, 74, 0.55);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.ach-bullets li em {
+  font-style: italic;
+  color: var(--accent-cyan);
+}
+.ach-bullets li strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.no-date {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--accent-amber);
+  background: var(--accent-amber-bg);
+  border: 1px solid var(--accent-amber-edge);
+  border-radius: var(--radius-tight);
+  padding: 2px 6px;
+}
+
+/* ─── Project grid (Instagram-style 3-col) ─────────────────────────── */
+/* Footer */
+.footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-default);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.footer a { color: var(--text-muted); text-decoration: none; border-bottom: 1px solid var(--border-default); transition: color 0.2s, border-color 0.2s; }
+.footer a:hover { color: var(--accent-orange); border-color: var(--accent-orange); }
+
+@media (max-width: 640px) {
+  .wrap { padding: 16px 14px 60px; }
+  .identity-card { padding: 18px 18px; }
+  /* Stack the (now larger) headshot above the identity info, left-aligned. */
+  .identity-row { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .photo-upload { width: 96px; height: 96px; }
+  .identity-top { flex-direction: column; align-items: flex-start; gap: 8px; }
+  h1.name { font-size: 20px; }
+  .summary-band { padding: 14px 18px 16px; }
+  .summary-stats { gap: 12px 20px; }
+  .section-grid { grid-template-columns: 1fr; }
+  .item-meta { flex-wrap: wrap; gap: 6px; }
+  .item-meta .hex-kpi:nth-child(n+5) { display: none; } /* Drop monitoring kpi on tight screens */
+}
+
+/* ─── Print navigation — contents strip + back-to-top chips ─────────────
+   Hidden on screen (the section tabs do this job interactively); shown in
+   both print layouts. Anchor links survive Chrome's Save-as-PDF as real
+   /Link annotations with /Dest destinations: in the continuous PDF they jump
+   down the single tall page, in paginated they land on the section labels.
+   Chips are border-based on purpose — no background-color reliance — so they
+   survive viewers/printers with "Background graphics" off. Colors ride the
+   tokens, so ink's monochrome palette covers them for free.
+   Chip numbers are CSS counters (decimal-leading-zero), not static text —
+   the list self-renumbers when the persona-gated Overview entry is hidden
+   (a generated file strips its conditional Overview entry the same way). */
+.print-toc, .backtotop { display: none; }
+.print-toc { margin: 0 0 14px; padding: 10px 14px 12px; border: 1px solid var(--border-default); border-radius: var(--radius-card); }
+.print-toc-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--accent-orange); margin: 0 0 8px; }
+.print-toc-links { display: flex; flex-wrap: wrap; gap: 7px 18px; counter-reset: toc; }
+.print-toc-links a { display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: var(--text-primary); font-size: 11px; font-weight: 600; letter-spacing: -0.005em; counter-increment: toc; }
+.toc-chip { display: inline-flex; align-items: center; justify-content: center; padding: 1px 7px; border: 1px solid currentColor; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent-orange); }
+.toc-chip::before { content: counter(toc, decimal-leading-zero); }
+.backtotop { margin: 6px 0 0; padding: 2px 9px; border: 1px solid currentColor; border-radius: var(--radius-pill); font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; }
+@media print {
+  .print-toc { display: block; }
+  .backtotop { display: inline-flex; }
+}
+
+/* ─── Continuous single-page export (Layout: Continuous) ────────────────
+   body.print-continuous is set by the export confirm handler, which then
+   measures document.documentElement.scrollHeight and injects a one-off
+   `@page { size: 816px <H>px; margin: 0 }` as the LAST style in <head> (the
+   only way to win the @page cascade — @page can't be selector-scoped).
+   These rules live OUTSIDE @media print on purpose: the height is measured
+   ON SCREEN, so the measured layout must be EXACTLY the printed layout.
+   They mirror every layout-affecting rule of the base @media print block;
+   !important mirrors the print block and overrides its break-avoid rules at
+   print time. Without the class, printing stays the classic paginated path. */
+body.print-continuous {
+  width: 816px;            /* pin layout width = @page width (8.5in @ 96dpi) */
+  padding: 48px 52px 56px; /* visual margins — @page margin is 0, so they live
+                              on body where scrollHeight captures them */
+  background: #fff;
+  font-size: 11px;
+}
+body.print-continuous .wrap { max-width: none; padding: 0; }
+/* Sample-only chrome: the demo-controls configurator never enters the
+   measured (= printed) layout; the two-column .layout flattens. */
+body.print-continuous .demo-controls { display: none !important; }
+body.print-continuous .layout { display: block; max-width: none; padding: 0; }
+body.print-continuous .topbar,
+body.print-continuous .chevron,
+body.print-continuous #export-modal,
+body.print-continuous #share-menu { display: none !important; }
+body.print-continuous .materialize,
+body.print-continuous .stagger-1,
+body.print-continuous .stagger-2,
+body.print-continuous .stagger-3,
+body.print-continuous .stagger-4 { animation: none !important; opacity: 1 !important; }
+body.print-continuous .section-grid { display: none !important; }
+body.print-continuous .section-pane { display: block !important; animation: none !important; }
+/* Same persona carve-out as the base print block: the Overview pane of a
+   non-active persona never enters the measured (= printed) layout. */
+body.print-continuous .section-pane[data-persona-hidden="true"] { display: none !important; }
+body.print-continuous .section-pane[data-pane]::before {
+  content: attr(data-pane);
+  display: block;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--accent-orange);
+  margin: 14px 0 8px;
+}
+body.print-continuous .section-pane:first-of-type::before { margin-top: 4px; }
+body.print-continuous .item-body { max-height: none !important; overflow: visible !important; }
+body.print-continuous .print-toc { display: block; }
+body.print-continuous .backtotop { display: inline-flex; }
+/* One tall page = zero fragmentation: neutralize every break rule the base
+   print stylesheet sets, so nothing reserves space it doesn't need. */
+body.print-continuous *, body.print-continuous *::before, body.print-continuous *::after {
+  break-inside: auto !important; break-before: auto !important; break-after: auto !important;
+  page-break-inside: auto !important; page-break-before: auto !important; page-break-after: auto !important;
+}
+/* A narrow browser window must not leak the mobile layout into the measured
+   geometry — restore the desktop values the 816px page actually prints with
+   (these out-specificity the @media (max-width: 640px) single-class rules). */
+body.print-continuous .identity-card { padding: 22px 24px; }
+body.print-continuous .identity-row { flex-direction: row; align-items: flex-start; gap: 18px; }
+body.print-continuous .photo-upload { width: 104px; height: 104px; }
+body.print-continuous .identity-top { flex-direction: row; align-items: flex-start; gap: 10px; }
+body.print-continuous h1.name { font-size: 22px; }
+body.print-continuous .summary-band { padding: 16px 24px 18px; }
+body.print-continuous .summary-stats { gap: 14px 28px; }
+body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
+body.print-continuous .item-meta .hex-kpi:nth-child(n+5) { display: inline-flex; }
+
+/* ─── THE THROUGHLINE — chronological strip in the identity card ────────
+   Shell markup: #throughline (index.html, bottom of Jane's .identity-card —
+   Jane-only in this sample; the template puts one strip in its single card);
+   data: window.HOPE_DATA.timeline (sample split: data/jane.js; authoring
+   contract: assets/templates/portfolio/data.js); behavior: portfolio.js.
+   tl-* namespace, tokens only. The card's 32×32 grid texture already covers
+   this area — the strip adds NO texture of its own. Motion is
+   transform/opacity ONLY: the playhead glides on transform:translateX (set
+   inline by rAF-scheduled JS), nodes lift on transform:scale; `left` on
+   nodes/ticks is static layout set once at build, never animated.
+   Published mode: fully kept — it's a feature, not an editing affordance
+   (see the published-mode contract above). Resume print modes exclude it for
+   free: the whole .identity-card is display:none there. */
+#throughline { position: relative; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+#throughline[hidden] { display: none; }
+.tl-rail { position: relative; height: 14px; margin: 34px 10px 26px; }
+.tl-track { position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; border-radius: var(--radius-pill); background: var(--border-default); }
+.tl-tick { position: absolute; top: calc(50% + 4px); width: 1px; height: 5px; background: var(--border-default); }
+.tl-tick-year { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.06em; }
+/* Nodes — 14px hexes (the brand clip-path, same polygon as .hex-kpi .hex),
+   one per entry, positioned proportionally by start date. Fills per the
+   Throughline contract (T3): experience orange · project cyan · education
+   violet · certification amber — token names only, values live in :root. */
+.tl-node { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; z-index: 2; cursor: pointer; }
+.tl-node .tl-hex { position: absolute; inset: 0; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: var(--accent-orange); transition: transform 0.25s ease; }
+.tl-node.tl-project .tl-hex { background: var(--accent-cyan); }
+.tl-node.tl-education .tl-hex { background: var(--accent-violet); }
+.tl-node.tl-certification .tl-hex { background: var(--accent-amber); }
+/* Ongoing (date_end null) — subtle emerald edge: a slightly larger hex
+   peeking out from under the type-colored one (a border would be eaten by
+   the clip-path). */
+.tl-node.tl-ongoing::before { content: ""; position: absolute; inset: -2.5px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: var(--accent-emerald-edge); transition: transform 0.25s ease; }
+.tl-node.tl-active .tl-hex, .tl-node.tl-active.tl-ongoing::before { transform: scale(1.45); }
+.tl-node:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 4px; border-radius: var(--radius-tight); }
+/* Floating label — shown on the ACTIVE node: sans 600 12px, mono date below. */
+.tl-node-label { position: absolute; bottom: calc(100% + 8px); left: 50%; display: flex; flex-direction: column; align-items: center; gap: 1px; white-space: nowrap; pointer-events: none; opacity: 0; transform: translate(-50%, 3px); transition: opacity 0.25s ease, transform 0.25s ease; }
+.tl-node.tl-active .tl-node-label { opacity: 1; transform: translate(-50%, 0); }
+.tl-node-text { font-size: 12px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.005em; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.tl-node-date { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted); letter-spacing: 0.04em; }
+/* Edge clamping (classes set by JS near the rail ends, px-measured) keeps
+   labels inside the card instead of bleeding past its rounded corners. */
+.tl-node.tl-clamp-start .tl-node-label { left: -7px; align-items: flex-start; transform: translate(0, 3px); }
+.tl-node.tl-clamp-end .tl-node-label { left: auto; right: -7px; align-items: flex-end; transform: translate(0, 3px); }
+.tl-node.tl-clamp-start.tl-active .tl-node-label, .tl-node.tl-clamp-end.tl-active .tl-node-label { transform: translate(0, 0); }
+/* Playhead + traveler. Default traveler: the soft orange glow dot — the
+   --accent-orange-glow token IS the glow. SVG travelers (curated slugs
+   embedded in portfolio.js, or a generator-inlined custom one via the data
+   file) are monochrome single-path marks per the brand-icon law
+   (design-tokens.md §6), ~16px, riding the same spot; .tl-flip mirrors them
+   while the loop wraps backward. Playhead z-index 1 < node z-index 2: the
+   traveler passes under the hexes. Jane rides the "paper-plane" slug —
+   a deliberate non-default pick (set in data/jane.js). */
+.tl-playhead { position: absolute; left: 0; top: 50%; z-index: 1; pointer-events: none; transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+.tl-traveler { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; }
+.tl-traveler.tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-orange); box-shadow: var(--accent-orange-glow); }
+.tl-traveler.tl-svg { color: var(--accent-orange); }
+.tl-traveler.tl-svg svg { width: 16px; height: 16px; display: block; fill: currentColor; }
+.tl-traveler.tl-flip svg { transform: scaleX(-1); }
+/* Click-navigate target flash (T6) — outline pulse via the glow token, 1.2s.
+   Both keyframes carry two shadows so the fade interpolates instead of
+   snapping (mismatched list lengths animate discretely). */
+@keyframes tl-target-pulse { 0%, 65% { box-shadow: var(--accent-orange-glow), 0 0 0 2px var(--accent-orange); } 100% { box-shadow: 0 4px 14px transparent, 0 0 0 2px transparent; } }
+.tl-flash { animation: tl-target-pulse 1.2s ease-out; }
+/* Hover mini-card (T5) — token panel. Lives at BODY level: the identity
+   card's overflow:hidden plus its materialize transform (fill-mode keeps a
+   computed transform, which makes the card the containing block even for
+   fixed children) would clip any card-level tooltip. JS clamps it inside the
+   viewport. Chips reuse .skill-chip. z-index 980: above content, below the
+   export modal (1000). */
+.tl-tooltip { position: absolute; z-index: 980; max-width: 280px; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-card); box-shadow: var(--shadow-md); padding: 10px 12px; pointer-events: none; }
+.tl-tooltip[hidden] { display: none; }
+.tl-tip-label { font-size: 12.5px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.005em; }
+.tl-tip-org { margin-top: 1px; font-size: 11.5px; font-weight: 600; color: var(--accent-cyan); }
+.tl-tip-dates { margin-top: 2px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; }
+.tl-tip-metric { margin-top: 5px; font-family: var(--font-mono); font-size: 10.5px; color: var(--accent-emerald); }
+.tl-tip-skills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+/* prefers-reduced-motion (T4) — static rail: playhead hidden, no autoplay
+   (portfolio.js adds .tl-static and never starts the loop), all nodes
+   visible as always, labels on hover/focus only. */
+.tl-static .tl-playhead { display: none; }
+.tl-static .tl-node:hover .tl-node-label, .tl-static .tl-node:focus-visible .tl-node-label { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  #throughline *, #throughline *::before { transition: none !important; animation: none !important; }
+}
+
+/* ─── THE THROUGHLINE — print (T8) ──────────────────────────────────────
+   Static rail in EVERY portfolio print style: playhead + tooltip hidden, ALL
+   node labels rendered. Two-row above/below alternation alone is NOT enough
+   at real entry densities (~15 nodes on a ~644px printed rail put same-row
+   neighbors as close as 26px while nowrap labels run 150-200px wide — pure
+   overprint). So labels print WRAPPED and narrow (max-width 80px, 8.5px/1.15
+   text, 7.5px date) on FOUR tiers: .tl-below (every 2nd node, JS-set) flips
+   under the rail, .tl-far (3rd+4th of each quartet, JS-set) pushes to an
+   outer row above/below — same-tier neighbors are 4 entries apart, which
+   clears the densest clusters. Below rows clear the year ticks; rail margins
+   reserve the tier depth. Colors ride the tokens, so ink's monochrome token
+   override covers hexes/labels/ticks for free; showcase inherits this block
+   unchanged. Resume modes never print the strip — it rides the existing
+   identity-card hide (body.print-doc-resume). */
+@media print {
+  .tl-playhead, .tl-tooltip { display: none !important; }
+  .tl-rail { margin: 132px 10px 140px; }
+  .tl-node .tl-hex, .tl-node.tl-ongoing::before { transform: none !important; }
+  .tl-node-label { opacity: 1 !important; transform: translate(-50%, 0) !important; max-width: 80px; white-space: normal; text-align: center; }
+  .tl-node-text { font-size: 8.5px; line-height: 1.15; }
+  .tl-node-date { font-size: 7.5px; line-height: 1.2; }
+  .tl-node.tl-clamp-start .tl-node-label, .tl-node.tl-clamp-end .tl-node-label { transform: translate(0, 0) !important; }
+  .tl-node.tl-clamp-start .tl-node-label { text-align: left; }
+  .tl-node.tl-clamp-end .tl-node-label { text-align: right; }
+  .tl-node.tl-far .tl-node-label { bottom: calc(100% + 70px); }
+  .tl-node.tl-below .tl-node-label { bottom: auto; top: calc(100% + 18px); }
+  .tl-node.tl-below.tl-far .tl-node-label { top: calc(100% + 78px); }
+}
+
+/* ─── H1 · Wide-screen identity header ──────────────────────────────────
+   MEDIA query, not container query — same judgment as the template: .wrap
+   caps the card's width at 880px, so the card's own inline-size never
+   crosses a useful threshold; what changes is the VIEWPORT. SAMPLE OFFSET:
+   the template flips at 1100px, but this sample seats a 270px demo-controls
+   column + 18px gap beside the portfolio column, so the card reaches the
+   same geometry 288px later — 1100 + 288 = 1388px. At 1388px the .layout is
+   already at its 1240px cap, so the card sits at its full 880px, exactly
+   what the template's card measures at its own breakpoint. Three columns:
+   LEFT the stats block (stacked vertically, mono); CENTER photo + name +
+   headline + summary (hierarchy unchanged); RIGHT the contact links
+   (stacked, right-aligned). Below 1388px not one rule here applies — the
+   narrow layout stays byte-identical. The LIVE pill pins to the card's
+   top-right at all widths (absolute against .identity-row, whose
+   position:relative comes from the .identity-card > * rule).
+   display:contents lifts .identity-info's children into the card grid — the
+   wrapper contributes no box of its own. Applies to every persona's card;
+   only the active one is visible. */
+@media (min-width: 1388px) {
+  .identity-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(0, 3fr) minmax(150px, 1fr); grid-template-rows: auto auto auto; column-gap: 32px; align-items: start; }
+  .identity-info { display: contents; }
+  .photo-upload { grid-column: 2; grid-row: 1; justify-self: center; }
+  .identity-top { grid-column: 2; grid-row: 2; justify-content: center; margin-top: 12px; }
+  .identity-name-block { flex: 0 1 auto; text-align: center; }
+  .live-pill { position: absolute; top: 0; right: 0; }
+  .stats-row { grid-column: 1; grid-row: 1 / span 3; align-self: center; flex-direction: column; gap: 12px; margin-top: 0; }
+  .stats-row > span { display: block; }
+  .stats-row .sep { display: none; }
+  .stats-row strong { display: block; font-size: 19px; line-height: 1.1; }
+  .contact-row { grid-column: 3; grid-row: 1 / span 3; align-self: center; justify-self: end; flex-direction: column; align-items: flex-end; gap: 9px; margin-top: 0; }
+  .summary { grid-column: 2; grid-row: 3; text-align: center; margin: 10px auto 0; }
+}
+
+/* THE THROUGHLINE on the continuous canvas — mirror of the print block above
+   (the continuous height is measured ON SCREEN, so the measured layout must
+   BE the printed layout — same doctrine as the rest of this section). */
+body.print-continuous .tl-playhead, body.print-continuous .tl-tooltip { display: none !important; }
+body.print-continuous .tl-rail { margin: 132px 10px 140px; }
+body.print-continuous .tl-node .tl-hex, body.print-continuous .tl-node.tl-ongoing::before { transform: none !important; }
+body.print-continuous .tl-node-label { opacity: 1 !important; transform: translate(-50%, 0) !important; max-width: 80px; white-space: normal; text-align: center; }
+body.print-continuous .tl-node-text { font-size: 8.5px; line-height: 1.15; }
+body.print-continuous .tl-node-date { font-size: 7.5px; line-height: 1.2; }
+body.print-continuous .tl-node.tl-clamp-start .tl-node-label, body.print-continuous .tl-node.tl-clamp-end .tl-node-label { transform: translate(0, 0) !important; }
+body.print-continuous .tl-node.tl-clamp-start .tl-node-label { text-align: left; }
+body.print-continuous .tl-node.tl-clamp-end .tl-node-label { text-align: right; }
+body.print-continuous .tl-node.tl-far .tl-node-label { bottom: calc(100% + 70px); }
+body.print-continuous .tl-node.tl-below .tl-node-label { bottom: auto; top: calc(100% + 18px); }
+body.print-continuous .tl-node.tl-below.tl-far .tl-node-label { top: calc(100% + 78px); }
+/* The wide-screen 3-col header must not leak into the 816px continuous
+   canvas — restore the classic row, exactly as the mobile-leak guards above
+   do. */
+body.print-continuous .identity-row { display: flex; }
+body.print-continuous .identity-info { display: block; }
+body.print-continuous .identity-top { justify-content: space-between; margin-top: 0; }
+body.print-continuous .identity-name-block { text-align: left; }
+body.print-continuous .live-pill { position: static; }
+body.print-continuous .stats-row { flex-direction: row; gap: 6px; margin-top: 8px; align-self: auto; }
+body.print-continuous .stats-row > span { display: inline; }
+body.print-continuous .stats-row .sep { display: inline; }
+body.print-continuous .stats-row strong { display: inline; font-size: inherit; }
+body.print-continuous .contact-row { flex-direction: row; align-items: normal; gap: 4px 16px; margin-top: 10px; align-self: auto; justify-self: auto; }

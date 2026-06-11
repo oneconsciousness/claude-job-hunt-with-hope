@@ -8,7 +8,7 @@ user-invocable: true
 
 # Hope Publish · Presentation, completed
 
-You are running Hope's publish step. The user has a generated portfolio sitting as a local HTML file. Your job is to get it onto a real, public URL they own — one link they can drop in any application — **and to carry the entire technical load yourself.**
+You are running Hope's publish step. The user has a generated portfolio sitting as a local folder. Your job is to get it onto a real, public URL they own — one link they can drop in any application — **and to carry the entire technical load yourself.**
 
 **Who you're serving:** often someone who has never used GitHub, doesn't know what "a repo" is, and will get scared and quit if you ask a technical question. So you don't ask technical questions. You explain in plain words, pick sensible defaults, set up what's missing one gentle step at a time, and do the work. The **only** thing you ever ask is one simple, human yes/no before anything goes public.
 
@@ -41,7 +41,7 @@ Also read `user-story.md` in the project folder if it exists (per `$PLUGIN_ROOT/
 ## HARD GUARDRAILS (these protect the user — never bypass)
 
 1. **One simple confirm before going public.** Never run a deploy / `gh repo create` until the user has said yes to a plain-English "this will be public, ok?" (step 5). Public is irreversible in spirit — recruiters and crawlers cache it instantly. This is the one question you always ask.
-2. **Publish an allowlist, never a folder.** Copy **only** the built portfolio HTML + its assets to a clean staging dir — plus, in step 6c, **exactly two** generated share images (`og-image.png`, `og-image-square.png`). `career.json`, `user-story.md`, notes, drafts, the `share-card*.html` sources, and the rest of the job-hunt folder **never** leave the machine.
+2. **Publish an allowlist, never a whole directory.** The allowlist is **exactly four files**, copied from the portfolio folder to a clean staging dir — `index.html`, `portfolio.css`, `portfolio.js`, `data.js` — plus, in step 6c, **exactly two** generated share images (`og-image.png`, `og-image-square.png`). `career.json`, `user-story.md`, notes, drafts, the `share-card*.html` sources, and the rest of the job-hunt folder **never** leave the machine.
 3. **Scan before you push.** Grep the staging dir for secret shapes before any deploy. Contact info in a portfolio is intentional — don't block on it.
 4. **Set up *with* them, never *as* them.** If GitHub isn't ready, guide them through it warmly — they click the browser login; you can't and don't run `gh auth login` for them. Never silently auto-install global tools. And never cold-halt with a wall of commands — walk them through it like a patient friend, one step at a time.
 
@@ -60,10 +60,10 @@ Read their dev-familiarity lightly — *"Have you used GitHub before?"* is fine 
 ## The flow
 
 ### 1. Locate the portfolio
-Find the generated file (default `career-graph/documents/portfolios/portfolio-*.html`). If none exists, route to `hope-portfolio` first.
+Find the generated portfolio **folder** (default `career-graph/documents/portfolios/portfolio-*/` — a folder is a portfolio when it contains an `index.html`, i.e. match `portfolio-*/index.html`). If none exists, route to `hope-portfolio` first.
 
 ### 2. Stage a clean publish dir
-Create `site/` and copy **only** the portfolio HTML (as `index.html`) + any local assets it references. Exclude `career.json`, notes, drafts. Hope portfolios are self-contained, so this is usually one copy.
+Create `site/` and copy **only** the four allowlisted siblings from the portfolio folder (guardrail 2): `index.html`, `portfolio.css`, `portfolio.js`, `data.js` — same names, no renaming. As always, `career.json` and `user-story.md` **never** ship; neither do notes or drafts. The folder is self-contained, so this is exactly four copies.
 
 ### 3. Pre-flight — re-publish check, then setup
 - If `.publish.json` exists → **re-publish**: reuse the recorded repo/URL, re-run step 6 (share-link + link-preview stamps, share images, published-mode stamp), then take step 7's re-publish path.
@@ -109,7 +109,9 @@ That's the whole gate. No repo jargon, no file list unless they ask.
 
 ### 6. Stamp the live URL + build the share images (all of this *before* any push)
 
-**a) The share link.** The portfolio carries an empty placeholder in its `<head>` (note it's self-closing):
+Every stamping sed in this step targets `site/index.html` **only** — `portfolio.css`, `portfolio.js`, and `data.js` ship verbatim, never sed-touched.
+
+**a) The share link.** The portfolio's `index.html` carries an empty placeholder in its `<head>` (note it's self-closing):
 ```html
 <meta name="hope:share-url" content="" />
 ```
@@ -122,9 +124,9 @@ The live URL is the **SITE_URL** you computed in step 3b (root for a user site, 
    sed -i '' -E 's|(<meta name="hope:share-url" content=")[^"]*(")|\1<SITE_URL>\2|' site/index.html
    ```
    (On Linux, `sed -i -E '...'` — drop the `''`.) The closing capture is just `(")`, not `(">)` — the tag is self-closing (`content="" />`), so anchoring on `">` would silently never match.
-2. **The user's local saved copy** — the *one* portfolio file you staged from in step 1. Resolve and reuse that exact path; do **not** glob `portfolio-*.html`, or you'll overwrite the Share link on other portfolios the user built for different targets/repos:
+2. **The user's local saved copy** — the `index.html` inside the *one* portfolio folder you staged from in step 1. Resolve and reuse that exact path; do **not** glob `portfolio-*/index.html`, or you'll overwrite the Share link on other portfolios the user built for different targets/repos:
    ```bash
-   sed -i '' -E 's|(<meta name="hope:share-url" content=")[^"]*(")|\1<SITE_URL>\2|' "<the-portfolio-file-from-step-1>"
+   sed -i '' -E 's|(<meta name="hope:share-url" content=")[^"]*(")|\1<SITE_URL>\2|' "<portfolio-folder-from-step-1>/index.html"
    ```
 
 **b) The link-preview tags (`og:url`, `og:image`, `twitter:image`).** The same `<head>` carries empty Open Graph / Twitter placeholders — these are what make the link unfurl as a rich card when pasted on LinkedIn / X / WhatsApp, and the crawlers require **absolute** `https://` URLs (relative paths silently fail). Derive them from **SITE_URL** — it always ends in `/`, so plain concatenation works: `og:image` = `<SITE_URL>og-image.png`. Use the **same self-closing-safe sed pattern** as the share-url stamp — the closing capture is `(")`, never `(">)`:
@@ -138,9 +140,9 @@ sed -i '' -E 's|(<meta property="og:image" content=")[^"]*(")|\1<SITE_URL>og-ima
 sed -i '' -E 's|(<meta name="twitter:image" content=")[^"]*(")|\1<SITE_URL>og-image.png\2|' site/index.html
 ```
 
-If the image couldn't be generated (no Chrome — see c), leave `og:image` / `twitter:image` as empty `content=""`: scrapers ignore an empty tag, but a stamped URL that 404s can break the whole preview. Stamp the same tags into the user's **local saved copy** too — same single-file rule as in (a): the exact path from step 1, never a `portfolio-*.html` glob.
+If the image couldn't be generated (no Chrome — see c), leave `og:image` / `twitter:image` as empty `content=""`: scrapers ignore an empty tag, but a stamped URL that 404s can break the whole preview. Stamp the same tags into the user's **local saved copy** too — same single-file rule as in (a): the staged-from folder's `index.html`, never a `portfolio-*/index.html` glob.
 
-**c) The share-card images (headless Chrome).** The portfolio skill leaves `share-card.html` (a fixed 1200×630 card) and `share-card-square.html` (1080×1080) **next to the portfolio file**. If `share-card.html` exists there AND Chrome exists at the path below, screenshot them straight into the staging dir:
+**c) The share-card images (headless Chrome).** The portfolio skill leaves `share-card.html` (a fixed 1200×630 card) and `share-card-square.html` (1080×1080) **next to the portfolio folder** (`<portfolio-dir>` below is the directory holding them). If `share-card.html` exists there AND Chrome exists at the path below, screenshot them straight into the staging dir:
 
 ```bash
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"

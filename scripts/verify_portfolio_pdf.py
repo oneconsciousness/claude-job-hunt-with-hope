@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """verify_portfolio_pdf.py — headless-Chrome PDF verification for Hope portfolios.
 
-Renders a portfolio HTML file to PDF via headless Chrome in several export
-modes and asserts the verify bar:
+Renders a portfolio (a modular FOLDER of index.html + portfolio.css +
+portfolio.js + data scripts, or a legacy single HTML file) to PDF via
+headless Chrome in several export modes and asserts the verify bar:
 
   * GEOMETRY   (continuous) exactly 1 page, 612 pt wide, height == measured
                scrollHeight x 0.75 within +/-2 pt; (paginated/resume) Letter.
@@ -37,10 +38,19 @@ link annotations are all parsed with re/zlib over the raw PDF. poppler
 (pdftoppm/pdftotext/pdfimages) and PyMuPDF are used only behind
 feature-detection and skip gracefully when absent.
 
+Staging is FOLDER-AWARE: the subject may be a portfolio folder or its
+index.html. Every sibling of index.html (portfolio.css, portfolio.js,
+data/ scripts, og images, ...) is copied verbatim into each /tmp mode dir;
+only the index.html content is rewritten (body classes, measure script,
+@page style), so relative <link>/<script src> references keep resolving.
+
 Usage:
-  scripts/verify_portfolio_pdf.py path/to/portfolio.html \
+  scripts/verify_portfolio_pdf.py [path/to/portfolio-folder | path/to/index.html] \
       [--chrome "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"] \
       [--modes continuous-classic,paginated-classic] [--keep]
+
+Default subject: assets/fixtures/persona-jane-doe/sample-portfolio/index.html
+(resolved relative to this script's repo).
 
 Exit code: 0 = all hard asserts passed, 1 = at least one hard FAIL,
 2 = environment/usage error (Chrome missing, HTML unreadable).
@@ -83,6 +93,11 @@ PAGINATED_TRAILING_BLANK_MAX = 0.25
 MIN_LINK_ANNOTS = 6
 
 CHROME_DEFAULT = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+# Default subject: the converted persona fixture folder's index.html,
+# resolved relative to this script so the repo can live anywhere.
+SUBJECT_DEFAULT = (Path(__file__).resolve().parent.parent
+                   / "assets" / "fixtures" / "persona-jane-doe"
+                   / "sample-portfolio" / "index.html")
 
 MEASURE_SCRIPT = """
 <script id="verify-measure">
@@ -172,6 +187,40 @@ def has_pymupdf() -> bool:
         return True
     except Exception:
         return False
+
+
+# ── Subject resolution + staging ─────────────────────────────────────────────
+def resolve_subject(subject: Path) -> Path:
+    """Accept a portfolio folder (containing index.html) or an HTML file path.
+
+    Returns the HTML file to verify; its parent is the folder whose siblings
+    get staged alongside every /tmp copy.
+    """
+    if subject.is_dir():
+        index = subject / "index.html"
+        if not index.is_file():
+            raise FileNotFoundError(f"folder has no index.html: {subject}")
+        return index
+    if subject.is_file():
+        return subject
+    raise FileNotFoundError(f"subject not found: {subject}")
+
+
+def stage_siblings(src_html: Path, dest_dir: Path) -> None:
+    """Copy every sibling of the subject HTML verbatim into dest_dir.
+
+    FOLDER-AWARE staging (M6): the rewritten HTML copies live in dest_dir, so
+    relative <link>/<script src> references (portfolio.css, portfolio.js,
+    data/*.js, ...) must resolve there. Only the HTML itself is rewritten —
+    siblings are copied byte-for-byte, subfolders recursively.
+    """
+    for entry in src_html.parent.iterdir():
+        if entry.name == src_html.name or entry.name.startswith("."):
+            continue
+        if entry.is_dir():
+            shutil.copytree(entry, dest_dir / entry.name, dirs_exist_ok=True)
+        else:
+            shutil.copy2(entry, dest_dir / entry.name)
 
 
 # ── HTML preparation ─────────────────────────────────────────────────────────
@@ -600,6 +649,7 @@ def pymupdf_shading_type4(pdf_path: Path) -> Optional[int]:
 # ── Per-mode verification ────────────────────────────────────────────────────
 def verify_mode(
     mode: Mode,
+    src_html: Path,
     base_html: str,
     chrome: str,
     work: Path,
@@ -607,6 +657,7 @@ def verify_mode(
 ) -> None:
     mode_dir = work / mode.name
     mode_dir.mkdir(exist_ok=True)
+    stage_siblings(src_html, mode_dir)  # folder-aware: siblings verbatim, HTML rewritten below
     pdf_path = mode_dir / f"{mode.name}.pdf"
 
     expected_h_pt: Optional[float] = None
@@ -792,15 +843,19 @@ def print_table(report: Report) -> None:
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description="Verify Hope portfolio PDF export via headless Chrome.")
-    parser.add_argument("html", type=Path, help="portfolio HTML file to verify")
+    parser.add_argument("subject", type=Path, nargs="?", default=SUBJECT_DEFAULT,
+                        help="portfolio folder or its index.html "
+                             f"(default: {SUBJECT_DEFAULT})")
     parser.add_argument("--chrome", default=CHROME_DEFAULT, help=f"Chrome binary (default: {CHROME_DEFAULT})")
     parser.add_argument("--modes", default=",".join(m.name for m in MODES),
                         help="comma-separated subset of: " + ", ".join(m.name for m in MODES))
     parser.add_argument("--keep", action="store_true", help="keep the /tmp work directory (always printed)")
     args = parser.parse_args(argv)
 
-    if not args.html.is_file():
-        print(f"ERROR: HTML file not found: {args.html}", file=sys.stderr)
+    try:
+        src_html = resolve_subject(args.subject)
+    except FileNotFoundError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
         return 2
     if not Path(args.chrome).is_file():
         print(f"ERROR: Chrome binary not found: {args.chrome}", file=sys.stderr)
@@ -813,7 +868,7 @@ def main(argv: list[str]) -> int:
         return 2
     modes = [m for m in MODES if m.name in wanted]
 
-    print(f"verify_portfolio_pdf: {args.html}")
+    print(f"verify_portfolio_pdf: {src_html}")
     print(f"chrome: {args.chrome}")
     for tool in ("pdftoppm", "pdftotext", "pdfimages"):
         print(f"feature: {tool}: {'yes (' + which(tool) + ')' if which(tool) else 'no — dependent checks will SKIP'}")
@@ -822,10 +877,10 @@ def main(argv: list[str]) -> int:
     work = Path(tempfile.mkdtemp(prefix="verify-portfolio-pdf-"))
     print(f"workdir: {work}\n")
 
-    base_html = args.html.read_text(encoding="utf-8")
+    base_html = load_html(src_html)
     report = Report()
     for mode in modes:
-        verify_mode(mode, base_html, args.chrome, work, report)
+        verify_mode(mode, src_html, base_html, args.chrome, work, report)
 
     print_table(report)
 

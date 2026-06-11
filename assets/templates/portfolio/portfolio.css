@@ -1,62 +1,3 @@
-<!doctype html>
-<html lang="en" data-theme="light">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>{{name}} — Portfolio{{#target_company}} · {{target_company}}{{/target_company}}</title>
-<!-- Share target. Empty at generation time; the publish skill rewrites content=""
-     to the live GitHub Pages URL (https://<owner>.github.io/<repo>/) before the
-     final deploy push, so the Share button copies the canonical published link.
-     Opened locally before publish, the button falls back to window.location.href. -->
-<meta name="hope:share-url" content="" />
-<!-- OG / link-preview meta — how this link unfurls rich on LinkedIn / X / WhatsApp.
-     og:url, og:image and twitter:image ship empty; the publish skill stamps them with
-     ABSOLUTE URLs (SITE_URL and SITE_URL + og-image.png) before the final deploy push.
-     The 1200×630 og-image.png is screenshotted from the skill-generated share-card.html. -->
-<meta property="og:type" content="profile" />
-<meta property="og:title" content="{{name}} — {{headline}}" />
-<meta property="og:description" content="{{og_description}}" />
-<meta property="og:url" content="" />
-<meta property="og:image" content="" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="{{name}} — {{headline}}" />
-<meta name="twitter:description" content="{{og_description}}" />
-<meta name="twitter:image" content="" />
-<!-- Provenance (disclosed, not hidden): a standards-based generator tag + a
-     schema.org ProfilePage so recruiters/crawlers can read who made this and with what.
-     This is the user's file under MIT — see the footer note; it's theirs to keep or remove. -->
-<meta name="generator" content="Hope — github.com/oneconsciousness/claude-job-hunt-with-hope" />
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ProfilePage",
-  "dateCreated": "{{generation_date}}",
-  "about": { "@type": "Person", "name": "{{name}}", "jobTitle": "{{headline}}" },
-  "creator": {
-    "@type": "SoftwareApplication",
-    "name": "Hope",
-    "applicationCategory": "BusinessApplication",
-    "url": "https://github.com/oneconsciousness/claude-job-hunt-with-hope"
-  }
-}
-</script>
-<!--
-  Hope portfolio template · v0.4 · cookbook v1.1 conformant.
-  Renders identical structure to assets/fixtures/persona-jane-doe/sample-portfolio.html.
-  Portfolio skill substitutes:
-    1. {{single_tokens}} — name, headline, contact fields, summary, counts, etc.
-    2. HOPE:loop_name comment-marker blocks — replaces the example item inside with N rendered items.
-    3. {{photo_data_url}} + {{photo_class}} — the headshot, baked in as a data: URL at
-       generation time (set {{photo_class}} to " has-photo" when filled, "" when empty).
-  See skills/portfolio/SKILL.md for the substitution contract.
--->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400..700,0..1,-50..200" rel="stylesheet">
-<style>
 :root {
   color-scheme: light dark;
   --bg: #F0EBE3; --surface: #E8E2D8; --surface-2: #EDE8DF;
@@ -808,1076 +749,170 @@ body.print-continuous h1.name { font-size: 22px; }
 body.print-continuous .summary-band { padding: 16px 24px 18px; }
 body.print-continuous .summary-stats { gap: 14px 28px; }
 body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
-</style>
-</head>
-<body>
-<div class="wrap" id="top">
 
-  <div class="topbar materialize">
-    <div class="share-wrap">
-      <button id="share-btn" class="action-btn" type="button" aria-label="Share this portfolio" aria-haspopup="true" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"></path></svg>
-        <span>Share</span>
-      </button>
-      <div id="share-menu" hidden role="menu" aria-label="Share this portfolio">
-        <button class="share-item" type="button" role="menuitem" data-share="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>Copy link</button>
-        <button class="share-item" type="button" role="menuitem" data-share="linkedin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>LinkedIn</button>
-        <button class="share-item" type="button" role="menuitem" data-share="x"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"/></svg>X</button>
-        <button class="share-item" type="button" role="menuitem" data-share="whatsapp"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>WhatsApp</button>
-        <button class="share-item" type="button" role="menuitem" data-share="email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>Email</button>
-      </div>
-    </div>
-    <button id="pdf-btn" class="action-btn" type="button" aria-label="Save as PDF">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5 5 5-5"></path><path d="M12 15V3"></path></svg>
-      <span>Save as PDF</span>
-    </button>
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" type="button">
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-    </button>
-  </div>
+/* ─── THE THROUGHLINE — chronological strip in the identity card ────────
+   Shell markup: #throughline (index.html, bottom of .identity-card); data:
+   window.HOPE_DATA.timeline (authoring contract in data.js); behavior:
+   portfolio.js. tl-* namespace, tokens only. The card's 32×32 grid texture
+   already covers this area — the strip adds NO texture of its own. Motion is
+   transform/opacity ONLY: the playhead glides on transform:translateX (set
+   inline by rAF-scheduled JS), nodes lift on transform:scale; `left` on
+   nodes/ticks is static layout set once at build, never animated.
+   Published mode: fully kept — it's a feature, not an editing affordance
+   (see the published-mode contract above). Resume print modes exclude it for
+   free: the whole .identity-card is display:none there. */
+#throughline { position: relative; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+#throughline[hidden] { display: none; }
+.tl-rail { position: relative; height: 14px; margin: 34px 10px 26px; }
+.tl-track { position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; border-radius: var(--radius-pill); background: var(--border-default); }
+.tl-tick { position: absolute; top: calc(50% + 4px); width: 1px; height: 5px; background: var(--border-default); }
+.tl-tick-year { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.06em; }
+/* Nodes — 14px hexes (the brand clip-path, same polygon as .hex-kpi .hex),
+   one per entry, positioned proportionally by start date. Fills per the
+   Throughline contract (T3): experience orange · project cyan · education
+   violet · certification amber — token names only, values live in :root. */
+.tl-node { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; z-index: 2; cursor: pointer; }
+.tl-node .tl-hex { position: absolute; inset: 0; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: var(--accent-orange); transition: transform 0.25s ease; }
+.tl-node.tl-project .tl-hex { background: var(--accent-cyan); }
+.tl-node.tl-education .tl-hex { background: var(--accent-violet); }
+.tl-node.tl-certification .tl-hex { background: var(--accent-amber); }
+/* Ongoing (date_end null) — subtle emerald edge: a slightly larger hex
+   peeking out from under the type-colored one (a border would be eaten by
+   the clip-path). */
+.tl-node.tl-ongoing::before { content: ""; position: absolute; inset: -2.5px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: var(--accent-emerald-edge); transition: transform 0.25s ease; }
+.tl-node.tl-active .tl-hex, .tl-node.tl-active.tl-ongoing::before { transform: scale(1.45); }
+.tl-node:focus-visible { outline: 2px solid var(--accent-orange); outline-offset: 4px; border-radius: var(--radius-tight); }
+/* Floating label — shown on the ACTIVE node: sans 600 12px, mono date below. */
+.tl-node-label { position: absolute; bottom: calc(100% + 8px); left: 50%; display: flex; flex-direction: column; align-items: center; gap: 1px; white-space: nowrap; pointer-events: none; opacity: 0; transform: translate(-50%, 3px); transition: opacity 0.25s ease, transform 0.25s ease; }
+.tl-node.tl-active .tl-node-label { opacity: 1; transform: translate(-50%, 0); }
+.tl-node-text { font-size: 12px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.005em; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.tl-node-date { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted); letter-spacing: 0.04em; }
+/* Edge clamping (classes set by JS near the rail ends, px-measured) keeps
+   labels inside the card instead of bleeding past its rounded corners. */
+.tl-node.tl-clamp-start .tl-node-label { left: -7px; align-items: flex-start; transform: translate(0, 3px); }
+.tl-node.tl-clamp-end .tl-node-label { left: auto; right: -7px; align-items: flex-end; transform: translate(0, 3px); }
+.tl-node.tl-clamp-start.tl-active .tl-node-label, .tl-node.tl-clamp-end.tl-active .tl-node-label { transform: translate(0, 0); }
+/* Playhead + traveler. Default traveler: the soft orange glow dot — the
+   --accent-orange-glow token IS the glow. SVG travelers (curated slugs
+   embedded in portfolio.js, or a generator-inlined custom one via data.js)
+   are monochrome single-path marks per the brand-icon law (design-tokens.md
+   §6), ~16px, riding the same spot; .tl-flip mirrors them while the loop
+   wraps backward. Playhead z-index 1 < node z-index 2: the traveler passes
+   under the hexes. */
+.tl-playhead { position: absolute; left: 0; top: 50%; z-index: 1; pointer-events: none; transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+.tl-traveler { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; }
+.tl-traveler.tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-orange); box-shadow: var(--accent-orange-glow); }
+.tl-traveler.tl-svg { color: var(--accent-orange); }
+.tl-traveler.tl-svg svg { width: 16px; height: 16px; display: block; fill: currentColor; }
+.tl-traveler.tl-flip svg { transform: scaleX(-1); }
+/* Click-navigate target flash (T6) — outline pulse via the glow token, 1.2s.
+   Both keyframes carry two shadows so the fade interpolates instead of
+   snapping (mismatched list lengths animate discretely). */
+@keyframes tl-target-pulse { 0%, 65% { box-shadow: var(--accent-orange-glow), 0 0 0 2px var(--accent-orange); } 100% { box-shadow: 0 4px 14px transparent, 0 0 0 2px transparent; } }
+.tl-flash { animation: tl-target-pulse 1.2s ease-out; }
+/* Hover mini-card (T5) — token panel. Lives at BODY level: the identity
+   card's overflow:hidden plus its materialize transform (fill-mode keeps a
+   computed transform, which makes the card the containing block even for
+   fixed children) would clip any card-level tooltip. JS clamps it inside the
+   viewport. Chips reuse .skill-chip. z-index 980: above content, below the
+   export modal (1000). */
+.tl-tooltip { position: absolute; z-index: 980; max-width: 280px; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-card); box-shadow: var(--shadow-md); padding: 10px 12px; pointer-events: none; }
+.tl-tooltip[hidden] { display: none; }
+.tl-tip-label { font-size: 12.5px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.005em; }
+.tl-tip-org { margin-top: 1px; font-size: 11.5px; font-weight: 600; color: var(--accent-cyan); }
+.tl-tip-dates { margin-top: 2px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; }
+.tl-tip-metric { margin-top: 5px; font-family: var(--font-mono); font-size: 10.5px; color: var(--accent-emerald); }
+.tl-tip-skills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+/* prefers-reduced-motion (T4) — static rail: playhead hidden, no autoplay
+   (portfolio.js adds .tl-static and never starts the loop), all nodes
+   visible as always, labels on hover/focus only. */
+.tl-static .tl-playhead { display: none; }
+.tl-static .tl-node:hover .tl-node-label, .tl-static .tl-node:focus-visible .tl-node-label { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  #throughline *, #throughline *::before { transition: none !important; animation: none !important; }
+}
 
-  <!-- IDENTITY ===================================================== -->
-  <div class="identity-card materialize stagger-1">
-    <div class="identity-row">
-      <label class="photo-upload{{photo_class}}" id="photo-upload" for="photo-input">
-        <span class="upload-prompt"><span class="material-symbols-rounded">add_a_photo</span><span>Photo</span></span>
-        <!-- Baked in at generation time as a data: URL (see SKILL.md "Bake the headshot
-             into the file"). Empty when no headshot was found → the upload prompt shows.
-             The file input below stays as a "change your photo" fallback either way. -->
-        <img id="photo-preview" src="{{photo_data_url}}" alt="{{name}}" />
-        <input type="file" accept="image/*" id="photo-input" />
-        <button class="photo-remove" id="photo-remove" type="button" aria-label="Remove photo">
-          <span class="material-symbols-rounded">close</span>
-        </button>
-      </label>
-      <div class="identity-info">
-        <div class="identity-top">
-          <div class="identity-name-block">
-            <h1 class="name">{{name}}</h1>
-            <p class="headline">{{headline}}</p>
-          </div>
-          <span class="live-pill"><span class="dot"></span>LIVE</span>
-        </div>
-        <div class="stats-row">
-          <span><strong>{{skill_count}}</strong> skills</span><span class="sep">//</span>
-          <span><strong>{{role_count}}</strong> roles</span><span class="sep">//</span>
-          <span><strong>{{contribution_count}}</strong> contributions</span>
-        </div>
-        <!-- Contact row — per-item icon slot. Each LINK item leads with a
-             monochrome single-path inline SVG brand mark (Simple-Icons-style,
-             viewBox 0 0 24 24, fill="currentColor"). The GENERATOR inlines the
-             right mark per platform, matched by hostname against the bundled
-             set in assets/icons/brands/ — see the platform→icon table in
-             skills/portfolio/SKILL.md § "Icons for links — bundled first,
-             fetched when missing" (unknown brand → announce + fetch + cache;
-             on failure → globe.svg). currentColor makes each mark inherit its
-             item's color (.linkedin stays --accent-cyan, other items
-             --text-secondary) and theme automatically; sizing comes from the
-             .contact-row .item svg rule. Never full-color logos, never icon
-             fonts, never external <img>/url() icon loads — inline only, so
-             the file stays self-contained. Location and email keep their
-             Material Symbols glyphs. The LinkedIn + site items below are
-             worked examples carrying real inlined linkedin/github marks:
-             render one item per link the user actually has, swap the mark per
-             the table, and drop the site example entirely when there is no
-             such link. (#resume-view never gets icons — real text and worded
-             anchors only, per its ATS rules.) -->
-        <div class="contact-row">
-          <span class="item location"><span class="material-symbols-rounded">location_on</span>{{location}}</span>
-          <a class="item" href="mailto:{{email}}" target="_blank" rel="noopener">
-            <span class="material-symbols-rounded">mail</span>{{email}}
-            <span class="material-symbols-rounded ext">open_in_new</span>
-          </a>
-          <a class="item linkedin" href="{{linkedin_url}}" target="_blank" rel="noopener">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>{{linkedin_handle}}
-            <span class="material-symbols-rounded ext">open_in_new</span>
-          </a>
-          <a class="item" href="{{site_url}}" target="_blank" rel="noopener">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>{{site_handle}}
-            <span class="material-symbols-rounded ext">open_in_new</span>
-          </a>
-        </div>
-        <p class="summary">{{summary}}</p>
-      </div>
-    </div>
-  </div>
+/* ─── THE THROUGHLINE — print (T8) ──────────────────────────────────────
+   Static rail in EVERY portfolio print style: playhead + tooltip hidden, ALL
+   node labels rendered. Two-row above/below alternation alone is NOT enough
+   at real entry densities (~15 nodes on a ~644px printed rail put same-row
+   neighbors as close as 26px while nowrap labels run 150-200px wide — pure
+   overprint). So labels print WRAPPED and narrow (max-width 80px, 8.5px/1.15
+   text, 7.5px date) on FOUR tiers: .tl-below (every 2nd node, JS-set) flips
+   under the rail, .tl-far (3rd+4th of each quartet, JS-set) pushes to an
+   outer row above/below — same-tier neighbors are 4 entries apart, which
+   clears the densest clusters. Below rows clear the year ticks; rail margins
+   reserve the tier depth. Colors ride the tokens, so ink's monochrome token
+   override covers hexes/labels/ticks for free; showcase inherits this block
+   unchanged. Resume modes never print the strip — it rides the existing
+   identity-card hide (body.print-doc-resume). */
+@media print {
+  .tl-playhead, .tl-tooltip { display: none !important; }
+  .tl-rail { margin: 132px 10px 140px; }
+  .tl-node .tl-hex, .tl-node.tl-ongoing::before { transform: none !important; }
+  .tl-node-label { opacity: 1 !important; transform: translate(-50%, 0) !important; max-width: 80px; white-space: normal; text-align: center; }
+  .tl-node-text { font-size: 8.5px; line-height: 1.15; }
+  .tl-node-date { font-size: 7.5px; line-height: 1.2; }
+  .tl-node.tl-clamp-start .tl-node-label, .tl-node.tl-clamp-end .tl-node-label { transform: translate(0, 0) !important; }
+  .tl-node.tl-clamp-start .tl-node-label { text-align: left; }
+  .tl-node.tl-clamp-end .tl-node-label { text-align: right; }
+  .tl-node.tl-far .tl-node-label { bottom: calc(100% + 70px); }
+  .tl-node.tl-below .tl-node-label { bottom: auto; top: calc(100% + 18px); }
+  .tl-node.tl-below.tl-far .tl-node-label { top: calc(100% + 78px); }
+}
 
-  <!-- PRINT CONTENTS (print/PDF only) ============================== -->
-  <!-- Never visible on screen — the section tabs do this job interactively.
-       In the PDF the anchors become real link annotations: on the continuous
-       single page they jump down the page; in paginated they land on the
-       section labels. Chips number themselves with a CSS counter
-       (decimal-leading-zero), so the numbering self-adjusts when the
-       conditional Overview entry is stripped — never an 02-first list.
-       Border-styled so they survive viewers that skip background graphics. -->
-  <nav class="print-toc" aria-hidden="true">
-    <div class="print-toc-title">Contents</div>
-    <div class="print-toc-links">
-      {{#show_summary}}
-      <a href="#pane-overview"><span class="toc-chip"></span>Overview</a>
-      {{/show_summary}}
-      <a href="#pane-experience"><span class="toc-chip"></span>Experience</a>
-      <a href="#pane-skills"><span class="toc-chip"></span>Skills</a>
-      <a href="#pane-education"><span class="toc-chip"></span>Education</a>
-      <a href="#pane-certifications"><span class="toc-chip"></span>Certifications</a>
-      <a href="#pane-projects"><span class="toc-chip"></span>Projects</a>
-    </div>
-  </nav>
+/* ─── H1 · Wide-screen identity header (≥1100px) ────────────────────────
+   MEDIA query, not container query — judgment: .wrap caps the card's width
+   at 880px at every viewport, so the card's own inline-size never crosses a
+   useful threshold; what actually changes at 1100px is the VIEWPORT, which
+   is exactly what a media query reads. Three columns: LEFT the stats block
+   (stacked vertically, mono); CENTER photo + name + headline + summary
+   (hierarchy unchanged); RIGHT the contact links (stacked, right-aligned).
+   Below 1100px not one rule here applies — the narrow layout stays
+   byte-identical. The LIVE pill pins to the card's top-right at all widths
+   (absolute against .identity-row, whose position:relative comes from the
+   .identity-card > * rule). display:contents lifts .identity-info's children
+   into the card grid — the wrapper contributes no box of its own. */
+@media (min-width: 1100px) {
+  .identity-row { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(0, 3fr) minmax(150px, 1fr); grid-template-rows: auto auto auto; column-gap: 32px; align-items: start; }
+  .identity-info { display: contents; }
+  .photo-upload { grid-column: 2; grid-row: 1; justify-self: center; }
+  .identity-top { grid-column: 2; grid-row: 2; justify-content: center; margin-top: 12px; }
+  .identity-name-block { flex: 0 1 auto; text-align: center; }
+  .live-pill { position: absolute; top: 0; right: 0; }
+  .stats-row { grid-column: 1; grid-row: 1 / span 3; align-self: center; flex-direction: column; gap: 12px; margin-top: 0; }
+  .stats-row > span { display: block; }
+  .stats-row .sep { display: none; }
+  .stats-row strong { display: block; font-size: 19px; line-height: 1.1; }
+  .contact-row { grid-column: 3; grid-row: 1 / span 3; align-self: center; justify-self: end; flex-direction: column; align-items: flex-end; gap: 9px; margin-top: 0; }
+  .summary { grid-column: 2; grid-row: 3; text-align: center; margin: 10px auto 0; }
+}
 
-  <!-- SECTION TABS ================================================= -->
-  <div class="section-grid materialize stagger-2">
-    {{#show_summary}}
-    <!-- Overview app tile — ships ONLY together with the Overview pane below
-         (same show_summary conditional; both strip with zero residue, leaving
-         the classic 5-tile grid with Experience as the default app).
-         No integrity bar: curated highlights carry no confidence score.
-         The init JS promotes this tile + its pane to active when present —
-         the static "active" on Experience below is the stripped-state fallback. -->
-    <button class="section-btn" data-section="overview" type="button">
-      <span class="icon"><span class="material-symbols-rounded">insights</span></span>
-      <span class="body">
-        <span class="label">Overview</span>
-        <span class="meta">
-          <span class="count">{{stat_count}} highlights</span>
-        </span>
-      </span>
-    </button>
-    {{/show_summary}}
-    <button class="section-btn active" data-section="experience" style="--conf-color: {{experience_conf_color}}" type="button">
-      <span class="icon"><span class="material-symbols-rounded">work</span></span>
-      <span class="body">
-        <span class="label">Experience</span>
-        <span class="meta">
-          <span class="count">{{role_count}} roles</span>
-          <span class="integrity">
-            <span class="bar-track"><span class="bar-fill" style="width: {{experience_pct}}%"></span></span>
-            <span class="pct">{{experience_pct}}%</span>
-          </span>
-        </span>
-      </span>
-    </button>
-    <button class="section-btn" data-section="skills" style="--conf-color: {{skills_conf_color}}" type="button">
-      <span class="icon"><span class="material-symbols-rounded">hub</span></span>
-      <span class="body">
-        <span class="label">Skills</span>
-        <span class="meta">
-          <span class="count">{{skill_count}} skills</span>
-          <span class="integrity">
-            <span class="bar-track"><span class="bar-fill" style="width: {{skills_pct}}%"></span></span>
-            <span class="pct">{{skills_pct}}%</span>
-          </span>
-        </span>
-      </span>
-    </button>
-    <button class="section-btn" data-section="education" style="--conf-color: {{education_conf_color}}" type="button">
-      <span class="icon"><span class="material-symbols-rounded">school</span></span>
-      <span class="body">
-        <span class="label">Education</span>
-        <span class="meta">
-          <span class="count">{{education_count}} {{education_count_word}}</span>
-          <span class="integrity">
-            <span class="bar-track"><span class="bar-fill" style="width: {{education_pct}}%"></span></span>
-            <span class="pct">{{education_pct}}%</span>
-          </span>
-        </span>
-      </span>
-    </button>
-    <button class="section-btn" data-section="certifications" style="--conf-color: {{certifications_conf_color}}" type="button">
-      <span class="icon"><span class="material-symbols-rounded">verified</span></span>
-      <span class="body">
-        <span class="label">Certifications</span>
-        <span class="meta">
-          <span class="count">{{certification_count}} {{certification_count_word}}</span>
-          <span class="integrity">
-            <span class="bar-track"><span class="bar-fill" style="width: {{certifications_pct}}%"></span></span>
-            <span class="pct">{{certifications_pct}}%</span>
-          </span>
-        </span>
-      </span>
-    </button>
-    <button class="section-btn" data-section="projects" style="--conf-color: {{projects_conf_color}}" type="button">
-      <span class="icon"><span class="material-symbols-rounded">rocket_launch</span></span>
-      <span class="body">
-        <span class="label">Projects</span>
-        <span class="meta">
-          <span class="count">{{project_count}} {{project_count_word}}</span>
-          <span class="integrity">
-            <span class="bar-track"><span class="bar-fill" style="width: {{projects_pct}}%"></span></span>
-            <span class="pct">{{projects_pct}}%</span>
-          </span>
-        </span>
-      </span>
-    </button>
-  </div>
-
-  <!-- OVERVIEW PANE (opt-in, default-open) ========================= -->
-  {{#show_summary}}
-  <!-- Renders ONLY when the user opted in (CuratedPortfolio.show_summary == true).
-       Opted out / nothing captured → the portfolio skill strips this whole
-       conditional block (markers included) plus the Overview tile and the TOC
-       entry above (same conditional), zero placeholder residue — the page
-       renders exactly as it does without the Overview app.
-       Placed FIRST among the panes so it prints first (print walks DOM order);
-       on screen the init JS promotes it to the default-open app.
-       Portfolio skill substitutes:
-         stat_count             — number of curated hero stats (feeds the tile's
-                                  "{{stat_count}} highlights" meta line).
-         summary_stats_loop     — up to 4 curated hero stats (Person.headline_stats,
-                                  human-curated, never auto-summed): stat_icon is a
-                                  Material Symbols name (e.g. rocket_launch / payments /
-                                  groups / public), stat_value e.g. "$2M+", stat_label
-                                  e.g. "client pipeline".
-         summary_interests_loop — up to 6 genuinely personal interests
-                                  (Person.interests, e.g. typography, trail running),
-                                  one neutral chip per interest.
-       Omit a whole row (.summary-stats or .summary-interests) when its source
-       list is empty — never render an eyebrow over nothing. -->
-  <div class="section-pane" data-pane="overview" id="pane-overview">
-    <section class="summary-band">
-      <div class="summary-stats">
-        <!-- HOPE:summary_stats_loop -->
-        <div class="summary-stat hex-kpi">
-          <span class="hex"><span class="material-symbols-rounded">{{stat_icon}}</span></span>
-          <span class="stat-text">
-            <span class="stat-value">{{stat_value}}</span>
-            <span class="stat-label">{{stat_label}}</span>
-          </span>
-        </div>
-        <!-- /HOPE:summary_stats_loop -->
-      </div>
-      <div class="summary-interests">
-        <span class="interests-eyebrow">Interests</span>
-        <!-- HOPE:summary_interests_loop -->
-        <span class="skill-chip">{{interest}}</span>
-        <!-- /HOPE:summary_interests_loop -->
-      </div>
-    </section>
-    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
-  </div>
-  {{/show_summary}}
-
-  <!-- EXPERIENCE PANE ============================================== -->
-  <div class="section-pane active" data-pane="experience" id="pane-experience">
-    <!-- HOPE:experience_loop_start
-         For each Experience (sort: is_current first, then start_date desc), render:
-         - Add "is-current" class on cards where is_current==true
-         - Add "expanded" class on the FIRST card by default
-         - org-logo: <img src="https://www.google.com/s2/favicons?domain={{company_domain}}&sz=128"
-                         onerror="this.outerHTML='<span class=\"org-fallback\">{{first_letter}}</span>';">
-         - hex KPIs: person→count(individual), groups→count(leadership), monitoring→count(c.metric != null)
-         - For contributions: split by type (individual vs leadership), render each group with header + numbered cards
-    -->
-    <div class="item-card{{is_current_class}} expanded" data-expand>
-      <span class="accent-bar"></span>
-      <div class="item-head">
-        <img class="org-logo" src="https://www.google.com/s2/favicons?domain={{company_domain}}&sz=128"
-             alt="{{company}}" width="44" height="44"
-             onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;{{company_initial}}&lt;/span&gt;';">
-        <div class="item-info">
-          <div class="title-row">
-            <span class="role-title">{{role_title}}</span>
-            {{#is_current}}<span class="active-pill">Active</span>{{/is_current}}
-          </div>
-          <span class="role-company">{{company}}</span>
-          <span class="role-dates">{{role_dates}}</span>
-        </div>
-        <div class="item-meta">
-          <span class="contrib-pill">{{contribution_count}} contribution{{plural_s}}</span>
-          <span class="hex-kpi" title="Individual contributions"><span class="hex"><span class="material-symbols-rounded">person</span></span><span class="num">{{ic_count}}</span></span>
-          <span class="hex-kpi" title="Leadership contributions"><span class="hex"><span class="material-symbols-rounded">groups</span></span><span class="num">{{lead_count}}</span></span>
-          <span class="hex-kpi" title="Quantified outcomes"><span class="hex"><span class="material-symbols-rounded">monitoring</span></span><span class="num">{{metric_count}}</span></span>
-          <span class="chevron"><span class="material-symbols-rounded">expand_more</span></span>
-        </div>
-      </div>
-      <div class="item-body">
-        <div class="item-body-inner">
-          <div class="item-divider"></div>
-          <!-- HOPE:contrib_groups_start
-               Render at most 2 groups per role: IC first if any, Leadership second if any.
-               group_class is "ic" or "lead"; group_icon is "person" or "groups";
-               group_title is "Individual Contributions" or "Leadership Contributions".
-               contrib_class matches group_class. contrib_icon matches group_icon.
-               metric_direction_class: "" for increase/decrease (default emerald), "achieved" for ✓.
-               metric_arrow: "↑" increase, "↓" decrease, "✓" achieved.
-          -->
-          <div class="contrib-group">
-            <div class="group-header {{group_class}}">
-              <span class="material-symbols-rounded">{{group_icon}}</span>
-              <span class="title">{{group_title}}</span>
-              <span class="bar"></span>
-            </div>
-            <article class="contrib {{contrib_class}}">
-              <div class="contrib-head">
-                <span class="contrib-num">{{contrib_num}}</span>
-                <span class="material-symbols-rounded type-icon">{{contrib_icon}}</span>
-                {{#domain}}<span class="contrib-domain">{{domain}}</span>{{/domain}}
-                {{#scope}}<span class="scope-badge">{{scope}}</span>{{/scope}}
-                {{#metric}}
-                <span class="metric-badge {{metric_direction_class}}">
-                  <span class="val">{{metric_value}}</span>
-                  <span class="arrow">{{metric_arrow}}</span>
-                  <span class="subj">{{metric_subject}}</span>
-                </span>
-                {{/metric}}
-              </div>
-              <p class="contrib-action">{{action}}</p>
-              {{#impact}}
-              <div class="contrib-impact">
-                <span class="material-symbols-rounded">arrow_forward</span>
-                <p>{{impact}}</p>
-              </div>
-              {{/impact}}
-              {{#has_skills}}
-              <div class="contrib-skills">
-                <!-- HOPE:skills_loop -->
-                <span class="skill-chip" data-cat="{{skill_category}}">{{skill_name}}</span>
-                <!-- /HOPE:skills_loop -->
-              </div>
-              {{/has_skills}}
-              {{#has_competencies}}
-              <div class="contrib-competencies">
-                <!-- HOPE:competencies_loop -->
-                <span class="competency">{{competency_name}}</span>
-                <!-- /HOPE:competencies_loop -->
-              </div>
-              {{/has_competencies}}
-            </article>
-          </div>
-          <!-- HOPE:contrib_groups_end -->
-        </div>
-      </div>
-    </div>
-    <!-- HOPE:experience_loop_end -->
-    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
-  </div>
-
-  <!-- SKILLS PANE ================================================== -->
-  <div class="section-pane" data-pane="skills" id="pane-skills">
-    <div class="skills-hud">
-      <!-- HOPE:skill_categories_loop_start
-           For each category in DEFAULT_CATEGORY_ORDER (then unknowns):
-           cat_color from SKILL_CATEGORY_ACCENT (cookbook §4):
-             tools=#38BDF8, programming=#34D399, languages=#A78BFA, methods/methodology=#F472B6,
-             domain=#818CF8, interpersonal/soft=#FBBF24, analytical=#FB923C, creative/design=#22D3EE.
-           For each skill in category, render a skill-cell with 4-segment level bar.
-           Level colors: expert=#22D3EE (4 lit), advanced=#16A34A (3 lit), proficient=#F59E0B (2 lit), beginner=#A78BFA (1 lit).
-           Lit segments: full color. Unlit: same color at 0.20 alpha.
-      -->
-      <div class="skill-cat" style="--cat-color: {{cat_color}}">
-        <div class="skill-cat-header">
-          <span class="ledge"></span>
-          <span class="name">{{cat_display_name}}</span>
-          <span class="count">[{{cat_count}}]</span>
-        </div>
-        <div class="skill-grid">
-          <!-- HOPE:skill_cells_loop -->
-          <div class="skill-cell">
-            <span class="level-bar">
-              <span class="seg" style="height:6px;background:{{seg1_color}}"></span>
-              <span class="seg" style="height:8px;background:{{seg2_color}}"></span>
-              <span class="seg" style="height:10px;background:{{seg3_color}}"></span>
-              <span class="seg" style="height:12px;background:{{seg4_color}}"></span>
-            </span>
-            <span class="name">{{skill_name}}</span>
-            <span class="years">{{years}}y</span>
-          </div>
-          <!-- /HOPE:skill_cells_loop -->
-        </div>
-      </div>
-      <!-- HOPE:skill_categories_loop_end -->
-    </div>
-    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
-  </div>
-
-  <!-- EDUCATION PANE =============================================== -->
-  <div class="section-pane" data-pane="education" id="pane-education">
-    <div class="edu-list">
-      <!-- HOPE:education_loop_start -->
-      <div class="edu-card">
-        <img class="org-logo" src="https://www.google.com/s2/favicons?domain={{institution_domain}}&sz=128"
-             alt="{{institution}}" width="44" height="44"
-             onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;{{institution_initial}}&lt;/span&gt;';">
-        <div class="info">
-          <div class="title-line">{{degree_line}}</div>
-          <div class="sub-line">{{institution}}</div>
-          <div class="date-line">{{edu_dates}}</div>
-        </div>
-      </div>
-      <!-- HOPE:education_loop_end -->
-    </div>
-    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
-  </div>
-
-  <!-- CERTIFICATIONS PANE ========================================== -->
-  <div class="section-pane" data-pane="certifications" id="pane-certifications">
-    <div class="edu-list">
-      <!-- HOPE:certifications_loop_start
-           When issue_date is null/empty, replace .date-line with: <span class="no-date">No date</span>
-      -->
-      <div class="edu-card">
-        <img class="org-logo" src="https://www.google.com/s2/favicons?domain={{issuer_domain}}&sz=128"
-             alt="{{issuer}}" width="44" height="44"
-             onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;{{issuer_initial}}&lt;/span&gt;';">
-        <div class="info">
-          <div class="title-line">{{cert_name}}</div>
-          <div class="sub-line">{{issuer}}</div>
-          <div class="date-line">{{cert_date_or_no_date}}</div>
-        </div>
-      </div>
-      <!-- HOPE:certifications_loop_end -->
-    </div>
-    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
-  </div>
-
-  <!-- PROJECTS PANE — expandable Experience-style cards ============= -->
-  <!-- Projects render with the SAME collapsible .item-card structure as the
-       Experience pane, so a project's full story (description, impact, the
-       skills it applied) is shown rather than thrown away. The card-expand JS
-       (.item-card[data-expand] .item-head click → .expanded) and the section-grid
-       filter both work here unchanged because the classes are identical. -->
-  <div class="section-pane" data-pane="projects" id="pane-projects">
-    <!-- HOPE:projects_loop_start
-         For each Project (sort: is_current/active first, then start_date desc), render:
-         - Add "expanded" class on the FIRST card by default (so the pane opens populated)
-         - org-logo: if the project has a link/host domain, use the favicon
-               <img class="org-logo" src="https://www.google.com/s2/favicons?domain={{project_domain}}&sz=128"
-                    onerror="this.outerHTML='<span class=\"org-fallback\">{{project_initial}}</span>';">
-           otherwise just render the lettermark: <span class="org-fallback">{{project_initial}}</span>
-         - role-title  = project name
-         - role-company = tagline (or tech summary if no tagline)
-         - role-dates  = project_dates (omit the <span> entirely if the project carries no dates)
-         - {{#is_active}}…{{/is_active}} active pill for in-progress / ongoing projects
-         - hex KPIs (optional): reuse person/groups/monitoring counts where the project has them;
-           omit any hex-kpi whose count is absent.
-         - Body: one .contrib block carrying the description, the impact line, and the
-           skills_applied chips. skill_category drives the chip color (same map as Experience).
-    -->
-    <div class="item-card project expanded" data-expand>
-      <span class="accent-bar"></span>
-      <div class="item-head">
-        <img class="org-logo" src="https://www.google.com/s2/favicons?domain={{project_domain}}&sz=128"
-             alt="{{project_name}}" width="44" height="44"
-             onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;{{project_initial}}&lt;/span&gt;';">
-        <div class="item-info">
-          <div class="title-row">
-            <span class="role-title">{{project_name}}</span>
-            {{#is_active}}<span class="active-pill">Active</span>{{/is_active}}
-          </div>
-          <span class="role-company">{{project_tagline}}</span>
-          {{#project_dates}}<span class="role-dates">{{project_dates}}</span>{{/project_dates}}
-        </div>
-        <div class="item-meta">
-          {{#best_metric}}<span class="contrib-pill">{{best_metric}}</span>{{/best_metric}}
-          <span class="chevron"><span class="material-symbols-rounded">expand_more</span></span>
-        </div>
-      </div>
-      <div class="item-body">
-        <div class="item-body-inner">
-          <div class="item-divider"></div>
-          <article class="contrib ic" style="background: transparent; border: 0; border-left: 0; padding: 0;">
-            <p class="contrib-action">{{project_description}}</p>
-            {{#impact}}
-            <div class="contrib-impact">
-              <span class="material-symbols-rounded">arrow_forward</span>
-              <p>{{impact}}</p>
-            </div>
-            {{/impact}}
-            {{#has_skills}}
-            <div class="contrib-skills">
-              <!-- HOPE:project_skills_loop -->
-              <span class="skill-chip" data-cat="{{skill_category}}">{{skill_name}}</span>
-              <!-- /HOPE:project_skills_loop -->
-            </div>
-            {{/has_skills}}
-            {{#link}}
-            <div class="project-link-row">
-              <a class="project-link" href="{{link}}" target="_blank" rel="noopener">
-                <span class="material-symbols-rounded">link</span>{{link_label}}
-                <span class="material-symbols-rounded ext">open_in_new</span>
-              </a>
-            </div>
-            {{/link}}
-          </article>
-        </div>
-      </div>
-    </div>
-    <!-- HOPE:projects_loop_end -->
-    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
-  </div>
-
-  <!-- RESUME VIEW (print-only) ===================================== -->
-  <!-- Always hidden on screen (#resume-view{display:none}); shown ONLY when
-       printing with body.print-doc-resume, set by the export chooser. The
-       markup is deliberately ATS-parseable: real <h1>/<h2>/<ul><li>, standard
-       section names, no tables, no text-in-images, no icon fonts, no
-       letter-spaced text. LINK RULE everywhere in this view: links are WORDED
-       anchors whose visible text is a real word — <a href="...">LinkedIn</a>,
-       <a href="...">GitHub</a>, <a href="...">Demo</a>, a project name —
-       never a visible raw URL. Anchor text is real text, so ATS extraction
-       keeps the words; raw URLs are the thing we drop. The mailto:/https:
-       hrefs become clickable annotations in Chrome's print-to-PDF.
-       Portfolio skill substitutes:
-         {{resume_contact_line}} — one link-bearing line: location · email ·
-                                   phone · worded links. Email is shown AS THE
-                                   ADDRESS and mailto-linked (the address itself
-                                   is the datum — ATS parsers need it as text).
-                                   Phone is plain text. LinkedIn / GitHub /
-                                   Portfolio / personal site are worded anchors
-                                   (<a href="...">LinkedIn</a>), never visible
-                                   URLs. Where the portfolio is published,
-                                   include <a href="{SITE}">Portfolio</a>.
-         {{resume_summary}}      — 2-3 sentence professional summary
-         resume_experience loop  — role, company, dates, 2-4 metric-led bullets,
-                                   each carrying ONE bolded key sub-phrase (see
-                                   the loop comment below)
-         resume_education loop   — degree, institution, dates
-         HOPE:resume_skills_line — replaced with the comma-joined skill names -->
-  <div id="resume-view" hidden>
-    <header class="resume-header">
-      <h1>{{name}}</h1>
-      <p class="resume-headline">{{headline}}</p>
-      <p class="resume-contact">{{resume_contact_line}}</p>
-    </header>
-    <section class="resume-section">
-      <h2>Summary</h2>
-      <p class="resume-summary">{{resume_summary}}</p>
-    </section>
-    <section class="resume-section">
-      <h2>Experience</h2>
-      <!-- HOPE:resume_experience_loop_start
-           For each Experience (sort: is_current first, then start_date desc),
-           render the entry below. 2-4 bullets per role; lead each bullet with
-           the quantified achievement where the graph carries a metric.
-           BOLD RULE: each bullet MAY carry exactly ONE inline <strong> around
-           its load-bearing sub-phrase — the metric + object, the "what moved":
-           "Cut onboarding <strong>from 3 weeks to 1</strong> by pairing every
-           hire with a design buddy." 2-6 words inside the strong, never the
-           whole bullet, never two strongs (bold soup kills skimmability
-           instead of helping it).
-           LINKS in bullets and entry headers are allowed as worded anchors —
-           a project name (<a href="...">Typebook</a>), <a href="...">Demo</a>,
-           <a href="...">GitHub</a> — never bare URLs. -->
-      <article class="resume-entry">
-        <div class="resume-entry-head">
-          <h3>{{role_title}}</h3>
-          <span class="resume-dates">{{role_dates}}</span>
-        </div>
-        <p class="resume-org">{{company}}</p>
-        <ul>
-          <!-- HOPE:resume_bullets_loop -->
-          <li>{{resume_bullet}}</li>
-          <!-- /HOPE:resume_bullets_loop -->
-        </ul>
-      </article>
-      <!-- HOPE:resume_experience_loop_end -->
-    </section>
-    <section class="resume-section">
-      <h2>Education</h2>
-      <!-- HOPE:resume_education_loop_start -->
-      <article class="resume-entry">
-        <div class="resume-entry-head">
-          <h3>{{degree_line}}</h3>
-          <span class="resume-dates">{{edu_dates}}</span>
-        </div>
-        <p class="resume-org">{{institution}}</p>
-      </article>
-      <!-- HOPE:resume_education_loop_end -->
-    </section>
-    <section class="resume-section">
-      <h2>Skills</h2>
-      <p class="resume-skills">
-        <!-- HOPE:resume_skills_line -->
-      </p>
-    </section>
-  </div>
-
-  <!-- Made with Hope, and given to you freely. If it helped you find work, please keep this
-       credit so the next person finds Hope too. It's your file under MIT, so the choice is
-       yours — but we hope you'll leave it. Pay it forward. -->
-  <div class="footer">Generated with <a href="https://github.com/oneconsciousness/claude-job-hunt-with-hope" target="_blank" rel="noopener">Hope</a> · {{generation_date}}{{#target_company}} · For {{target_company}}{{/target_company}}</div>
-</div>
-
-<!-- EXPORT CHOOSER (modal) ========================================= -->
-<!-- Opened by #pdf-btn. THIS RELEASE it is the "Save résumé as PDF" dialog:
-     picks resume style + font + fit, sets body.print-doc-resume.print-style-
-     <style>, applies --resume-font (and floor-aware auto-fit --rfs when
-     chosen) on #resume-view, closes, calls window.print(). Last choice
-     persists in localStorage ('hope-resume-pref').
-     PORTFOLIO PDF — gated for the next release; re-enable by restoring the
-     Document fieldset (and the portfolio Style + Layout fieldsets that hung
-     off it). The print engine — continuous-mode JS, portfolio print styles,
-     print TOC, body-class plumbing — is kept intact; only this UI entry
-     point is gone. The default no-class browser print (Cmd+P) still prints
-     the paginated classic portfolio. -->
-<div id="export-modal" hidden role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
-  <div class="export-backdrop" data-export-close></div>
-  <div class="export-dialog">
-    <div class="export-head">
-      <h2 id="export-modal-title">Save résumé as PDF</h2>
-      <button class="export-x" type="button" aria-label="Close" data-export-close>&times;</button>
-    </div>
-    <fieldset class="export-group" id="export-styles-resume">
-      <legend class="export-group-label">Style</legend>
-      <div class="export-opts">
-        <label class="export-opt">
-          <input type="radio" name="export-style-resume" value="classic" checked />
-          <span class="opt-name">Classic<span class="opt-tag">Recommended</span></span>
-          <span class="opt-desc">Timeless serif résumé — black on white, single column.</span>
-        </label>
-        <label class="export-opt">
-          <input type="radio" name="export-style-resume" value="modern" />
-          <span class="opt-name">Modern</span>
-          <span class="opt-desc">Clean Inter sans-serif with one restrained orange accent.</span>
-        </label>
-        <label class="export-opt">
-          <input type="radio" name="export-style-resume" value="compact" />
-          <span class="opt-name">Compact</span>
-          <span class="opt-desc">Dense — fits more per page, never below the readability floor.</span>
-        </label>
-      </div>
-    </fieldset>
-    <!-- Per-style default pre-selected by JS (classic → Georgia,
-         modern/compact → Inter). Picking one overrides the résumé family via
-         --resume-font on #resume-view. All ATS-safe system stacks. -->
-    <fieldset class="export-group" id="export-font-resume">
-      <legend class="export-group-label">Font</legend>
-      <div class="export-opts">
-        <label class="export-opt">
-          <input type="radio" name="export-font-resume" value="georgia" checked />
-          <span class="opt-name">Georgia (serif)</span>
-        </label>
-        <label class="export-opt">
-          <input type="radio" name="export-font-resume" value="times" />
-          <span class="opt-name">Times New Roman (serif)</span>
-        </label>
-        <label class="export-opt">
-          <input type="radio" name="export-font-resume" value="inter" />
-          <span class="opt-name">Inter (sans)</span>
-        </label>
-      </div>
-    </fieldset>
-    <fieldset class="export-group" id="export-fit-resume">
-      <legend class="export-group-label">Fit</legend>
-      <div class="export-opts export-opts-2">
-        <label class="export-opt">
-          <input type="radio" name="export-fit-resume" value="comfortable" checked />
-          <span class="opt-name">Comfortable<span class="opt-tag">Recommended</span></span>
-          <span class="opt-desc">Standard sizing.</span>
-        </label>
-        <label class="export-opt">
-          <input type="radio" name="export-fit-resume" value="auto" />
-          <span class="opt-name">Auto-fit</span>
-          <span class="opt-desc">Tighten to fit fewer pages, never below the readability floor.</span>
-        </label>
-      </div>
-    </fieldset>
-    <div class="export-actions">
-      <button class="export-cancel" type="button" data-export-close>Cancel</button>
-      <button id="export-confirm" class="export-confirm" type="button">Save as PDF</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function() {
-  // PUBLISHED-MODE CONTRACT (see the matching CSS block by the same title):
-  // a published copy carries data-hope-mode="published" on <html>; the local
-  // generated file never does. Every EDITING affordance below checks this
-  // flag; visitor FEATURES (theme toggle, Share, Save-as-PDF, section
-  // navigation, card expansion) deliberately do not.
-  var isPublished = document.documentElement.dataset.hopeMode === 'published';
-  const STORAGE_KEY = 'hope-portfolio-theme';
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) {}
-  }
-  let savedTheme = 'light';
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'light' || stored === 'dark') savedTheme = stored;
-  } catch (e) {}
-  applyTheme(savedTheme);
-  document.getElementById('theme-toggle').addEventListener('click', () => {
-    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-  });
-  // Share — #share-btn opens the #share-menu popover.
-  // Items: Copy link · LinkedIn · X · WhatsApp · Email. Canonical URL: the
-  // <meta name="hope:share-url"> content, which the publish skill rewrites to
-  // the live GitHub Pages URL. Empty (un-published) → window.location.href.
-  var shareBtn = document.getElementById('share-btn');
-  var shareMenu = document.getElementById('share-menu');
-  var shareLabel = shareBtn ? shareBtn.querySelector('span') : null;
-  if (shareLabel) shareLabel.dataset.idle = shareLabel.textContent;
-  var flash = function (text, ok) {
-    if (shareLabel) shareLabel.textContent = text;
-    if (ok) shareBtn.classList.add('copied');
-    setTimeout(function () {
-      if (shareLabel) shareLabel.textContent = shareLabel.dataset.idle;
-      shareBtn.classList.remove('copied');
-    }, 1600);
-  };
-  var getCanonicalUrl = function () {
-    var meta = document.querySelector('meta[name="hope:share-url"]');
-    return meta && meta.content ? meta.content.trim() : '';
-  };
-  var getShareUrl = function () { return getCanonicalUrl() || window.location.href; };
-  var getName = function () {
-    var el = document.querySelector('h1.name');
-    return el ? el.textContent.trim() : '';
-  };
-  var getShareText = function () {
-    var el = document.querySelector('.headline');
-    var headline = el ? el.textContent.trim() : '';
-    return headline ? getName() + ' — ' + headline : getName();
-  };
-  var copyFallback = function (url) {
-    // Non-secure context (file://, http) — navigator.clipboard is undefined there.
-    // document.execCommand('copy') is deprecated but the only path that works.
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = url; ta.setAttribute('readonly', '');
-      ta.style.position = 'absolute'; ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select(); ta.setSelectionRange(0, url.length);
-      var ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      flash(ok ? 'Copied!' : 'Copy: ' + url, ok);
-    } catch (e) { flash('Copy: ' + url, false); }
-  };
-  var copyShareUrl = function () {
-    var canonical = getCanonicalUrl();
-    var url = canonical || window.location.href;
-    // No published link yet and opened from disk → don't leak the local file path.
-    if (!canonical && url.indexOf('file:') === 0) { flash('Publish first to share a link', false); return; }
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(url).then(
-        function () { flash('Copied!', true); },
-        function () { copyFallback(url); }
-      );
-      return;
-    }
-    copyFallback(url);
-  };
-  var closeShareMenu = function () {
-    if (shareMenu && !shareMenu.hidden) {
-      shareMenu.hidden = true;
-      if (shareBtn) shareBtn.setAttribute('aria-expanded', 'false');
-    }
-  };
-  if (shareBtn && shareMenu) {
-    shareBtn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (shareMenu.hidden) {
-        shareMenu.hidden = false;
-        shareBtn.setAttribute('aria-expanded', 'true');
-      } else {
-        closeShareMenu();
-      }
-    });
-    shareMenu.addEventListener('click', function (e) {
-      var item = e.target.closest('[data-share]');
-      if (!item) return;
-      var action = item.getAttribute('data-share');
-      closeShareMenu();
-      if (action === 'copy') { copyShareUrl(); return; }
-      var url = getShareUrl();
-      var text = getShareText();
-      var href = '';
-      if (action === 'linkedin') {
-        href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url);
-      } else if (action === 'x') {
-        href = 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
-      } else if (action === 'whatsapp') {
-        href = 'https://wa.me/?text=' + encodeURIComponent(text + ' ' + url);
-      } else if (action === 'email') {
-        // %0D%0A%0D%0A = RFC 6068 blank line between the text and the link.
-        href = 'mailto:?subject=' + encodeURIComponent(getName() + ' — Portfolio') +
-               '&body=' + encodeURIComponent(text) + '%0D%0A%0D%0A' + encodeURIComponent(url);
-      }
-      if (href) window.open(href, '_blank', 'noopener');
-    });
-    document.addEventListener('click', function (e) {
-      if (!shareMenu.hidden && !e.target.closest('.share-wrap')) closeShareMenu();
-    });
-  }
-  // Save as PDF — #pdf-btn opens the #export-modal chooser. THIS RELEASE the
-  // export is RESUME-ONLY: the dialog picks style + font + fit, "Save as PDF"
-  // sets body.print-doc-resume + .print-style-<style>, applies the chosen
-  // family via --resume-font on #resume-view, optionally runs floor-aware
-  // auto-fit (--rfs), closes the modal and calls window.print(); 'afterprint'
-  // tears it all down (classes, --rfs, --resume-font, width pin). The last
-  // choice persists in localStorage ('hope-resume-pref') and is preselected
-  // next time. The default no-class browser print (Cmd+P) still prints the
-  // paginated classic portfolio — the browser's native path, untouched.
-  var pdfBtn = document.getElementById('pdf-btn');
-  var exportModal = document.getElementById('export-modal');
-  var resumeView = document.getElementById('resume-view');
-
-  // ── READABILITY FLOOR — recruiters reject smaller. Hard constraints:
-  // body text never below 10pt; line-height never below 1.2 (encoded in the
-  // resume style blocks — auto-fit never touches leading); page margins never
-  // below 0.5in (the @page rule already sits at the floor).
-  var RESUME_MIN_BODY_PT = 10;
-  var RESUME_MIN_LEADING = 1.2;
-  // Per-style base body size in pt. Auto-fit's floor scale is
-  // RESUME_MIN_BODY_PT / base: classic → 0.909, modern → 0.952,
-  // compact → 1.0 (compact never shrinks — it already sits at the floor).
-  var RESUME_BASE_PT = { classic: 11, modern: 10.5, compact: 10 };
-
-  var RESUME_PREF_KEY = 'hope-resume-pref';
-  var RESUME_STYLES = ['classic', 'modern', 'compact'];
-  var RESUME_FONTS = ['georgia', 'times', 'inter'];
-  var RESUME_FITS = ['comfortable', 'auto'];
-  // ATS-safe system families only — no decorative faces, no icon fonts.
-  var RESUME_FONT_STACKS = {
-    georgia: "Georgia, 'Times New Roman', serif",
-    times: "'Times New Roman', Times, serif",
-    inter: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-  };
-  var RESUME_DEFAULT_FONT = { classic: 'georgia', modern: 'inter', compact: 'inter' };
-  // {style, font, fit} — validated field-by-field; anything unexpected falls
-  // back to the defaults (font's default depends on the resolved style).
-  var readResumePref = function () {
-    var pref = { style: 'classic', font: '', fit: 'comfortable' };
-    try {
-      var raw = localStorage.getItem(RESUME_PREF_KEY);
-      if (raw) {
-        var p = JSON.parse(raw);
-        if (p && RESUME_STYLES.indexOf(p.style) !== -1) pref.style = p.style;
-        if (p && RESUME_FONTS.indexOf(p.font) !== -1) pref.font = p.font;
-        if (p && RESUME_FITS.indexOf(p.fit) !== -1) pref.fit = p.fit;
-      }
-    } catch (e) {}
-    if (!pref.font) pref.font = RESUME_DEFAULT_FONT[pref.style] || 'georgia';
-    return pref;
-  };
-
-  /* PORTFOLIO PDF — gated for the next release; re-enable by restoring the
-     Document fieldset. Everything from here through enableContinuousPrint is
-     the portfolio print engine's plumbing: kept intact, but no UI path
-     reaches it this release. hope-export-pref (the old combined pref) is
-     still read harmlessly by readExportPref; the resume dialog persists to
-     hope-resume-pref instead. */
-  var EXPORT_PREF_KEY = 'hope-export-pref';
-  var EXPORT_STYLES = { portfolio: ['classic', 'ink', 'showcase'], resume: ['classic', 'modern', 'compact'] };
-  var EXPORT_LAYOUTS = ['continuous', 'paginated'];
-  var readExportPref = function () {
-    var pref = { doc: 'portfolio', style: 'classic', layout: 'continuous' };
-    try {
-      var raw = localStorage.getItem(EXPORT_PREF_KEY);
-      if (raw) {
-        var p = JSON.parse(raw);
-        if (p && EXPORT_STYLES[p.doc]) {
-          pref.doc = p.doc;
-          if (EXPORT_STYLES[p.doc].indexOf(p.style) !== -1) pref.style = p.style;
-          if (EXPORT_LAYOUTS.indexOf(p.layout) !== -1) pref.layout = p.layout;
-        }
-      }
-    } catch (e) {}
-    return pref;
-  };
-  // Continuous single-page export. The @page rule cannot be selector-scoped,
-  // so it is injected as the LAST style in <head> (wins the @page cascade over
-  // the base Letter rule) sized to the measured document height. The height is
-  // measured ON SCREEN under body.print-continuous — its rules live outside
-  // @media print so the measured layout IS the printed layout — at the exact
-  // print width (816px = 8.5in @ 96dpi; px only: exact 0.75 px→pt). +1px
-  // absorbs fractional rounding; the 19200px cap (200in) is Acrobat's MediaBox
-  // ceiling — past it Chrome flows the remainder onto N continuous pages.
-  // enable() is idempotent: it clears stale state first, so a killed print
-  // dialog (afterprint never fired) can't leak into the next export.
-  var CONT_PAGE_W_PX = 816;
-  var CONT_MAX_H_PX = 19200;
-  var disableContinuousPrint = function () {
-    document.body.classList.remove('print-continuous');
-    document.body.style.width = '';
-    var stale = document.getElementById('continuous-page');
-    if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
-  };
-  var enableContinuousPrint = function () {
-    disableContinuousPrint();
-    document.body.classList.add('print-continuous');
-    document.body.style.width = CONT_PAGE_W_PX + 'px'; // measure at print width
-    void document.body.offsetHeight;                   // force reflow before measuring
-    var h = Math.ceil(document.documentElement.scrollHeight) + 1;
-    if (h > CONT_MAX_H_PX) h = CONT_MAX_H_PX;
-    var pageStyle = document.createElement('style');
-    pageStyle.id = 'continuous-page';
-    pageStyle.textContent = '@page { size: ' + CONT_PAGE_W_PX + 'px ' + h + 'px; margin: 0; }';
-    document.head.appendChild(pageStyle);
-  };
-  /* end PORTFOLIO PDF gate */
-
-  // ── Resume auto-fit ──
-  // Paginated Letter geometry at 96dpi: page = 816×1056px; @page margin is
-  // 0.5in (vertical) / 0.55in (horizontal) → printable content 710.4×960px.
-  var RESUME_PAGE_CONTENT_W_PX = 816 - 2 * (0.55 * 96); // 710.4
-  var RESUME_PAGE_CONTENT_H_PX = 1056 - 2 * (0.5 * 96); // 960
-  var RESUME_RFS_STEP = 0.02;
-  var measureResumePages = function () {
-    void resumeView.offsetHeight; // force reflow before measuring
-    return Math.max(1, Math.ceil(resumeView.scrollHeight / RESUME_PAGE_CONTENT_H_PX));
-  };
-  // Step --rfs down 0.02 per iteration, re-measuring, until either the
-  // estimated page count drops (target: one page less than start, or a
-  // single page) or the chosen style's floor scale is hit. Compact's floor
-  // scale is 1.0 — it never shrinks. If the floor is hit before fitting,
-  // print anyway at the floor — that's correct behavior, never go smaller.
-  var runResumeAutoFit = function (style) {
-    var basePt = RESUME_BASE_PT[style] || RESUME_BASE_PT.classic;
-    var floorScale = RESUME_MIN_BODY_PT / basePt;
-    document.body.style.width = RESUME_PAGE_CONTENT_W_PX + 'px'; // pin measurement to print width
-    resumeView.style.setProperty('--rfs', '1');
-    var startPages = measureResumePages();
-    if (startPages <= 1) return; // already a single page — nothing to tighten
-    var targetPages = Math.max(1, startPages - 1);
-    var scale = 1;
-    while (scale > floorScale) {
-      scale = Math.max(floorScale, +(scale - RESUME_RFS_STEP).toFixed(4));
-      resumeView.style.setProperty('--rfs', String(scale));
-      if (measureResumePages() <= targetPages) return; // page-count drop — stop
-    }
-    // Floor reached without fitting: keep the floor scale and print.
-  };
-  var checkedValue = function (name) {
-    var el = exportModal ? exportModal.querySelector('input[name="' + name + '"]:checked') : null;
-    return el ? el.value : '';
-  };
-  var syncExportUI = function () {
-    exportModal.querySelectorAll('.export-opt').forEach(function (opt) {
-      var input = opt.querySelector('input');
-      opt.classList.toggle('selected', !!(input && input.checked));
-    });
-  };
-  var closeExportModal = function () { if (exportModal) exportModal.hidden = true; };
-  if (pdfBtn && exportModal && resumeView) {
-    pdfBtn.addEventListener('click', function () {
-      var pref = readResumePref();
-      var styleRadio = exportModal.querySelector('input[name="export-style-resume"][value="' + pref.style + '"]');
-      if (styleRadio) styleRadio.checked = true;
-      var fontRadio = exportModal.querySelector('input[name="export-font-resume"][value="' + pref.font + '"]');
-      if (fontRadio) fontRadio.checked = true;
-      var fitRadio = exportModal.querySelector('input[name="export-fit-resume"][value="' + pref.fit + '"]');
-      if (fitRadio) fitRadio.checked = true;
-      syncExportUI();
-      exportModal.hidden = false;
-    });
-    exportModal.addEventListener('change', function (e) {
-      // Style drives the Font default: switching style pre-selects that
-      // style's default family (the user can still override it after).
-      if (e.target && e.target.name === 'export-style-resume') {
-        var def = RESUME_DEFAULT_FONT[e.target.value] || 'georgia';
-        var defRadio = exportModal.querySelector('input[name="export-font-resume"][value="' + def + '"]');
-        if (defRadio) defRadio.checked = true;
-      }
-      syncExportUI();
-    });
-    exportModal.addEventListener('click', function (e) {
-      if (e.target.closest('[data-export-close]')) closeExportModal();
-    });
-    document.getElementById('export-confirm').addEventListener('click', function () {
-      var style = checkedValue('export-style-resume') || 'classic';
-      var font = checkedValue('export-font-resume') || RESUME_DEFAULT_FONT[style] || 'georgia';
-      var fit = checkedValue('export-fit-resume') || 'comfortable';
-      try { localStorage.setItem(RESUME_PREF_KEY, JSON.stringify({ style: style, font: font, fit: fit })); } catch (e) {}
-      document.body.classList.add('print-doc-resume', 'print-style-' + style);
-      resumeView.style.setProperty('--resume-font', RESUME_FONT_STACKS[font] || RESUME_FONT_STACKS.georgia);
-      closeExportModal();
-      if (fit === 'auto') runResumeAutoFit(style);
-      window.print();
-    });
-    window.addEventListener('afterprint', function () {
-      var stale = [];
-      document.body.classList.forEach(function (c) {
-        if (c.indexOf('print-doc-') === 0 || c.indexOf('print-style-') === 0) stale.push(c);
-      });
-      stale.forEach(function (c) { document.body.classList.remove(c); });
-      // Resume teardown: auto-fit scale, font override, measurement width pin.
-      resumeView.style.removeProperty('--rfs');
-      resumeView.style.removeProperty('--resume-font');
-      document.body.style.width = '';
-      disableContinuousPrint(); // gated portfolio engine — keep its state clean too
-    });
-  }
-  document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Escape') return;
-    if (exportModal && !exportModal.hidden) closeExportModal();
-    closeShareMenu();
-  });
-  // Default-open app: Overview when its pane shipped (show_summary kept),
-  // else the markup's static Experience fallback stands. This script runs
-  // synchronously before first paint, so there's no active-tab flash.
-  var overviewPane = document.getElementById('pane-overview');
-  if (overviewPane) {
-    document.querySelectorAll('.section-btn').forEach(function (b) {
-      b.classList.toggle('active', b.getAttribute('data-section') === 'overview');
-    });
-    document.querySelectorAll('.section-pane').forEach(function (p) {
-      p.classList.toggle('active', p === overviewPane);
-    });
-  }
-  document.querySelectorAll('.section-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.getAttribute('data-section');
-      document.querySelectorAll('.section-btn').forEach(b => b.classList.toggle('active', b === btn));
-      document.querySelectorAll('.section-pane').forEach(p => p.classList.toggle('active', p.getAttribute('data-pane') === target));
-    });
-  });
-  document.querySelectorAll('.item-card[data-expand] .item-head').forEach(head => {
-    head.addEventListener('click', (e) => {
-      if (e.target.closest('a, button')) return;
-      head.closest('.item-card').classList.toggle('expanded');
-    });
-  });
-  const PHOTO_KEY = 'hope_headshot_data_url';
-  const photoInput = document.getElementById('photo-input');
-  const photoPreview = document.getElementById('photo-preview');
-  const photoUpload = document.getElementById('photo-upload');
-  const photoRemove = document.getElementById('photo-remove');
-  // A photo baked into the file at generation time arrives as the img's src +
-  // the .has-photo class already on the label. Remember it so "remove" reverts
-  // to it instead of wiping the published photo. A localStorage upload (the
-  // "change your photo" fallback) overrides it in this browser only.
-  const bakedPhoto = (photoPreview && photoPreview.getAttribute('src')) || '';
-  function setPhoto(dataUrl) {
-    if (dataUrl) { photoPreview.src = dataUrl; photoUpload.classList.add('has-photo'); }
-    else { photoPreview.removeAttribute('src'); photoUpload.classList.remove('has-photo'); }
-  }
-  // Normalize the load-time state: drop an empty src="" (no baked photo) so it
-  // never fires a spurious request, and honor whatever's correct on first paint.
-  if (photoPreview) { if (bakedPhoto) setPhoto(bakedPhoto); else setPhoto(null); }
-  // PUBLISHED-MODE CONTRACT: on a published copy the photo is the owner's
-  // baked-in one, full stop. The file input is disabled (the CSS gate already
-  // makes the box inert) and the photo localStorage is neither read nor
-  // written — a visitor's stale local photo must never shadow the owner's
-  // baked photo.
-  if (photoInput && isPublished) {
-    photoInput.disabled = true;
-  }
-  if (photoInput && !isPublished) {
-    photoInput.addEventListener('change', () => {
-      const file = photoInput.files && photoInput.files[0];
-      if (!file || !file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setPhoto(ev.target.result);
-        try { localStorage.setItem(PHOTO_KEY, ev.target.result); } catch (e) {}
-      };
-      reader.readAsDataURL(file);
-    });
-    // A locally-uploaded photo wins over the baked-in one for this viewer.
-    try { const stored = localStorage.getItem(PHOTO_KEY); if (stored) setPhoto(stored); } catch (e) {}
-  }
-  if (photoRemove && !isPublished) {
-    photoRemove.addEventListener('click', (e) => {
-      e.preventDefault(); e.stopPropagation();
-      try { localStorage.removeItem(PHOTO_KEY); } catch (e) {}
-      // Revert to the baked-in photo if the file shipped with one; else clear.
-      setPhoto(bakedPhoto || null);
-    });
-  }
-})();
-</script>
-</body>
-</html>
+/* THE THROUGHLINE on the continuous canvas — mirror of the print block above
+   (the continuous height is measured ON SCREEN, so the measured layout must
+   BE the printed layout — same doctrine as the rest of this section). */
+body.print-continuous .tl-playhead, body.print-continuous .tl-tooltip { display: none !important; }
+body.print-continuous .tl-rail { margin: 132px 10px 140px; }
+body.print-continuous .tl-node .tl-hex, body.print-continuous .tl-node.tl-ongoing::before { transform: none !important; }
+body.print-continuous .tl-node-label { opacity: 1 !important; transform: translate(-50%, 0) !important; max-width: 80px; white-space: normal; text-align: center; }
+body.print-continuous .tl-node-text { font-size: 8.5px; line-height: 1.15; }
+body.print-continuous .tl-node-date { font-size: 7.5px; line-height: 1.2; }
+body.print-continuous .tl-node.tl-clamp-start .tl-node-label, body.print-continuous .tl-node.tl-clamp-end .tl-node-label { transform: translate(0, 0) !important; }
+body.print-continuous .tl-node.tl-clamp-start .tl-node-label { text-align: left; }
+body.print-continuous .tl-node.tl-clamp-end .tl-node-label { text-align: right; }
+body.print-continuous .tl-node.tl-far .tl-node-label { bottom: calc(100% + 70px); }
+body.print-continuous .tl-node.tl-below .tl-node-label { bottom: auto; top: calc(100% + 18px); }
+body.print-continuous .tl-node.tl-below.tl-far .tl-node-label { top: calc(100% + 78px); }
+/* The ≥1100px 3-col header must not leak into the 816px continuous canvas —
+   restore the classic row, exactly as the mobile-leak guards above do. */
+body.print-continuous .identity-row { display: flex; }
+body.print-continuous .identity-info { display: block; }
+body.print-continuous .identity-top { justify-content: space-between; margin-top: 0; }
+body.print-continuous .identity-name-block { text-align: left; }
+body.print-continuous .live-pill { position: static; }
+body.print-continuous .stats-row { flex-direction: row; gap: 6px; margin-top: 8px; align-self: auto; }
+body.print-continuous .stats-row > span { display: inline; }
+body.print-continuous .stats-row .sep { display: inline; }
+body.print-continuous .stats-row strong { display: inline; font-size: inherit; }
+body.print-continuous .contact-row { flex-direction: row; align-items: normal; gap: 4px 16px; margin-top: 10px; align-self: auto; justify-self: auto; }
+body.print-continuous .summary { text-align: left; margin: 12px 0 0; }
