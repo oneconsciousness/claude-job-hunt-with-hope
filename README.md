@@ -4,9 +4,9 @@
 
 Free · open-source (MIT) · your data never leaves your machine
 
-I built Hope while job-hunting. The one thing I've submitted with it — my portfolio — is getting interview calls.
+I built Hope while job-hunting. It's gotten me interviews at EY, Amazon, Baker McKenzie, and more — and it's done the same for others, at FedEx, Cerebras, Apple. 85.5% of its earlier users landed multiple interviews and secured full-time roles.
 
-Hope has been evolving since 2023 — born inside my startup CareerX on early ChatGPT, rebuilt across many models and stacks since, and at home now with Claude. Tools that do good should meet people wherever they are — this is Hope's best form yet.
+Hope has been evolving since 2023 — born inside my startup **CareerX, Inc.** on early ChatGPT and rebuilt across many models and stacks since. CareerX has grown into **Agent Hope — an agentic career manager for humans** — and this plugin, at home with Claude, is its best form yet. Tools that do good should meet people wherever they are.
 
 <!-- IMAGE: portfolio-hero — see tasks/readme-image-prompts/ for the generation prompt -->
 <p align="center"><img src="assets/readme/portfolio-hero.png" alt="A finished Hope portfolio website, shown in its light theme and its dark theme side by side" width="720"></p>
