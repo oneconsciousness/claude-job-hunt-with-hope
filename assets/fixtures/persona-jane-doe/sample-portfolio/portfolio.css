@@ -1885,8 +1885,12 @@ h1.name {
   .summary-band { padding: 14px 18px 16px; }
   .summary-stats { gap: 12px 20px; }
   .section-grid { grid-template-columns: 1fr; }
-  .item-meta { flex-wrap: wrap; gap: 6px; }
-  .item-meta .hex-kpi:nth-child(n+5) { display: none; } /* Drop monitoring kpi on tight screens */
+  /* Collapsed/expanded tiles on a phone: give the role its own full-width row,
+     then drop the summary cluster (contributions count + breakdown hexes +
+     chevron) onto a clean right-aligned second row — so the contributions tag
+     never lands on top of a wrapping company name. */
+  .item-head { flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; }
+  .item-meta { flex-basis: 100%; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 }
 
 /* ─── Print navigation — contents strip + back-to-top chips ─────────────
@@ -1978,7 +1982,6 @@ body.print-continuous h1.name { font-size: 22px; }
 body.print-continuous .summary-band { padding: 16px 24px 18px; }
 body.print-continuous .summary-stats { gap: 14px 28px; }
 body.print-continuous .item-meta { flex-wrap: nowrap; gap: 10px; }
-body.print-continuous .item-meta .hex-kpi:nth-child(n+5) { display: inline-flex; }
 
 /* ─── THE THROUGHLINE — chronological strip in the identity card ────────
    Shell markup: #throughline (index.html, bottom of Jane's .identity-card —

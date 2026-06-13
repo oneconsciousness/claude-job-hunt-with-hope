@@ -40,6 +40,16 @@
     return meta && meta.content ? meta.content.trim() : '';
   };
   var getShareUrl = function () { return getCanonicalUrl() || window.location.href; };
+  // A share only works when it points at a public URL. Before publishing, the
+  // page is opened from disk (file://) or a local preview server (localhost) and
+  // the canonical meta is still empty — sharing that gives a dead/empty card on
+  // LinkedIn / X / WhatsApp / email. Every share target gates on this.
+  var canShare = function () {
+    if (getCanonicalUrl()) return true; // publish stamped a real URL
+    var u = window.location.href;
+    if (u.indexOf('file:') === 0) return false;
+    return !/^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(:|\/|$)/i.test(u);
+  };
   var getName = function () {
     var el = document.querySelector('h1.name');
     return el ? el.textContent.trim() : '';
@@ -66,8 +76,9 @@
   var copyShareUrl = function () {
     var canonical = getCanonicalUrl();
     var url = canonical || window.location.href;
-    // No published link yet and opened from disk → don't leak the local file path.
-    if (!canonical && url.indexOf('file:') === 0) { flash('Publish first to share a link', false); return; }
+    // No published link yet (opened from disk or a local preview server) →
+    // don't leak the local path; tell them to publish first.
+    if (!canShare()) { flash('Publish first to share a link', false); return; }
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(url).then(
         function () { flash('Copied!', true); },
@@ -99,6 +110,8 @@
       var action = item.getAttribute('data-share');
       closeShareMenu();
       if (action === 'copy') { copyShareUrl(); return; }
+      // Same guard as copy: never open a social share pointing at a local/preview URL.
+      if (!canShare()) { flash('Publish first to share a link', false); return; }
       var url = getShareUrl();
       var text = getShareText();
       var href = '';

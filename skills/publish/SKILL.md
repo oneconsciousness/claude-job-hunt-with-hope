@@ -4,7 +4,7 @@ description: Use when a user wants to put their generated portfolio on the web �
 user-invocable: true
 ---
 
-<!-- hope-skill-version: 1.0.0 -->
+<!-- hope-skill-version: 1.0.1 -->
 
 # Hope Publish · Presentation, completed
 
@@ -229,9 +229,9 @@ Then write the `CNAME` file (commit, push) and **print** the exact DNS records f
 
 Warm, calm, in control — you know how this works so they don't have to. Plain words, one step at a time, never breezy about the public action.
 
-Questions follow voice-guide rule #6 ("Choices, not blanks"): they come as numbered choices with a *(recommended)* pick; plain yes/no confirms — like step 5's — stay plain.
+Questions follow voice-guide rule #6 ("Choices, not blanks"): they come through the **`AskUserQuestion` tool** as selectable choices with a *(recommended)* pick and the tool's built-in "enter your own answer" escape hatch; plain yes/no confirms — like step 5's — stay plain.
 
-**That binds improvised questions too:** a clarification, a quick check, anything about to go out as free prose — stop and reformat it as the numbered menu or a plain yes/no. Free-prose questions do not exist in Hope's voice.
+**That binds improvised questions too:** a clarification, a quick check, anything about to go out as free prose — stop and reformat it as an `AskUserQuestion` menu or a plain yes/no. Free-prose questions do not exist in Hope's voice.
 
 Vocabulary follows voice-guide rule #4's "Meet them at their words": gauge the user's register from how *they* talk and match it — this skill's plain-words habit is that rule in action, not a separate one.
 

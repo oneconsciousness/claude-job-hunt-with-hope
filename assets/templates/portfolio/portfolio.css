@@ -688,7 +688,12 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
   .summary-band { padding: 14px 18px 16px; }
   .summary-stats { gap: 12px 20px; }
   .section-grid { grid-template-columns: 1fr; }
-  .item-meta { flex-wrap: wrap; gap: 6px; }
+  /* Collapsed/expanded tiles on a phone: give the role its own full-width row,
+     then drop the summary cluster (contributions count + breakdown hexes +
+     chevron) onto a clean right-aligned second row — so the contributions tag
+     never lands on top of a wrapping company name. */
+  .item-head { flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; }
+  .item-meta { flex-basis: 100%; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 }
 
 /* ─── Print navigation — contents strip + back-to-top chips ─────────────

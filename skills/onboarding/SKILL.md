@@ -4,7 +4,7 @@ description: Use when a user is starting their job hunt with Hope for the first 
 user-invocable: true
 ---
 
-<!-- hope-skill-version: 1.0.0 -->
+<!-- hope-skill-version: 1.0.1 -->
 
 # Hope Onboarding · Milestone 1
 
@@ -47,7 +47,7 @@ The schema is in `$PLUGIN_ROOT/references/career-graph-schema.md`. Use determini
 
 Onboarding is **smart intake**: find what already exists, gather it with the least possible user effort, and interview only for what's still missing. The whole thing should feel like "give me what you've got, I'll do the work."
 
-**Binding, for every ask in this milestone:** every question — including improvised ones (a clarification, a quick check, anything) — takes voice-guide rule #6's numbered form, or an explicit plain yes/no. Free-prose questions do not exist in Hope's voice.
+**Binding, for every ask in this milestone:** every question — including improvised ones (a clarification, a quick check, anything) — takes voice-guide rule #6's form **delivered through the `AskUserQuestion` tool** (its automatic "enter your own answer" option is the free-text escape hatch), or an explicit plain yes/no. Never type a question as free prose for the user to compose an answer from scratch — that does not exist in Hope's voice. (The one inline-numbered exception is Step 1's multi-select inventory below: six options exceed the tool's four-option cap.)
 
 ### The welcome tour — show the system, don't lecture it (first-time users only)
 
@@ -80,7 +80,7 @@ Never ask for something that's already in the folder. If the scan finds **nothin
 
 ### Step 1 · The inventory — one question, multi-select
 
-Ask **once**, up front, covering everything (voice-guide rule #6: numbered, one "(recommended)" with a one-clause why, free text always honored; this runs to six options because it's a **multi-select inventory** — rule #6's scannable-checklist exception, not a decision):
+Ask **once**, up front, covering everything (voice-guide rule #6: numbered, one "(recommended)" with a one-clause why, free text always honored; this runs to six options because it's a **multi-select inventory** — rule #6's scannable-checklist exception, not a decision — so it's the one ask rendered as an **inline numbered list**, since six options exceed `AskUserQuestion`'s four-option cap):
 
 > "What do you already have? Any combo — '1 and 3', or say it your way:
 > 1. A resume or CV (recommended — the richest single source)
@@ -134,7 +134,7 @@ No grilling. If a source already answered a question, never ask it again.
 
 ### The no-assets path — option 6
 
-If the user has nothing (option 6, or the inventory comes back empty), build it from a conversation — ask three things, not more, not fewer. Ask each per **voice-guide rule #6 ("Choices, not blanks.")**: numbered options so the user can answer with just "2", exactly one marked "(recommended)" with a one-clause why, free text always honored. These are narrative questions, so the options are example-scaffolds that spark the user's own answer — never a quiz. Keep the warmth; this is a conversation, not a form.
+If the user has nothing (option 6, or the inventory comes back empty), build it from a conversation — ask three things, not more, not fewer. Ask each per **voice-guide rule #6 ("Choices, not blanks.")** **through the `AskUserQuestion` tool**: 2–4 options the user can pick (the tool's "enter your own answer" is always there as the escape hatch), exactly one marked "(recommended)" with a one-clause why. These are narrative questions, so the options are example-scaffolds that spark the user's own answer — never a quiz. Keep the warmth; this is a conversation, not a form.
 
 1. **What kind of work are you looking for?** (Listen for role family, level, industry — but don't grill.)
 
@@ -288,7 +288,7 @@ Even the warm example carries the numbers — the rule-#6 form binds every quest
 
 When they say something interesting, follow up. When they're brief, don't pad. When they say "that's all," accept it.
 
-And when you ask, offer **choices, not blanks** — voice-guide rule #6: numbered options answerable with a "2", exactly one "(recommended)" with a one-clause why, free text always honored.
+And when you ask, offer **choices, not blanks** — voice-guide rule #6, **via the `AskUserQuestion` tool**: 2–4 selectable options, exactly one "(recommended)" with a one-clause why, the tool's "enter your own answer" always there.
 
 ## Quality bar before exiting onboarding
 

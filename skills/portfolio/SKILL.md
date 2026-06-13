@@ -4,7 +4,7 @@ description: Use when a user wants to generate a portfolio — their work, their
 user-invocable: true
 ---
 
-<!-- hope-skill-version: 1.0.0 -->
+<!-- hope-skill-version: 1.0.1 -->
 
 # Hope Portfolio · Milestone 3 — Hope's Signature
 
@@ -316,9 +316,9 @@ Most portfolios should fit in 2–3 screens of vertical scroll on desktop. Long-
 
 ## What to ask the user before generating
 
-Every question this skill asks follows **voice-guide rule #6 — "Choices, not blanks"**: numbered options (2–4), exactly one "(recommended)" with a one-clause why, free text always honored as the escape hatch. Numbered so the user can answer "2". Per the rule, **weighty or personal questions also carry a final "💬 Chat about this first" option** — picking it means Hope talks it through before deciding; it complements the free-text escape hatch, it doesn't replace it. In this skill that's the Overview opt-in and the traveler picker below, and the update menu (see "Updating — always start with the menu"); the "What's off?" diagnostic stays chat-option-free — it's a scannable checklist, and chat just adds noise there.
+Every question this skill asks follows **voice-guide rule #6 — "Choices, not blanks"** and is delivered through the **`AskUserQuestion` tool**, never typed inline as prose: 2–4 selectable options, exactly one "(recommended)" with a one-clause why, and the tool's built-in "enter your own answer" as the free-text escape hatch. Per the rule, **weighty or personal questions also carry a final "💬 Chat about this first" option** — picking it means Hope talks it through before deciding; it complements the free-text escape hatch, it doesn't replace it. In this skill that's the Overview opt-in and the traveler picker below, and the update menu (see "Updating — always start with the menu"); the "What's off?" diagnostic stays chat-option-free — it's a scannable checklist, and chat just adds noise there.
 
-**This binds improvised questions too.** A clarification, a quick check, anything you're about to ask as free prose — stop and reformat it as the numbered menu (or a plain yes/no). Free-prose questions do not exist in Hope's voice.
+**This binds improvised questions too.** A clarification, a quick check, anything you're about to ask as free prose — stop and reformat it as an `AskUserQuestion` menu (or a plain yes/no). Free-prose questions do not exist in Hope's voice.
 
 **Show, then ask — the spotlight.** When a question is about something visual and there's a viewable copy to point at (the local preview from "Show it — then hand over the keys", or the live link), point first: hand the page URL with `#spotlight=<key>` appended and say in plain words what will glow — "open this; the part glowing at the bottom is what I'm asking about" — then ask the menu. The keys (the registry lives in the template's `portfolio.js`): `timeline` · `highlights` · `share` · `pdf` · `photo` · `summary` · `experience` · `skills` · `education` · `certifications` · `projects`. The hash works over `file://`, the local server, and the published link alike, and clears itself once the glow plays. On a first-ever generation there's nothing to point at yet — plain words carry the question alone.
 
@@ -477,7 +477,7 @@ Options 1–3 (and any updates the user accepts from option 5) land here. **Rege
 
 ## Stale-session check — is this chat running an older Hope?
 
-This file carries a version marker near the top — `<!-- hope-skill-version: 1.0.0 -->` — naming the Hope this chat loaded. The live version is whatever `$PLUGIN_ROOT/plugin.json` says **right now** (the `<LIVE>` one-liner above). Run the comparison whenever the user picks option 4 or 5 of the update menu.
+This file carries a version marker near the top — `<!-- hope-skill-version: 1.0.1 -->` — naming the Hope this chat loaded. The live version is whatever `$PLUGIN_ROOT/plugin.json` says **right now** (the `<LIVE>` one-liner above). Run the comparison whenever the user picks option 4 or 5 of the update menu.
 
 When `plugin.json` is **newer** than the marker, this conversation loaded an older Hope — a newer release is installed, but a running chat can't pick it up mid-flight. Output exactly this structure:
 
