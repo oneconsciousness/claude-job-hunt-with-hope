@@ -4,7 +4,7 @@ description: Use when a user wants to generate a portfolio — their work, their
 user-invocable: true
 ---
 
-<!-- hope-skill-version: 1.0.1 -->
+<!-- hope-skill-version: 1.1.0 -->
 
 # Hope Portfolio · Milestone 3 — Hope's Signature
 
@@ -76,7 +76,7 @@ Read the user's career graph. If a target Job is named (`hope make portfolio for
 
 If no target Job is named, generate a **general portfolio** representing the user's strongest work overall.
 
-Either way, **create a CuratedPortfolio node** in the graph linking to the included Experiences/Skills/Projects, and record on it the user's Overview-app decision as `"show_summary": true|false` and their traveler choice as `"timeline_traveler"` (see the opt-in prompt and the traveler picker below — both per-portfolio presentation choices, not Person facts). This means the user's graph remembers which curation went out for which role.
+Either way, **create a CuratedPortfolio node** in the graph linking to the included Experiences/Skills/Projects, and record on it the user's app-catalog decisions as `"show_summary": true|false` and `"show_social": true|false`, and their traveler choice as `"timeline_traveler"` (see the app catalog and the traveler picker below — per-portfolio presentation choices, not Person facts). This means the user's graph remembers which curation went out for which role.
 
 ## Voice in the portfolio copy
 
@@ -120,6 +120,8 @@ cat "$PLUGIN_ROOT/assets/templates/portfolio/data.js"  # carries the authoring c
 
 Copy `portfolio.css` and `portfolio.js` into the output folder **verbatim** — every substitution targets `index.html` and `data.js` only. Replace placeholders with content from the graph. **Do not deviate from the design tokens** in `$PLUGIN_ROOT/references/design-tokens.md` (loaded above).
 
+**Reuse shipped patterns — grep `portfolio.css` before you write any new CSS or markup.** Search for the pattern that already exists and reuse it: responsive grids (`grep -nE 'auto-fit|auto-fill|grid-template' portfolio.css`), card shells (`.item-card`, `.edu-card`), chips (`.skill-chip`), pills, hex KPIs. Because `portfolio.css` ships **verbatim** and custom CSS has nowhere clean to live, a hand-rolled rule — e.g. a fixed `grid-template-columns: 1fr 1fr` that never collapses on a phone — is a **bug, not a shortcut**. The shipped patterns are the only way to stay consistent and responsive: treat "reuse the existing pattern" as a required pre-flight, not a preference.
+
 ### Projects loop — substitution contract (item-cards, not tiles)
 
 The Projects pane uses the **same collapsible `.item-card` structure as Experience** — projects carry real content (`description`, `tagline`, `impact`, a full `skills_applied` list), and a tile would throw all of it away. The `<!-- HOPE:projects_loop_start … projects_loop_end -->` block in the template renders **one `.item-card.project` per project**. For each project, substitute:
@@ -138,6 +140,15 @@ The Projects pane uses the **same collapsible `.item-card` structure as Experien
 | `{{link}}` / `{{link_label}}` | trailing `<a class="item linkedin">` | Optional external link (repo, live site, writeup); omit the block when the project has no link. |
 
 Mark the **first** project card `expanded` (so the pane opens populated). The card reuses Experience's `.item-card[data-expand] .item-head` markup verbatim, so the card-expand JS and the section-grid "Projects" filter work on project cards with no extra wiring. There is **no** project tile, hero gradient, or metric tag — those were removed.
+
+### Promotion / tenure within one company
+
+A role progression at one employer — "Associate Analyst → Business Analyst at Nova Healthcare" — is common; render it **natively**, not as a hand-patched one-off. Two shapes, pick by the work:
+
+- **One card, progression in the title** (default) — when the two roles share one continuous story and metric set: title reads "Associate Analyst → Business Analyst", `.role-company` is the org, `.role-dates` spans the whole tenure (earliest start → latest end), one timeline entry / one `tl-` id. Cleanest when the promotion is really "same thread, bigger scope."
+- **Two cards, same org** — when each role earned its own distinct contributions: two `.item-card`s sharing the `.role-company` + org logo, each with its own dates and `tl-` id + timeline entry. They sort **newest-first** like any other cards (the structural gate enforces it — the later role leads), so the progression reads top-down on its own.
+
+Either way, don't invent ad-hoc "Promoted" pills or bespoke markup — use the shipped `.item-card` structure and let date order carry the story.
 
 ### Overview app — substitution contract (opt-in, zero residue)
 
@@ -193,6 +204,33 @@ The Throughline strip itself — rail, hex nodes, playhead, pause/hover/click/pr
 - **Voice: specific, not generic.** "Unified Figma's design system" beats "Design work". Same specificity bar as the cards, compressed to ≤40 chars.
 
 **`traveler`** — the playhead glyph the user chose (see the traveler picker in "What to ask the user before generating"): `"dot"` (the default soft-orange glow dot) · `"<slug>"` for one of the bundled travelers in `$PLUGIN_ROOT/assets/icons/travelers/` (`paper-plane`, `car`, `train`, `sailboat`, `bicycle`, `rocket`, `footprints`) · `{"inline": "<svg…>"}` for a found or hand-made glyph, which **you inline at generation**. **No picker UI ships in the artifact** — choosing happens in chat; the artifact just renders the choice.
+
+### Social Feed app — substitution contract (opt-in, live embeds)
+
+The Social Feed is an **optional app** (offered via the app catalog — see "What to ask the user before generating"). Like the Overview app it ships as two conditional pieces, both wrapped in `{{#show_social}} … {{/show_social}}`:
+
+- **Tile** — `<button class="section-btn" data-section="social">`, labeled "Social", Material Symbols icon `rss_feed`, meta-count line "`{{social_count}} {{social_count_word}}`" (e.g. `5 posts` / `1 post`). No integrity bar — a curated feed carries no confidence score.
+- **Pane** — `<div class="section-pane" data-pane="social" id="pane-social">`, placed **after** the Projects pane (before `#resume-view`). It ships **empty**: just `<div class="social-grid" id="social-grid"></div>`. Unlike every other pane, **you do not author card HTML here** — `portfolio.js` renders the cards from `window.HOPE_DATA.social` at runtime, exactly as it renders the Throughline from `window.HOPE_DATA.timeline`.
+
+**Render gate:** renders only when `CuratedPortfolio.show_social` is `true` AND `window.HOPE_DATA.social` is a non-empty array. Otherwise **strip every `{{#show_social}}…{{/show_social}}` block (tile AND pane) with zero residue** and leave `social` as `[]` (or omit the key) in `data.js`.
+
+**Posts are not career events** — they carry **no `tl-` id** and never appear on the Throughline (the structural gate `verify_portfolio_structure.py` only checks tl- carded cards, so the social pane is correctly outside its scope).
+
+**What you write:** fill `data.js`'s `{{social_data_json}}` slot so `window.HOPE_DATA.social` is an array of posts (the field-by-field authoring contract is stated once in the template's `data.js` comment). Per post:
+
+| Field | Contract |
+|---|---|
+| `platform` | one of — **iframe embeds:** `youtube` `vimeo` `spotify` `soundcloud` `applemusic` `figma` `codepen` `loom` `bluesky` `linkedin` `substack` `flickr`; **script embeds:** `tiktok` `instagram` `x` `threads` `pinterest`; **link cards:** `dribbble` `behance` `medium` `gist` `link`. `link` = a generic link card for any URL. |
+| `url` | the public permalink. The renderer derives the embed from it — **you never write embed HTML**. |
+| `title` | optional label for the always-present "View on …" link (defaults to "View on {platform}"). |
+| `caption` | optional one short line shown above the embed. |
+| `pinned` | optional boolean, reserved (future: surface in Overview). |
+
+**How it renders (template-owned — don't reinvent):** `portfolio.js` maps each platform to one of three renderers — an `<iframe>`, the platform's `<blockquote>` + async script, or a link card — and **every** card always carries a "View on …" link. That link is the fallback: live embeds need the published `https` site + a connection, so over `file://` / offline the pane shows links, never blank boxes. `.social-grid` reuses the `.skill-grid` auto-fit pattern (collapses on a phone).
+
+**Platform fit by field** (suggest, don't impose): designers → Behance, Figma, Dribbble, Instagram, CodePen · developers → GitHub Gist, CodePen, X, YouTube · marketers → LinkedIn, X, Instagram, TikTok, YouTube · writers → Medium, Substack, X, Threads, Bluesky · video → YouTube, Vimeo, TikTok, Loom · music → Spotify, SoundCloud, Apple Music · photographers → Instagram, Flickr. **LinkedIn** only embeds posts the author marked embeddable; **X** is the least reliable (its widget degrades). When a platform won't embed, the link card still works — never block on an embed.
+
+**Print / résumé:** embeds never print — `@media print` hides `.social-embed` and shows the link list only; `#resume-view` carries no social content.
 
 ### Resume view — substitution contract
 
@@ -281,8 +319,9 @@ Either way the localStorage "change your photo" widget stays in the file as a fa
 **Before saving the user's files, clean and verify the output:**
 - **Strip the template-authoring comments** — the `<!-- Hope portfolio template · … See skills/portfolio/SKILL.md for the substitution contract -->` block in `index.html` AND the authoring-contract comment in `data.js` (it documents the timeline shape and names `{{timeline_data_json}}` literally, which fails the "no unsubstituted tokens" check). They document the template for *you*; they must not ship in the user's portfolio. Keep the disclosed provenance comments (share-url, generator) — those are intentional.
 - **"Generated" means all of it** — the full folder per "What this skill outputs": `index.html` with a **populated `#resume-view`**, `portfolio.css` and `portfolio.js` carried over verbatim, `data.js` with the **timeline dataset and traveler substituted**, plus **`share-card.html` and `share-card-square.html`** (see "Share cards & link-preview meta"). A run that produces only `index.html` is incomplete.
-- **Verify zero unsubstituted placeholders remain** — grep **every file in the generated folder** (all four named files AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the contact-row site tokens `{{site_url}}`/`{{site_handle}}` (drop that item entirely when the user has no site link), the `resume_*` loop blocks, the Overview-app tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_count}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments, AND `{{timeline_data_json}}` in `data.js` — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, a half-stripped Overview app (a stray tile with no pane, or vice versa) only fails for users who opted out, and an unsubstituted `data.js` leaves the `{{timeline_data_json}}` slot in place — the template ships it inside a comment so the file still parses, but the Throughline renders empty and the traveler choice is lost. If any survive, the substitution is incomplete; fix before saving. Never hand the user files with raw template tokens.
+- **Verify zero unsubstituted placeholders remain** — grep **every file in the generated folder** (all four named files AND both share cards) for `{{` and `<!-- HOPE:`. This explicitly includes the newer tokens — `{{og_description}}`, `{{resume_contact_line}}`, `{{resume_summary}}`, the contact-row site tokens `{{site_url}}`/`{{site_handle}}` (drop that item entirely when the user has no site link), the `resume_*` loop blocks, the Overview-app tokens: `{{#show_summary}}`/`{{/show_summary}}`, `{{stat_count}}`, `{{stat_icon}}`, `{{stat_value}}`, `{{stat_label}}`, `{{interest}}`, and the `summary_stats_loop` / `summary_interests_loop` comments, the **Social Feed tokens** `{{#show_social}}`/`{{/show_social}}`, `{{social_count}}`, `{{social_count_word}}` and `{{social_data_json}}` in `data.js` (all strip with zero residue when the user didn't add the Social Feed; when they did, `{{social_data_json}}` becomes the `social` array), AND `{{timeline_data_json}}` in `data.js` — because an unpopulated resume view is invisible on screen and only fails when the user prints a résumé, a half-stripped Overview app (a stray tile with no pane, or vice versa) only fails for users who opted out, and an unsubstituted `data.js` leaves the `{{timeline_data_json}}` slot in place — the template ships it inside a comment so the file still parses, but the Throughline renders empty and the traveler choice is lost. If any survive, the substitution is incomplete; fix before saving. Never hand the user files with raw template tokens.
 - **Verify the anchor pairing** — every `anchor` in the timeline dataset must resolve to an `id="tl-<id>"` on a card in `index.html`, and every included item-card must carry its `tl-` id (per "The Throughline — timeline data contract"). Compare `grep -o 'id="tl-[^"]*"' index.html` against the dataset's `anchor` values — a dataset anchor with no card is a dead click on the rail; fix both directions before saving.
+- **Verify structure — order, placement, agreement.** `data.js` and the pane cards are **two views of one chronology** and must not drift: the timeline array is chronological (ascending — left→right on the rail), the cards in each pane run **reverse-chronological (newest first)**, and both must reference the same items. **Derive both from one date-sorted dataset — never hand-order the cards independently** (that second, hand-made ordering is exactly how a promotion ends up shown oldest-first). When `python3` is available, assert all three automatically: `python3 "$PLUGIN_ROOT/scripts/verify_portfolio_structure.py" <portfolio-folder>/` — it checks **agreement** (every timeline entry ↔ its `tl-` card), **containment** (each card sits inside its declared pane — no experience card nested in the projects pane), and **order** (each pane newest-first). Read the PASS/FAIL table and fix every FAIL before saving — these are placement and sequence bugs the token/anchor checks above cannot see. If `python3` isn't available, do the same by eye: read each pane top-to-bottom and confirm the dates descend, and that no card sits in the wrong pane.
 - **Verify zero external icon URLs** — grep **every file in the saved folder** for `simpleicons` and `cdn.simpleicons.org` (e.g. `grep -rnE 'simpleicons|cdn\.simpleicons\.org' <portfolio-folder>/`) and require **zero matches**. Per "Icons for links — bundled first, fetched when missing", any CDN fetch happens at generation time and the SVG lands inline; a surviving network icon URL means an icon was referenced instead of inlined — fix before saving.
 - **Verify the PDF export — produce and inspect, don't assume.** After generating, print one résumé PDF and check it. When `python3` is available, run the bundled checker against the generated folder — it accepts the folder (or its `index.html`) and stages its /tmp copies folder-aware, all siblings included: `python3 "$PLUGIN_ROOT/scripts/verify_portfolio_pdf.py" <portfolio-folder>/ --modes resume-classic`. Read its PASS/FAIL table and fix any FAIL before handing the folder over. If `python3` isn't available, say so plainly instead of claiming the export was verified.
 
@@ -320,7 +359,7 @@ Every question this skill asks follows **voice-guide rule #6 — "Choices, not b
 
 **This binds improvised questions too.** A clarification, a quick check, anything you're about to ask as free prose — stop and reformat it as an `AskUserQuestion` menu (or a plain yes/no). Free-prose questions do not exist in Hope's voice.
 
-**Show, then ask — the spotlight.** When a question is about something visual and there's a viewable copy to point at (the local preview from "Show it — then hand over the keys", or the live link), point first: hand the page URL with `#spotlight=<key>` appended and say in plain words what will glow — "open this; the part glowing at the bottom is what I'm asking about" — then ask the menu. The keys (the registry lives in the template's `portfolio.js`): `timeline` · `highlights` · `share` · `pdf` · `photo` · `summary` · `experience` · `skills` · `education` · `certifications` · `projects`. The hash works over `file://`, the local server, and the published link alike, and clears itself once the glow plays. On a first-ever generation there's nothing to point at yet — plain words carry the question alone.
+**Show, then ask — the spotlight.** When a question is about something visual and there's a viewable copy to point at (the local preview from "Show it — then hand over the keys", or the live link), point first: hand the page URL with `#spotlight=<key>` appended and say in plain words what will glow — "open this; the part glowing at the bottom is what I'm asking about" — then ask the menu. The keys (the registry lives in the template's `portfolio.js`): `timeline` · `highlights` · `share` · `pdf` · `photo` · `summary` · `experience` · `skills` · `education` · `certifications` · `projects` · `social`. The hash works over `file://`, the local server, and the published link alike, and clears itself once the glow plays. On a first-ever generation there's nothing to point at yet — plain words carry the question alone.
 
 If the user has provided a target Job, just confirm: "Generating a portfolio targeted at {company} for {role}. The angle I'm taking is {angle in one sentence}. Continue?" (A plain yes/no confirm IS rule-#6 compliant — don't pad it with fake options.)
 
@@ -341,18 +380,35 @@ If the answer is "general", scaffold the constraint question instead of leaving 
 >
 > Or tell me in your own words — these are just sparks.
 
-**Overview app opt-in — ask once per portfolio.** If `Person.headline_stats` exist and this CuratedPortfolio has no recorded `show_summary` decision yet, ask before first including the app:
+**App catalog — pick the optional apps (ask once per portfolio).** Every portfolio always carries the core sections: Experience, Skills, Education & Certifications, Projects. On top of those, Hope has **optional apps** the user chooses — don't decide for them. Offer the ones that apply as **one multi-select** (`AskUserQuestion`, `multiSelect: true`; the tool's "enter your own answer" is the escape hatch), recommending the ones that fit. This is a catalog: today the optional apps are **Overview** and **Social Feed**, and future apps slot into the same pick-list.
 
-> Want a highlights panel at the top of your page — your proudest numbers and a line of interests, the first thing a recruiter sees?
-> 1. **Show it** (recommended — recruiters skim, and your strongest numbers deserve the first screen)
-> 2. **Skip it** — your page opens straight on your Experience section
-> 3. **💬 Chat about this first** — we'll talk through what a recruiter should see up front before deciding
+Offer **Overview** only if `Person.headline_stats` is non-empty; offer **Social Feed** always. If neither applies (no stats, and nothing to feature), skip the question entirely and ship the core.
+
+> Your portfolio always shows your Experience, Skills, Education, and Projects. Want to add either of these?
+> - **Overview** (recommended) — a highlights panel up top: your proudest numbers and a line of interests, the first thing a recruiter sees
+> - **Social Feed** — your recent posts (LinkedIn, Instagram, YouTube, Dribbble, …) as live embeds, so your work shows itself
+>
+> Pick any, both, or neither — or tell me in your own words.
+
+Record each pick on the CuratedPortfolio node — `"show_summary": true|false` and `"show_social": true|false` — per-portfolio presentation choices: don't re-ask while iterating on the same portfolio, and honor an existing decision on regeneration (see "Updating an existing portfolio" below).
+
+- **If Overview is picked** — render per the Overview app contract above: the gate is `show_summary === true` AND non-empty `headline_stats`; stats are human-curated (never auto-summed); strip every `{{#show_summary}}…{{/show_summary}}` block with zero residue when off. With no `headline_stats` and no `interests`, the app isn't offered and `show_summary` stays absent.
+- **If Social Feed is picked** — gather the posts (next), write them to `data.js` as `window.HOPE_DATA.social` per the Social Feed app contract, and strip every `{{#show_social}}…{{/show_social}}` block with zero residue when off.
+
+Show before asking when there's a viewable copy: hand `<preview-url>#spotlight=highlights` (Overview) or `#spotlight=social` (Social Feed) first — "the part glowing is the app I mean" — then the menu. First-ever portfolio: the plain words carry it alone.
+
+**Social Feed — gather the posts (browser-assisted).** When the user adds the Social Feed, don't make them hunt for embed codes — offer the least-effort path and let them say yes:
+
+> Great — for the Social Feed, how should I get your posts?
+> 1. **Paste the links** (recommended — fastest) — drop the post URLs you want featured (LinkedIn, Instagram, YouTube, Dribbble, Behance, TikTok, X, Vimeo, Spotify, a personal site…) and I'll embed each
+> 2. **Pull them for you** — give me your handles / profile URLs and I'll read your recent public posts in the browser and pick the strongest
+> 3. **💬 Chat about which to feature first**
 >
 > Or tell me in your own words.
 
-Show before asking when there's something to show: if a generated copy that includes the panel is already viewable, hand `<preview-url>#spotlight=highlights` first — "the panel glowing at the top is the one I mean" — then the menu. No viewable copy yet (or the copy has no panel)? The plain description above carries it.
+**Browser pull (option 2) is read-only, on user-named URLs only** — the same guardrail as onboarding's LinkedIn-via-browser (see `references/computer-use-guardrails.md`): visit only the profile/handle URLs the user gives, read public posts, extract permalinks; never log in as them or act on their behalf. No browser available → fall back to paste. This "offer to fetch, don't make them hunt" pattern is general: any app that needs live external content can reuse it (GitHub pins, a personal site, …). Keep the feed **curated — 4–8 strong posts beat a wall** — and write each as `{ platform, url, title?, caption?, pinned? }` (platform list + how the renderer turns a url into an embed: the Social Feed app contract).
 
-Record the answer on the CuratedPortfolio node as `"show_summary": true|false`; it's a per-portfolio presentation choice, so don't re-ask while iterating on the same portfolio — and an existing decision is honored when regenerating (see "Updating an existing portfolio" below). If the Person has **no** `headline_stats` and no `interests`, don't ask at all — skip the app silently (leave `show_summary` absent; the conditional blocks strip with zero residue).
+**Disclose the trade-off in plain words before shipping a Social Feed** (it's the one app that isn't fully self-contained): "One thing about the Social Feed — it shows live posts from those sites, so it needs your published link and a connection to display them. Opened offline, or if a post is later deleted, each one falls back to a clickable link — your page never breaks, it just shows the link instead of the live post." Never expose the words "embed", "iframe", "oEmbed", or "script" to the user.
 
 **Traveler picker — ask once per portfolio.** The Throughline's playhead carries a glyph — the traveler — and it's the user's to choose. If this CuratedPortfolio has no recorded `timeline_traveler` yet, ask at generation:
 
@@ -391,6 +447,8 @@ After first generation, **always ask "What's off?"** Don't ask "do you like it?"
 > Or tell me in your own words.
 
 Update the artifact. Update the CuratedPortfolio in the graph if the curation changed (including a changed `show_summary` or `timeline_traveler` decision).
+
+**Gap-filling? Re-read the source documents first.** When something's missing — a role, an internship, an early job, a date, a whole early-career arc — go back to the user's **original source documents** (uploaded PDFs, the résumé, a LinkedIn export) *before* searching any generated or derived file. The authoritative history is the **input, not the output**: a LinkedIn export or résumé routinely holds entire roles and schooling that the rendered HTML never captured, and hunting through `data.js` or the generated markup for facts the source already states wastes turns and invents gaps that aren't real. Richest source first — the same instinct onboarding uses, carried into iteration.
 
 ## Show it — then hand over the keys
 
@@ -477,7 +535,7 @@ Options 1–3 (and any updates the user accepts from option 5) land here. **Rege
 
 ## Stale-session check — is this chat running an older Hope?
 
-This file carries a version marker near the top — `<!-- hope-skill-version: 1.0.1 -->` — naming the Hope this chat loaded. The live version is whatever `$PLUGIN_ROOT/plugin.json` says **right now** (the `<LIVE>` one-liner above). Run the comparison whenever the user picks option 4 or 5 of the update menu.
+This file carries a version marker near the top — `<!-- hope-skill-version: 1.1.0 -->` — naming the Hope this chat loaded. The live version is whatever `$PLUGIN_ROOT/plugin.json` says **right now** (the `<LIVE>` one-liner above). Run the comparison whenever the user picks option 4 or 5 of the update menu.
 
 When `plugin.json` is **newer** than the marker, this conversation loaded an older Hope — a newer release is installed, but a running chat can't pick it up mid-flight. Output exactly this structure:
 

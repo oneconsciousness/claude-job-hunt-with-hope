@@ -598,6 +598,26 @@ h1.name { margin: 0 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0
 .skill-cat-header .name { font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--cat-color, var(--accent-cyan)); opacity: 0.92; }
 .skill-cat-header .count { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-dim); }
 .skill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px; }
+
+/* ── Social Feed (optional app) ─── cards JS-rendered by portfolio.js into
+   #social-grid. Reuses the .skill-grid auto-fit pattern (wider min for embeds)
+   so it collapses to one column on a phone with no hand-rolled media query. */
+.social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; align-items: start; }
+.social-card { display: flex; flex-direction: column; gap: 9px; background: var(--card-bg); border: 1px solid var(--border-default); border-left: 3px solid var(--accent-orange); border-radius: var(--radius-card); padding: 12px 13px; overflow: hidden; }
+.social-card.social-cls-link { background: var(--surface-2); }
+.social-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.social-plat { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent-orange); flex-shrink: 0; }
+.social-cap { font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; }
+.social-embed { position: relative; width: 100%; }
+.social-embed iframe { width: 100%; border: 0; border-radius: var(--radius-tight); display: block; background: var(--surface-2); }
+.social-embed blockquote { margin: 0 !important; }
+.social-link { display: inline-flex; align-items: center; gap: 5px; align-self: flex-start; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em; color: var(--accent-cyan); text-decoration: none; transition: color 0.15s; }
+.social-link .ext { font-size: 13px; }
+.social-link:hover { color: var(--accent-orange); }
+.social-card.social-cls-link .social-link { font-size: 13px; }
+/* Embeds can't print and don't exist on screen offline — the "View on …" link
+   is always there as the fallback. In every print mode, show links only. */
+@media print { .social-embed { display: none !important; } .social-link { color: #111 !important; } }
 .skill-cell { display: flex; align-items: center; gap: 10px; background: var(--card-bg); border: 1px solid var(--border-default); border-radius: var(--radius-card); padding: 8px 12px; transition: all 0.2s; box-shadow: var(--shadow-sm); }
 .skill-cell:hover { background: var(--card-bg-hover); border-color: var(--accent-orange); }
 .level-bar { display: flex; align-items: flex-end; gap: 2px; flex-shrink: 0; }

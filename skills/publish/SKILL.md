@@ -4,7 +4,7 @@ description: Use when a user wants to put their generated portfolio on the web �
 user-invocable: true
 ---
 
-<!-- hope-skill-version: 1.0.1 -->
+<!-- hope-skill-version: 1.1.0 -->
 
 # Hope Publish · Presentation, completed
 
@@ -204,6 +204,8 @@ cd site
 git add -A && git commit -m "Update portfolio" && git push
 ```
 Same repo, same URL — never a second site for the same portfolio. Pages rebuilds on its own when the branch changes; no API calls needed. **Refresh `published_at` in `.publish.json` to now** (every publish, not just the first) — it's how the update-check knows whether the live site is behind the local file.
+
+**Avoid the two classic stumbles — directory-independent + idempotent.** Every git command above targets the **staging dir**. If you run them across separate steps rather than one chained block, prefer `git -C site …` (and `gh repo create … --source=site`) over relying on a persisted `cd site` — a git command that runs from the project root otherwise fails with *"not a git repository."* And re-publish is **safe to re-run end-to-end**: step 4 re-copies the allowlist into a clean `site/` and step 6 re-stamps from scratch, so the share-url / OG / published-mode stamps converge to the same result however many times you publish (the `sed` replacements match `content="…"` → identical output; the `data-hope-mode` stamp is grep-guarded against double-stamping).
 
 ### 8. Return the URL
 Plainly and warmly: "Done — your portfolio is live at **<url>**. Copy it into any application. It can take a minute to appear the first time. And your live site is view-only for visitors — only you can change it, by republishing." Offer to open it for them. The page's own **Share** button now copies this exact link too — and if they ask where that button is, point rather than describe: `<url>#spotlight=share` makes it glow on the live page (the spotlight hash works on the published link).

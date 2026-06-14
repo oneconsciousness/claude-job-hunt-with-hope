@@ -596,6 +596,16 @@
         </span>
       </span>
     </button>
+    <!-- Social Feed tile — JS-rendered pane below; no integrity bar (curated). -->
+    <button class="section-btn" data-section="social" type="button">
+      <span class="icon"><span class="material-symbols-rounded">rss_feed</span></span>
+      <span class="body">
+        <span class="label">Social</span>
+        <span class="meta">
+          <span class="count" id="cnt-social">5 posts</span>
+        </span>
+      </span>
+    </button>
   </div>
 
   <!-- ────────────  OVERVIEW PANE (opt-in, default-open)  ──────────── -->
@@ -2571,8 +2581,53 @@
   <div class="section-pane" data-pane="education" id="pane-education">
     <div class="edu-list">
 
-      <!-- RISD BFA — rich entry with honors metric, bullets, skill chips -->
-      <div data-persona="jane" class="edu-card rich" data-edu-index="0" id="tl-risd-bfa">
+      <!-- Pentagram — compact entry, no bullets, just date (newest) -->
+      <div data-persona="jane" class="edu-card" data-edu-index="0" id="tl-pentagram-intensive">
+        <div class="edu-head">
+          <img class="org-logo"
+               src="https://www.google.com/s2/favicons?domain=pentagram.com&sz=128"
+               alt="Pentagram" width="44" height="44"
+               onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;P&lt;/span&gt;';">
+          <div class="info">
+            <div class="title-row">
+              <span class="title-line">Brand Identity Intensive · Public Workshop</span>
+            </div>
+            <div class="sub-line">Pentagram · NYC</div>
+            <div class="date-line">Mar 2021 · 3-day program</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stanford CCS — medium-rich entry with bullets + skills -->
+      <div data-persona="jane" class="edu-card rich" data-edu-index="1" id="tl-stanford-hci">
+        <div class="edu-head">
+          <img class="org-logo"
+               src="https://www.google.com/s2/favicons?domain=stanford.edu&sz=128"
+               alt="Stanford Continuing Studies" width="44" height="44"
+               onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;S&lt;/span&gt;';">
+          <div class="info">
+            <div class="title-row">
+              <span class="title-line">Certificate in Human-Computer Interaction</span>
+            </div>
+            <div class="sub-line">Stanford Continuing Studies · Online</div>
+            <div class="date-line">Sep 2019 — Jun 2020</div>
+          </div>
+        </div>
+        <div class="edu-body">
+          <ul class="ach-bullets">
+            <li><span class="material-symbols-rounded">check</span><span>Capstone: <em>Accessible Color Systems for Enterprise UX</em> — published as an internal Linear design-system RFC.</span></li>
+            <li><span class="material-symbols-rounded">check</span><span>8 graduate-level courses including Design for Behavior Change and Quantitative Research Methods.</span></li>
+          </ul>
+          <div class="contrib-skills">
+            <span class="skill-chip" data-cat="analytical">user research</span>
+            <span class="skill-chip" data-cat="analytical">A/B testing</span>
+            <span class="skill-chip" data-cat="domain">enterprise ux</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RISD BFA — rich entry with honors metric, bullets, skill chips (oldest) -->
+      <div data-persona="jane" class="edu-card rich" data-edu-index="2" id="tl-risd-bfa">
         <div class="edu-head">
           <img class="org-logo"
                src="https://www.google.com/s2/favicons?domain=risd.edu&sz=128"
@@ -2609,51 +2664,6 @@
             <span class="skill-chip" data-cat="creative">editorial design</span>
             <span class="skill-chip" data-cat="domain">letterform conservation</span>
             <span class="skill-chip" data-cat="creative">brand identity</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stanford CCS — medium-rich entry with bullets + skills -->
-      <div data-persona="jane" class="edu-card rich" data-edu-index="1" id="tl-stanford-hci">
-        <div class="edu-head">
-          <img class="org-logo"
-               src="https://www.google.com/s2/favicons?domain=stanford.edu&sz=128"
-               alt="Stanford Continuing Studies" width="44" height="44"
-               onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;S&lt;/span&gt;';">
-          <div class="info">
-            <div class="title-row">
-              <span class="title-line">Certificate in Human-Computer Interaction</span>
-            </div>
-            <div class="sub-line">Stanford Continuing Studies · Online</div>
-            <div class="date-line">Sep 2019 — Jun 2020</div>
-          </div>
-        </div>
-        <div class="edu-body">
-          <ul class="ach-bullets">
-            <li><span class="material-symbols-rounded">check</span><span>Capstone: <em>Accessible Color Systems for Enterprise UX</em> — published as an internal Linear design-system RFC.</span></li>
-            <li><span class="material-symbols-rounded">check</span><span>8 graduate-level courses including Design for Behavior Change and Quantitative Research Methods.</span></li>
-          </ul>
-          <div class="contrib-skills">
-            <span class="skill-chip" data-cat="analytical">user research</span>
-            <span class="skill-chip" data-cat="analytical">A/B testing</span>
-            <span class="skill-chip" data-cat="domain">enterprise ux</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pentagram — compact entry, no bullets, just date -->
-      <div data-persona="jane" class="edu-card" data-edu-index="2" id="tl-pentagram-intensive">
-        <div class="edu-head">
-          <img class="org-logo"
-               src="https://www.google.com/s2/favicons?domain=pentagram.com&sz=128"
-               alt="Pentagram" width="44" height="44"
-               onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;P&lt;/span&gt;';">
-          <div class="info">
-            <div class="title-row">
-              <span class="title-line">Brand Identity Intensive · Public Workshop</span>
-            </div>
-            <div class="sub-line">Pentagram · NYC</div>
-            <div class="date-line">Mar 2021 · 3-day program</div>
           </div>
         </div>
       </div>
@@ -2822,8 +2832,25 @@
   <div class="section-pane" data-pane="certifications" id="pane-certifications">
     <div class="edu-list">
 
+      <!-- Deque — plain dated entry (newest) -->
+      <div data-persona="jane" class="edu-card" data-cert-index="0" id="tl-cert-deque">
+        <div class="edu-head">
+          <img class="org-logo"
+               src="https://www.google.com/s2/favicons?domain=deque.com&sz=128"
+               alt="Deque" width="44" height="44"
+               onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;D&lt;/span&gt;';">
+          <div class="info">
+            <div class="title-row">
+              <span class="title-line">Accessibility Color &amp; Contrast Practitioner</span>
+            </div>
+            <div class="sub-line">Deque University</div>
+            <div class="date-line">Issued Jan 2024</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Cooper Design Leadership — rich entry -->
-      <div data-persona="jane" class="edu-card rich" data-cert-index="0" id="tl-cert-cooper-leadership">
+      <div data-persona="jane" class="edu-card rich" data-cert-index="1" id="tl-cert-cooper-leadership">
         <div class="edu-head">
           <img class="org-logo"
                src="https://www.google.com/s2/favicons?domain=cooper.com&sz=128"
@@ -2859,7 +2886,7 @@
       </div>
 
       <!-- IAAP WAS — medium entry, just description + skill chip -->
-      <div data-persona="jane" class="edu-card rich" data-cert-index="1">
+      <div data-persona="jane" class="edu-card rich" data-cert-index="2">
         <div class="edu-head">
           <img class="org-logo"
                src="https://www.google.com/s2/favicons?domain=accessibilityassociation.org&sz=128"
@@ -2886,7 +2913,7 @@
       </div>
 
       <!-- Type@Cooper — plain dated entry -->
-      <div data-persona="jane" class="edu-card" data-cert-index="2" id="tl-cert-type-cooper">
+      <div data-persona="jane" class="edu-card" data-cert-index="3" id="tl-cert-type-cooper">
         <div class="edu-head">
           <img class="org-logo"
                src="https://www.google.com/s2/favicons?domain=typecooper.org&sz=128"
@@ -2898,23 +2925,6 @@
             </div>
             <div class="sub-line">Type@Cooper · The Cooper Union</div>
             <div class="date-line">Issued Feb 2018</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ColorBrewer — plain dated entry -->
-      <div data-persona="jane" class="edu-card" data-cert-index="3" id="tl-cert-deque">
-        <div class="edu-head">
-          <img class="org-logo"
-               src="https://www.google.com/s2/favicons?domain=deque.com&sz=128"
-               alt="Deque" width="44" height="44"
-               onerror="this.outerHTML='&lt;span class=\'org-fallback\'&gt;D&lt;/span&gt;';">
-          <div class="info">
-            <div class="title-row">
-              <span class="title-line">Accessibility Color &amp; Contrast Practitioner</span>
-            </div>
-            <div class="sub-line">Deque University</div>
-            <div class="date-line">Issued Jan 2024</div>
           </div>
         </div>
       </div>
@@ -4099,6 +4109,15 @@
       </div>
     </div>
 
+    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
+  </div>
+
+  <!-- SOCIAL FEED PANE — JS-rendered by portfolio.js from window.HOPE_DATA.social
+       (Jane only in this sample, like the Throughline). Live embeds need the
+       published https site + a connection; offline each post shows its
+       "View on …" link. Posts are not career events: no tl- id, off the rail. -->
+  <div class="section-pane" data-pane="social" id="pane-social">
+    <div class="social-grid" id="social-grid"></div>
     <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
   </div>
 

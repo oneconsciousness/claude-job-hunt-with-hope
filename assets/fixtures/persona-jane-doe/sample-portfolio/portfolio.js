@@ -407,7 +407,8 @@
       skills: { sel: '.section-pane[data-pane="skills"]', pane: 'skills' },
       education: { sel: '.section-pane[data-pane="education"]', pane: 'education' },
       certifications: { sel: '.section-pane[data-pane="certifications"]', pane: 'certifications' },
-      projects: { sel: '.section-pane[data-pane="projects"]', pane: 'projects' }
+      projects: { sel: '.section-pane[data-pane="projects"]', pane: 'projects' },
+      social: { sel: '.section-pane[data-pane="social"]', pane: 'social' }
     };
     var spotEl = null;
     var spotCleanup = null;
@@ -604,6 +605,97 @@
       setPhoto(bakedPhoto || null);
     });
   }
+
+  // ── Social Feed (optional app) ───────────────────────────────────────────
+  // Renders window.HOPE_DATA.social into #social-grid. Social posts are NOT
+  // career events: no Throughline node, no tl- id, no pane-order rule. Each
+  // card shows the platform's live embed AND a "View on …" link that always
+  // works — so when the page is opened offline / from file:// (embeds need an
+  // http origin + a connection) or a post is gone, the card degrades to a
+  // clickable link, never a blank box. This is the one app that loads
+  // third-party embed scripts / iframes (Hope is otherwise self-contained) —
+  // a deliberate, disclosed trade-off (see skills/portfolio/SKILL.md).
+  (function () {
+    var grid = document.getElementById('social-grid');
+    var posts = (window.HOPE_DATA && Array.isArray(window.HOPE_DATA.social)) ? window.HOPE_DATA.social : [];
+    if (!grid || !posts.length) return;
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+    // Platform registry. cls 'iframe' → src(url) returns an <iframe> URL (or
+    // null → link card only); 'script' → block(url) returns the platform's
+    // blockquote + names the async script to load once; 'link' → link card only.
+    var P = {
+      youtube:    { name: 'YouTube',     cls: 'iframe', h: 220, src: function (u) { var m = u.match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/)([\w-]{11})/); return m ? 'https://www.youtube.com/embed/' + m[1] : null; } },
+      vimeo:      { name: 'Vimeo',       cls: 'iframe', h: 220, src: function (u) { var m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/); return m ? 'https://player.vimeo.com/video/' + m[1] : null; } },
+      spotify:    { name: 'Spotify',     cls: 'iframe', h: 152, src: function (u) { var m = u.match(/open\.spotify\.com\/(?:intl-[a-z]+\/)?(track|album|playlist|episode|show|artist)\/(\w+)/); return m ? 'https://open.spotify.com/embed/' + m[1] + '/' + m[2] : null; } },
+      soundcloud: { name: 'SoundCloud',  cls: 'iframe', h: 166, src: function (u) { return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(u) + '&color=%23d97706&visual=false'; } },
+      applemusic: { name: 'Apple Music', cls: 'iframe', h: 175, src: function (u) { return u.replace('music.apple.com', 'embed.music.apple.com'); } },
+      figma:      { name: 'Figma',       cls: 'iframe', h: 300, src: function (u) { return 'https://www.figma.com/embed?embed_host=hope&url=' + encodeURIComponent(u); } },
+      codepen:    { name: 'CodePen',     cls: 'iframe', h: 300, src: function (u) { var m = u.match(/codepen\.io\/([^\/]+)\/(?:pen|details)\/(\w+)/); return m ? 'https://codepen.io/' + m[1] + '/embed/' + m[2] + '?default-tab=result' : null; } },
+      loom:       { name: 'Loom',        cls: 'iframe', h: 240, src: function (u) { return u.indexOf('/embed/') > -1 ? u : u.replace('/share/', '/embed/'); } },
+      bluesky:    { name: 'Bluesky',     cls: 'iframe', h: 300, src: function (u) { var m = u.match(/bsky\.app\/profile\/([^\/]+)\/post\/(\w+)/); return m ? 'https://embed.bsky.app/embed/' + m[1] + '/app.bsky.feed.post/' + m[2] : null; } },
+      linkedin:   { name: 'LinkedIn',    cls: 'iframe', h: 320, src: function (u) { var m = u.match(/(urn:li:(?:share|ugcPost|activity):[\w-]+)/) || u.match(/activity-(\d+)/); return m ? 'https://www.linkedin.com/embed/feed/update/' + (m[1].indexOf('urn:') === 0 ? m[1] : 'urn:li:activity:' + m[1]) : null; } },
+      substack:   { name: 'Substack',    cls: 'iframe', h: 320, src: function (u) { return u; } },
+      flickr:     { name: 'Flickr',      cls: 'iframe', h: 280, src: function (u) { return u; } },
+      tiktok:     { name: 'TikTok',      cls: 'script', script: 'https://www.tiktok.com/embed.js', block: function (u) { var m = u.match(/video\/(\d+)/); return '<blockquote class="tiktok-embed" cite="' + esc(u) + '"' + (m ? ' data-video-id="' + m[1] + '"' : '') + ' style="max-width:325px;min-width:240px"><a href="' + esc(u) + '"></a></blockquote>'; } },
+      instagram:  { name: 'Instagram',   cls: 'script', script: '//www.instagram.com/embed.js', global: 'instgrm', process: function () { window.instgrm && window.instgrm.Embeds && window.instgrm.Embeds.process(); }, block: function (u) { return '<blockquote class="instagram-media" data-instgrm-permalink="' + esc(u) + '" data-instgrm-version="14"></blockquote>'; } },
+      x:          { name: 'X',           cls: 'script', script: 'https://platform.twitter.com/widgets.js', block: function (u) { return '<blockquote class="twitter-tweet"><a href="' + esc(String(u).replace('//x.com', '//twitter.com')) + '"></a></blockquote>'; } },
+      threads:    { name: 'Threads',     cls: 'script', script: 'https://www.threads.net/embed.js', block: function (u) { return '<blockquote class="text-post-media" data-text-post-permalink="' + esc(u) + '"></blockquote>'; } },
+      pinterest:  { name: 'Pinterest',   cls: 'script', script: '//assets.pinterest.com/js/pinit.js', block: function (u) { return '<a data-pin-do="embedPin" href="' + esc(u) + '"></a>'; } },
+      dribbble:   { name: 'Dribbble',    cls: 'link' },
+      behance:    { name: 'Behance',     cls: 'link' },
+      medium:     { name: 'Medium',      cls: 'link' },
+      gist:       { name: 'GitHub',      cls: 'link' },
+      link:       { name: 'Link',        cls: 'link' }
+    };
+
+    var loaded = {};
+    function loadScript(src) {
+      if (!src || loaded[src]) return;
+      loaded[src] = 1;
+      var s = document.createElement('script');
+      s.async = true; s.src = src;
+      document.body.appendChild(s);
+    }
+
+    var needsProcess = {};
+    posts.forEach(function (post) {
+      if (!post || typeof post !== 'object' || !post.url) return;
+      var key = String(post.platform || 'link').toLowerCase();
+      var cfg = P[key] || P.link;
+      var card = document.createElement('article');
+      card.className = 'social-card social-' + key + ' social-cls-' + cfg.cls;
+      var head = '<div class="social-head"><span class="social-plat">' + esc(cfg.name) + '</span>'
+        + (post.caption ? '<span class="social-cap">' + esc(post.caption) + '</span>' : '') + '</div>';
+      var body = '';
+      if (cfg.cls === 'iframe') {
+        var src = null; try { src = cfg.src(String(post.url)); } catch (e) { src = null; }
+        if (src) body = '<div class="social-embed"><iframe src="' + esc(src) + '" height="' + (cfg.h || 240)
+          + '" loading="lazy" frameborder="0" scrolling="no" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; clipboard-write" allowfullscreen title="' + esc(cfg.name) + ' embed"></iframe></div>';
+      } else if (cfg.cls === 'script') {
+        try { body = '<div class="social-embed">' + cfg.block(String(post.url)) + '</div>'; } catch (e) { body = ''; }
+        loadScript(cfg.script);
+        if (cfg.process) needsProcess[key] = cfg;
+      }
+      var foot = '<a class="social-link" href="' + esc(post.url) + '" target="_blank" rel="noopener">'
+        + esc(post.title || ('View on ' + cfg.name)) + '<span class="material-symbols-rounded ext">open_in_new</span></a>';
+      card.innerHTML = head + body + foot;
+      grid.appendChild(card);
+    });
+
+    // Script-class platforms that need an explicit processor once their script
+    // lands and the blockquotes are in the DOM (Instagram). Twitter/TikTok
+    // widgets auto-observe new nodes, so they need no nudge.
+    Object.keys(needsProcess).forEach(function (k) {
+      var cfg = needsProcess[k];
+      var t = setInterval(function () { if (window[cfg.global]) { try { cfg.process(); } catch (e) {} clearInterval(t); } }, 400);
+      setTimeout(function () { clearInterval(t); }, 8000);
+    });
+  })();
 
   // ─── THE THROUGHLINE — chronological strip in the identity card ────
   // Data: window.HOPE_DATA (SAMPLE SPLIT: defined in data/jane.js — Jane,

@@ -288,6 +288,20 @@
         </span>
       </span>
     </button>
+    {{#show_social}}
+    <!-- Social Feed tile — ships ONLY together with the Social pane below
+         (same show_social conditional; both strip with zero residue). No
+         integrity bar: a curated feed carries no confidence score. -->
+    <button class="section-btn" data-section="social" type="button">
+      <span class="icon"><span class="material-symbols-rounded">rss_feed</span></span>
+      <span class="body">
+        <span class="label">Social</span>
+        <span class="meta">
+          <span class="count">{{social_count}} {{social_count_word}}</span>
+        </span>
+      </span>
+    </button>
+    {{/show_social}}
   </div>
 
   <!-- OVERVIEW PANE (opt-in, default-open) ========================= -->
@@ -597,6 +611,25 @@
     <!-- HOPE:projects_loop_end -->
     <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
   </div>
+
+  {{#show_social}}
+  <!-- SOCIAL FEED PANE (opt-in) ==================================== -->
+  <!-- Renders ONLY when the user added the Social Feed app
+       (CuratedPortfolio.show_social == true). Cards are JS-RENDERED by
+       portfolio.js from window.HOPE_DATA.social — this pane ships as an empty
+       #social-grid; the skill writes the `social` array into data.js, never
+       hand-authored card HTML here. Posts are not career events: no tl- id, no
+       Throughline node. Opted out → the skill strips this whole block + the
+       Social tile (same conditional), zero residue.
+       NOTE: the Social Feed is the one app that loads third-party embed
+       scripts/iframes. It needs the published https link + a connection and
+       will NOT render when the file is opened offline; every post falls back to
+       a clickable "View on …" link. Disclosed to the user at generation time. -->
+  <div class="section-pane" data-pane="social" id="pane-social">
+    <div class="social-grid" id="social-grid"></div>
+    <a class="backtotop" href="#top" aria-hidden="true">↑ Contents</a>
+  </div>
+  {{/show_social}}
 
   <!-- RESUME VIEW (print-only) ===================================== -->
   <!-- Always hidden on screen (#resume-view{display:none}); shown ONLY when
